@@ -1,0 +1,3 @@
+[submodule "GitGud/vendor/spdlog"]
+	path = GitGud/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
