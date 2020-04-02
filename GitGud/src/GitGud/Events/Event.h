@@ -12,8 +12,8 @@ namespace GitGud
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased,
-		MouseButtonPressed, MouseButtonReleased, MouseMove, MouseScrolled
+		KeyPress, KeyRelease,
+		MouseButtonPress, MouseButtonRelease, MouseMove, MouseScroll
 	};
 
 	enum EventCategory
@@ -26,12 +26,11 @@ namespace GitGud
 		EventCategoryMouseButton	= 1 << 4
 	};
 
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override() { return category; }
+#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
+								virtual EventType GetEventType() const override { return GetStaticType(); }\
+								virtual const char* GetName() const override { return #type; }
 
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
-                               virtual EventType GetEventType() const override { return GetStaticType(); }\
-                               virtual const char* GetName() const override { return #type; }
-
+#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 	class GG_API Event
 	{
@@ -54,6 +53,25 @@ namespace GitGud
 
 	class EventDispatcher
 	{
+		template<typename T>
+		using EventFn = std::function<bool(&T)>;
 
+	public:
+		EventDispatcher(Event& event) : _event(event) {}
+
+		template<typename T>
+		bool Dispatch(EventFn<T> func)
+		{
+			if (_event.GetnEventType() == T::GetSataticType())
+			{
+				_event._handled = func(*(T*)&_event);
+				return true;
+			}
+
+			return false;
+		}
+
+	private:
+		Event& _event;
 	};
 }
