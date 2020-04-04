@@ -2,9 +2,6 @@
 
 #include "GitGud/Core.h"
 
-#include <string>
-#include <functional>
-
 namespace GitGud
 {
 	enum class EventType

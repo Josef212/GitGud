@@ -18,6 +18,9 @@ project "GitGud"
 	targetdir ("bin/" .. outputdir .. "%/{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "%/{prj.name}")
 
+	pchheader "ggpch.h"
+	pchsource "GitGud/src/ggpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",

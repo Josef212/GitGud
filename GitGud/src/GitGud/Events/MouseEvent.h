@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace GitGud
 {
 	class GG_API MouseMoveEvent : public Event
