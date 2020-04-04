@@ -10,6 +10,12 @@ workspace "GitGud"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder 
+IncludeDir = {}
+IncludeDir["GLFW"] = "GitGud/vendor/glfw/include"
+
+include "GitGud/vendor/glfw"
+
 project "GitGud"
 	location "GitGud"
 	kind "SharedLib"
@@ -30,7 +36,14 @@ project "GitGud"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links
+	{
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
