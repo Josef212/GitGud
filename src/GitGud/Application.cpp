@@ -1,3 +1,4 @@
+#include "ggpch.h"
 #include "Application.h"
 
 namespace GitGud
