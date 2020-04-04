@@ -20,9 +20,10 @@ project "GitGud"
 	location "GitGud"
 	kind "SharedLib"
 	language "C++"
+	cppdialect "C++17"
 
-	targetdir ("bin/" .. outputdir .. "%/{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "%/{prj.name}")
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "ggpch.h"
 	pchsource "GitGud/src/ggpch.cpp"
@@ -80,8 +81,8 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 
-	targetdir ("bin/" .. outputdir .. "%/{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "%/{prj.name}")
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
