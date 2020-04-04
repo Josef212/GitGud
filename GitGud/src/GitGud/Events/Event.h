@@ -57,9 +57,9 @@ namespace GitGud
 		template<typename T, typename F>
 		bool Dispatch(const F& func)
 		{
-			if (_event.GetnEventType() == T::GetSataticType())
+			if (_event.GetEventType() == T::GetStaticType())
 			{
-				_event._handled = func(*(T*)&_event);
+				_event._handled = func(static_cast<T&>(_event));
 				return true;
 			}
 
