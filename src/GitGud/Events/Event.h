@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ggpch.h"
 #include "GitGud/Core.h"
 
 namespace GitGud
@@ -50,14 +51,11 @@ namespace GitGud
 
 	class EventDispatcher
 	{
-		template<typename T>
-		using EventFn = std::function<bool(&T)>;
-
 	public:
 		EventDispatcher(Event& event) : _event(event) {}
 
-		template<typename T>
-		bool Dispatch(EventFn<T> func)
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
 		{
 			if (_event.GetnEventType() == T::GetSataticType())
 			{

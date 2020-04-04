@@ -9,3 +9,13 @@
 #else
 	#error Only Windows supported
 #endif // GG_PLATFORM_WINDOWS
+
+#ifdef GG_ENABLE_ASSERTS
+	#define GG_ASSERT(x, ...) { if(!(x)) {GG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define GG_CORE_ASSERT(x, ...) { if(!(x)) {GG_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+	#define GG_ASSERT(x, ...)
+	#define GG_CORE_ASSERT(x, ...)
+#endif
+
+typedef unsigned int uint;

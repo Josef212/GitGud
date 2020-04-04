@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "GitGud/Log.h"
+
 #ifdef GG_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif // GG_PLATFORM_WINDOWS
