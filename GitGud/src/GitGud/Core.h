@@ -10,6 +10,10 @@
 	#error Only Windows supported
 #endif // GG_PLATFORM_WINDOWS
 
+#ifdef GG_DEBUG
+	#define GG_ENABLE_ASSERTS
+#endif
+
 #ifdef GG_ENABLE_ASSERTS
 	#define GG_ASSERT(x, ...) { if(!(x)) {GG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 	#define GG_CORE_ASSERT(x, ...) { if(!(x)) {GG_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
