@@ -7,8 +7,13 @@ namespace GitGud
 {
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
+	Application* Application::s_instance = nullptr;
+
 	Application::Application()
 	{
+		GG_CORE_ASSERT(!s_instance, "Application already exists!");
+		s_instance = this;
+
 		_window = std::unique_ptr<Window>(Window::Create());
 		_window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	}
@@ -54,11 +59,13 @@ namespace GitGud
 	void Application::PushLayer(Layer* layer)
 	{
 		_layerStack.PushLayer(layer);
+		layer->OnAtach();
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
 		_layerStack.PushOverlay(overlay);
+		overlay->OnAtach();
 	}
 
 	bool Application::OnWindowClosed(WindowCloseEvent& e)

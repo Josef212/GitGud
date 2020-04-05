@@ -51,4 +51,19 @@ namespace GitGud
 
 		EVENT_CLASS_TYPE(KeyRelease)
 	};
+
+	class GG_API KeyTypeEvent : public KeyEvent
+	{
+	public:
+		KeyTypeEvent(int keyCode) : KeyEvent(keyCode) {}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypeEvent: " << _keyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyType)
+	};
 }
