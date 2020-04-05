@@ -32,9 +32,9 @@ namespace GitGud
 
 	class GG_API Event
 	{
-		friend class EventDispatcher;
-
 	public:
+		bool Handled = false;
+
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
@@ -45,8 +45,6 @@ namespace GitGud
 			return GetCategoryFlags() & category;
 		}
 
-	protected:
-		bool _handled = false;
 	};
 
 	class EventDispatcher
@@ -59,7 +57,7 @@ namespace GitGud
 		{
 			if (_event.GetEventType() == T::GetStaticType())
 			{
-				_event._handled = func(static_cast<T&>(_event));
+				_event.Handled = func(static_cast<T&>(_event));
 				return true;
 			}
 

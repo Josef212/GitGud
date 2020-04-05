@@ -2,8 +2,8 @@
 
 #include "GitGud/Core.h"
 #include "GitGud/Application.h"
+#include "GitGud/Layer.h"
 #include "GitGud/Log.h"
-#include "GitGud/Events/Event.h"
 
 
 // --------------------------------------------
