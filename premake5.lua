@@ -14,9 +14,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "GitGud/vendor/glfw/include"
 IncludeDir["Glad"] = "GitGud/vendor/glad/include"
+IncludeDir["ImGui"] = "GitGud/vendor/imgui"
 
 include "GitGud/vendor/glfw"
 include "GitGud/vendor/glad"
+include "GitGud/vendor/imgui"
 
 project "GitGud"
 	location "GitGud"
@@ -41,13 +43,15 @@ project "GitGud"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 

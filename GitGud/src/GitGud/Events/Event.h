@@ -10,7 +10,7 @@ namespace GitGud
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPress, KeyRelease,
+		KeyPress, KeyRelease, KeyType,
 		MouseButtonPress, MouseButtonRelease, MouseMove, MouseScroll
 	};
 

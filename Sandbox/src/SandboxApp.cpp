@@ -22,6 +22,7 @@ public:
 	SandboxApp() 
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new GitGud::ImGuiLayer());
 	}
 
 	~SandboxApp() {}

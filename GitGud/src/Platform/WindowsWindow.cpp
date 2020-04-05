@@ -120,6 +120,14 @@ namespace GitGud
 				}
 		});
 
+		glfwSetCharCallback(_window, [](GLFWwindow* window, uint keyCode)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			KeyTypeEvent event(keyCode);
+			data.EventCallback(event);
+		});
+
 		glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
