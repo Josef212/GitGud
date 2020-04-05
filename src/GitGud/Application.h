@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Core.h"
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+
 #include "Window.h"
+#include "Events/ApplicationEvent.h"
+#include "LayerStack.h"
+
 
 namespace GitGud
 {
@@ -17,12 +19,16 @@ namespace GitGud
 
 		void OnEvent(Event& e);
 
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* overlay);
+
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
 
 	private:
 		std::unique_ptr<Window> _window;
 		bool _running = true;
+		LayerStack _layerStack;
 	};
 
 	Application* CreateApplication();
