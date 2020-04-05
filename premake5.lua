@@ -13,8 +13,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder 
 IncludeDir = {}
 IncludeDir["GLFW"] = "GitGud/vendor/glfw/include"
+IncludeDir["Glad"] = "GitGud/vendor/glad/include"
 
 include "GitGud/vendor/glfw"
+include "GitGud/vendor/glad"
 
 project "GitGud"
 	location "GitGud"
@@ -38,12 +40,14 @@ project "GitGud"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links
 	{
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 
@@ -55,7 +59,8 @@ project "GitGud"
 		defines
 		{
 			"GG_PLATFORM_WINDOWS",
-			"GG_BUILD_DLL"
+			"GG_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands

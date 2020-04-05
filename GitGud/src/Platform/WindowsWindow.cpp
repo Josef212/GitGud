@@ -5,6 +5,8 @@
 #include "GitGud/Events/KeyEvent.h"
 #include "GitGud/Events/MouseEvent.h"
 
+#include <glad/glad.h>
+
 namespace GitGud
 {
 	static bool s_glfwInitialized = false;
@@ -65,6 +67,10 @@ namespace GitGud
 
 		_window = glfwCreateWindow(_data.Width, _data.Height, _data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(_window);
+
+		int gladStatus = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		GG_CORE_ASSERT(gladStatus, "Failed to initialize Glad!");
+
 		glfwSetWindowUserPointer(_window, &_data);
 		SetVSync(true);
 
