@@ -17,9 +17,12 @@ IncludeDir["GLFW"] = "GitGud/vendor/glfw/include"
 IncludeDir["Glad"] = "GitGud/vendor/glad/include"
 IncludeDir["ImGui"] = "GitGud/vendor/imgui"
 
-include "GitGud/vendor/glfw"
-include "GitGud/vendor/glad"
-include "GitGud/vendor/imgui"
+group "Dependencies"
+	include "GitGud/vendor/glfw"
+	include "GitGud/vendor/glad"
+	include "GitGud/vendor/imgui"
+	
+group ""
 
 project "GitGud"
 	location "GitGud"
@@ -70,7 +73,7 @@ project "GitGud"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
 		}
 
 	filter "configurations:Debug"

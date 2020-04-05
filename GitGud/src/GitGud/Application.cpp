@@ -5,7 +5,7 @@
 
 namespace GitGud
 {
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+#define BIND_EVENT_FN(x) GG_BIND_EVENT_FN(Application::x)
 
 	Application* Application::s_instance = nullptr;
 
