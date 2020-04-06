@@ -6,6 +6,8 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 
+#include "GitGud/ImGui/ImGuiLayer.h"
+
 
 namespace GitGud
 {
@@ -30,6 +32,7 @@ namespace GitGud
 
 	private:
 		std::unique_ptr<Window> _window;
+		ImGuiLayer* _imguiLayer;
 		bool _running = true;
 		LayerStack _layerStack;
 

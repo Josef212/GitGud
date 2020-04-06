@@ -1,5 +1,7 @@
 #include <GitGud.h>
 
+#include <imgui/imgui.h>
+
 class ExampleLayer : public GitGud::Layer
 {
 public:
@@ -14,6 +16,13 @@ public:
 	{
 		//GG_TRACE("{0}", event);
 	}
+
+	virtual void OnImGuiRender() override
+	{
+		//ImGui::Begin("Test");
+		//
+		//ImGui::End();
+	}
 };
 
 class SandboxApp : public GitGud::Application
@@ -22,7 +31,6 @@ public:
 	SandboxApp() 
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new GitGud::ImGuiLayer());
 	}
 
 	~SandboxApp() {}

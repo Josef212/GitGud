@@ -115,6 +115,7 @@ project "Sandbox"
 	{
 		"GitGud/vendor/spdlog/include",
 		"GitGud/src",
+		"GitGud/vendor",
 		"%{IncludeDir.Glm}"
 	}
 
