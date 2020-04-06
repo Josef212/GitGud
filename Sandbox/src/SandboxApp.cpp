@@ -7,12 +7,12 @@ public:
 
 	void OnUpdate() override
 	{
-		GG_INFO("ExampleLayer::OnUpdate");
+		//GG_INFO("ExampleLayer::OnUpdate");
 	}
 
 	void OnEvent(GitGud::Event& event) override
 	{
-		GG_TRACE("{0}", event);
+		//GG_TRACE("{0}", event);
 	}
 };
 

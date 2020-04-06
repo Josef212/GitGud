@@ -9,18 +9,46 @@ namespace GitGud
 {
 	Input* Input::s_instance = new WindowsInput();
 
-	bool WindowsInput::IsKeyPressedImpl(int keyCode)
+	bool WindowsInput::IsKeyImpl(int keyCode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keyCode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(int button)
+	bool WindowsInput::IsKeyImplDown(int keyCode)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		auto state = glfwGetKey(window, keyCode);
+		return state == GLFW_PRESS;
+	}
+
+	bool WindowsInput::IsKeyImplUp(int keyCode)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		auto state = glfwGetKey(window, keyCode);
+		return state == GLFW_RELEASE;
+	}
+
+	bool WindowsInput::IsMouseButtonImpl(int button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
+	}
+
+	bool WindowsInput::IsMouseButtonDownImpl(int button)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		auto state = glfwGetMouseButton(window, button);
+		return state == GLFW_PRESS;
+	}
+
+	bool WindowsInput::IsMouseButtonUpImpl(int button)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		auto state = glfwGetMouseButton(window, button);
+		return state == GLFW_RELEASE;
 	}
 
 	float WindowsInput::GetMouseXImpl()
