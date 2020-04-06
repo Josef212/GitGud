@@ -3,9 +3,8 @@
 
 namespace GitGud
 {
-	LayerStack::LayerStack()
+	LayerStack::LayerStack() : _layerInsertIndex(0)
 	{
-		_layerInsert = _layers.begin();
 	}
 
 	LayerStack::~LayerStack()
@@ -18,7 +17,8 @@ namespace GitGud
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		_layerInsert = _layers.emplace(_layerInsert, layer);
+		_layers.emplace(_layers.begin() + _layerInsertIndex, layer);
+		_layerInsertIndex++;
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
@@ -32,7 +32,7 @@ namespace GitGud
 		if (it != end())
 		{
 			_layers.erase(it);
-			_layerInsert--;
+			_layerInsertIndex--;
 		}
 	}
 

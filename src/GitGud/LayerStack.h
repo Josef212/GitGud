@@ -23,6 +23,6 @@ namespace GitGud
 
 	private:
 		std::vector<Layer*> _layers;
-		std::vector<Layer*>::iterator _layerInsert;
+		uint _layerInsertIndex = 0;
 	};
 }

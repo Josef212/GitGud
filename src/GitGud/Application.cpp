@@ -18,6 +18,9 @@ namespace GitGud
 
 		_window = std::unique_ptr<Window>(Window::Create());
 		_window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+		_imguiLayer = new ImGuiLayer();
+		PushOverlay(_imguiLayer);
 	}
 
 	Application::~Application()
@@ -36,6 +39,13 @@ namespace GitGud
 			{
 				layer->OnUpdate();
 			}
+
+			_imguiLayer->Begin();
+			for (Layer* layer : _layerStack)
+			{
+				layer->OnImGuiRender();
+			}
+			_imguiLayer->End();
 
 			_window->OnUpdate();
 		}

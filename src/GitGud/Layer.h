@@ -14,6 +14,7 @@ namespace GitGud
 		virtual void OnAtach() {}
 		virtual void OnDeatach() {}
 		virtual void OnUpdate() {}
+		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
 		inline const std::string& GetName() const { return _debugName; }
