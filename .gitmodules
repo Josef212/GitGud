@@ -7,3 +7,6 @@
 [submodule "GitGud/vendor/imgui"]
 	path = GitGud/vendor/imgui
 	url = https://github.com/TheCherno/imgui
+[submodule "GitGud/vendor/glm"]
+	path = GitGud/vendor/glm
+	url = https://github.com/g-truc/glm
