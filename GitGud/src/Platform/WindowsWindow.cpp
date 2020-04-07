@@ -5,7 +5,7 @@
 #include "GitGud/Events/KeyEvent.h"
 #include "GitGud/Events/MouseEvent.h"
 
-#include <glad/glad.h>
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace GitGud
 {
@@ -34,7 +34,7 @@ namespace GitGud
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(_window);
+		_context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -53,7 +53,7 @@ namespace GitGud
 		_data.Title = props.Title;
 		_data.Width = props.Width;
 		_data.Height = props.Height;
-
+		
 		GG_CORE_INFO("Creating window {0} ({1} x {2})", _data.Title, _data.Width, _data.Height);
 
 		if (!s_glfwInitialized)
@@ -66,10 +66,9 @@ namespace GitGud
 		}
 
 		_window = glfwCreateWindow(_data.Width, _data.Height, _data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(_window);
-
-		int gladStatus = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		GG_CORE_ASSERT(gladStatus, "Failed to initialize Glad!");
+		
+		_context = new OpenGLContext(_window);
+		_context->Init();
 
 		glfwSetWindowUserPointer(_window, &_data);
 		SetVSync(true);
