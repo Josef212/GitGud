@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GitGud/Window.h"
+#include "GitGud/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
 
@@ -29,6 +30,7 @@ namespace GitGud
 	
 	private:
 		GLFWwindow* _window;
+		GraphicsContext* _context;
 
 		struct WindowData
 		{
