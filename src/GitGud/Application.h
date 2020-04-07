@@ -35,6 +35,7 @@ namespace GitGud
 		ImGuiLayer* _imguiLayer;
 		bool _running = true;
 		LayerStack _layerStack;
+		uint _vertexArray, _vertexBuffer, _indexBuffer;
 
 	private:
 		static Application* s_instance;
