@@ -9,6 +9,8 @@
 #include "GitGud/ImGui/ImGuiLayer.h"
 
 
+#include "GitGud/Renderer/Shader.h"
+
 namespace GitGud
 {
 	class GG_API Application
@@ -35,7 +37,10 @@ namespace GitGud
 		ImGuiLayer* _imguiLayer;
 		bool _running = true;
 		LayerStack _layerStack;
+
+
 		uint _vertexArray, _vertexBuffer, _indexBuffer;
+		std::unique_ptr<Shader> _shader;
 
 	private:
 		static Application* s_instance;

@@ -51,6 +51,39 @@ namespace GitGud
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		// -----------
+
+		std::string vertexSrc = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_position;
+
+			out vec3 v_pos;
+
+			void main()			
+			{
+				v_pos = a_position;
+				gl_Position = vec4(a_position, 1.0);
+			}
+		)";
+
+		std::string fragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			in vec3 v_pos;
+
+			void main()			
+			{
+				vec4 col = vec4(0.8, 0.2, 0.3, 1.0);
+				col = vec4(v_pos * 0.5 + 0.5, 1.0);
+				color = col;
+			}
+		)";
+
+		_shader.reset(new Shader(vertexSrc, fragmentSrc));
 	}
 
 	Application::~Application()
@@ -62,12 +95,18 @@ namespace GitGud
 	{
 		while (_running)
 		{
+
+			// ----------------------------------------------------
+
 			glClearColor(0.1f, 0.1f, 0.1f, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			_shader->Bind();
 			glBindVertexArray(_vertexArray);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+
+			// ----------------------------------------------------
 
 			for (Layer* layer : _layerStack)
 			{
