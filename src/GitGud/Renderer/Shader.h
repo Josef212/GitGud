@@ -1,12 +1,10 @@
 #pragma once
 
-#include "GitGud/Core.h"
-
 #include <string>
 
 namespace GitGud
 {
-	class GG_API Shader
+	class Shader
 	{
 	public:
 		Shader(const std::string& vertexSrc, const std::string fragSrc);

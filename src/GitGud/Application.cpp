@@ -36,21 +36,18 @@ namespace GitGud
 			0, 1, 2
 		};
 
+
+		_indexBuffer.reset(IndexBuffer::Create(indices, 3));
+
 		glGenVertexArrays(1, &_vertexArray);
 		glBindVertexArray(_vertexArray);
 
-		glGenBuffers(1, &_vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+		_vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void*)0);
-				
-		glGenBuffers(1, &_indexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+		
 		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		// -----------
 
@@ -103,8 +100,8 @@ namespace GitGud
 
 			_shader->Bind();
 			glBindVertexArray(_vertexArray);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+			_indexBuffer->Bind();
+			glDrawElements(GL_TRIANGLES, _indexBuffer->GetCount(), GL_UNSIGNED_INT, NULL);
 
 			// ----------------------------------------------------
 
