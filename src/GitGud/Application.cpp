@@ -11,6 +11,24 @@ namespace GitGud
 
 	Application* Application::s_instance = nullptr;
 
+	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case GitGud::ShaderDataType::Float:		return GL_FLOAT;
+		case GitGud::ShaderDataType::Float2:	return GL_FLOAT;
+		case GitGud::ShaderDataType::Float3:	return GL_FLOAT;
+		case GitGud::ShaderDataType::Float4:	return GL_FLOAT;
+		case GitGud::ShaderDataType::Mat3:		return GL_FLOAT;
+		case GitGud::ShaderDataType::Mat4:		return GL_FLOAT;
+		case GitGud::ShaderDataType::Int:		return GL_INT;
+		case GitGud::ShaderDataType::Int2:		return GL_INT;
+		case GitGud::ShaderDataType::Int3:		return GL_INT;
+		case GitGud::ShaderDataType::Int4:		return GL_INT;
+		case GitGud::ShaderDataType::Bool:		return GL_BOOL;
+		}
+	}
+
 	Application::Application()
 	{
 		GG_CORE_ASSERT(!s_instance, "Application already exists!");
@@ -24,11 +42,11 @@ namespace GitGud
 
 		// ----------------------------
 
-		float vertices[3 * 3] =
+		float vertices[3 * 7] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.2f, 1.0f,
+			 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.2f, 1.0f,
+			 0.0f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f
 		};
 
 		uint indices[] =
@@ -43,9 +61,31 @@ namespace GitGud
 		glBindVertexArray(_vertexArray);
 
 		_vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void*)0);
+
+		{
+			BufferLayout layout =
+			{
+				{ShaderDataType::Float3, "a_position"},
+				{ShaderDataType::Float4, "a_color"}
+			};
+
+			_vertexBuffer->SetLayout(layout);
+		}
+
+		const auto& layout = _vertexBuffer->GetLayout();
+		uint32_t index = 0;
+		for (const auto& element : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(
+				index, 
+				element.GetComponentCount(), 
+				ShaderDataTypeToOpenGLBaseType(element.Type), 
+				element.Normalized ? GL_TRUE : GL_FALSE, 
+				layout.GetStride(),
+				(const void*)element.Offset);
+			++index;
+		}
 		
 		glBindVertexArray(0);
 
@@ -55,12 +95,13 @@ namespace GitGud
 			#version 330 core
 
 			layout(location = 0) in vec3 a_position;
+			layout(location = 1) in vec4 a_color;
 
-			out vec3 v_pos;
+			out vec4 v_color;
 
 			void main()			
 			{
-				v_pos = a_position;
+				v_color = a_color;
 				gl_Position = vec4(a_position, 1.0);
 			}
 		)";
@@ -70,13 +111,11 @@ namespace GitGud
 
 			layout(location = 0) out vec4 color;
 
-			in vec3 v_pos;
+			in vec4 v_color;
 
 			void main()			
 			{
-				vec4 col = vec4(0.8, 0.2, 0.3, 1.0);
-				col = vec4(v_pos * 0.5 + 0.5, 1.0);
-				color = col;
+				color = v_color;
 			}
 		)";
 
