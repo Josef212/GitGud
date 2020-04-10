@@ -3,7 +3,7 @@
 
 #include "Input.h"
 
-#include <glad/glad.h>
+#include "GitGud/Renderer/Renderer.h"
 
 namespace GitGud
 {
@@ -23,7 +23,7 @@ namespace GitGud
 		PushOverlay(_imguiLayer);
 
 		// ----------------------------
-
+		// Triangle
 		{
 			float vertices[3 * 7] =
 			{
@@ -57,7 +57,7 @@ namespace GitGud
 		}
 
 		// -----------
-
+		// Quad
 		{
 			float vertices[4 * 7] =
 			{
@@ -136,17 +136,16 @@ namespace GitGud
 
 			// ----------------------------------------------------
 
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+			RenderCommand::Clear();
+
+			Renderer::BeginScene();
 
 			_shader->Bind();
+			Renderer::Submit(_quadVertexArray);
+			Renderer::Submit(_triVertexArray);
 
-			_quadVertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, _quadVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
-
-			_triVertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, _triVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
-
+			Renderer::EndScene();
 			// ----------------------------------------------------
 
 			for (Layer* layer : _layerStack)
