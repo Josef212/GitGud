@@ -23,8 +23,8 @@ namespace GitGud
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None: GG_CORE_ASSERT(false, "RendererAPI::None is not supported!");
-		case RendererAPI::OpenGL: return new OpenGLIndexBuffer(indices, size);
+			case RendererAPI::None: GG_CORE_ASSERT(false, "RendererAPI::None is not supported!");
+			case RendererAPI::OpenGL: return new OpenGLIndexBuffer(indices, size);
 		}
 
 		GG_CORE_ASSERT(false, "Unknown RendererAPI");

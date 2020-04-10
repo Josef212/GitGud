@@ -11,24 +11,6 @@ namespace GitGud
 
 	Application* Application::s_instance = nullptr;
 
-	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case GitGud::ShaderDataType::Float:		return GL_FLOAT;
-		case GitGud::ShaderDataType::Float2:	return GL_FLOAT;
-		case GitGud::ShaderDataType::Float3:	return GL_FLOAT;
-		case GitGud::ShaderDataType::Float4:	return GL_FLOAT;
-		case GitGud::ShaderDataType::Mat3:		return GL_FLOAT;
-		case GitGud::ShaderDataType::Mat4:		return GL_FLOAT;
-		case GitGud::ShaderDataType::Int:		return GL_INT;
-		case GitGud::ShaderDataType::Int2:		return GL_INT;
-		case GitGud::ShaderDataType::Int3:		return GL_INT;
-		case GitGud::ShaderDataType::Int4:		return GL_INT;
-		case GitGud::ShaderDataType::Bool:		return GL_BOOL;
-		}
-	}
-
 	Application::Application()
 	{
 		GG_CORE_ASSERT(!s_instance, "Application already exists!");
@@ -42,52 +24,72 @@ namespace GitGud
 
 		// ----------------------------
 
-		float vertices[3 * 7] =
 		{
-			-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.2f, 1.0f,
-			 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.2f, 1.0f,
-			 0.0f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f
-		};
+			float vertices[3 * 7] =
+			{
+				-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.2f, 1.0f,
+				 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.2f, 1.0f,
+				 0.0f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f
+			};
 
-		uint indices[] =
-		{
-			0, 1, 2
-		};
+			uint indices[] =
+			{
+				0, 1, 2
+			};
 
+			_triVertexArray.reset(VertexArray::Create());
 
-		_indexBuffer.reset(IndexBuffer::Create(indices, 3));
+			std::shared_ptr<IndexBuffer> indexBuffer;
+			indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
 
-		glGenVertexArrays(1, &_vertexArray);
-		glBindVertexArray(_vertexArray);
+			std::shared_ptr<VertexBuffer> vertexBuffer;
+			vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-		_vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-		{
 			BufferLayout layout =
 			{
 				{ShaderDataType::Float3, "a_position"},
 				{ShaderDataType::Float4, "a_color"}
 			};
 
-			_vertexBuffer->SetLayout(layout);
+			vertexBuffer->SetLayout(layout);
+			_triVertexArray->AddVertexBuffer(vertexBuffer);
+			_triVertexArray->AddIndexBuffer(indexBuffer);
 		}
 
-		const auto& layout = _vertexBuffer->GetLayout();
-		uint32_t index = 0;
-		for (const auto& element : layout)
+		// -----------
+
 		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(
-				index, 
-				element.GetComponentCount(), 
-				ShaderDataTypeToOpenGLBaseType(element.Type), 
-				element.Normalized ? GL_TRUE : GL_FALSE, 
-				layout.GetStride(),
-				(const void*)element.Offset);
-			++index;
+			float vertices[4 * 7] =
+			{
+				-0.5f, -0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f,
+				 0.5f, -0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f,
+				 0.5f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f,
+				-0.5f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f
+			};
+
+			uint indices[] =
+			{
+				0, 1, 2, 0, 2, 3
+			};
+
+			_quadVertexArray.reset(VertexArray::Create());
+
+			std::shared_ptr<IndexBuffer> indexBuffer;
+			indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
+
+			std::shared_ptr<VertexBuffer> vertexBuffer;
+			vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+
+			BufferLayout layout =
+			{
+				{ShaderDataType::Float3, "a_position"},
+				{ShaderDataType::Float4, "a_color"}
+			};
+
+			vertexBuffer->SetLayout(layout);
+			_quadVertexArray->AddVertexBuffer(vertexBuffer);
+			_quadVertexArray->AddIndexBuffer(indexBuffer);
 		}
-		
-		glBindVertexArray(0);
 
 		// -----------
 
@@ -99,7 +101,7 @@ namespace GitGud
 
 			out vec4 v_color;
 
-			void main()			
+			void main()
 			{
 				v_color = a_color;
 				gl_Position = vec4(a_position, 1.0);
@@ -113,7 +115,7 @@ namespace GitGud
 
 			in vec4 v_color;
 
-			void main()			
+			void main()
 			{
 				color = v_color;
 			}
@@ -138,9 +140,12 @@ namespace GitGud
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			_shader->Bind();
-			glBindVertexArray(_vertexArray);
-			_indexBuffer->Bind();
-			glDrawElements(GL_TRIANGLES, _indexBuffer->GetCount(), GL_UNSIGNED_INT, NULL);
+
+			_quadVertexArray->Bind();
+			glDrawElements(GL_TRIANGLES, _quadVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
+
+			_triVertexArray->Bind();
+			glDrawElements(GL_TRIANGLES, _triVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, NULL);
 
 			// ----------------------------------------------------
 

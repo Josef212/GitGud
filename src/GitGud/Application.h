@@ -10,7 +10,7 @@
 
 
 #include "GitGud/Renderer/Shader.h"
-#include "GitGud/Renderer/Buffer.h"
+#include "GitGud/Renderer/VertexArray.h"
 
 namespace GitGud
 {
@@ -40,10 +40,9 @@ namespace GitGud
 		LayerStack _layerStack;
 
 
-		uint _vertexArray;
-		std::unique_ptr<Shader> _shader;
-		std::unique_ptr<VertexBuffer> _vertexBuffer;
-		std::unique_ptr<IndexBuffer> _indexBuffer;
+		std::shared_ptr<Shader> _shader;
+		std::shared_ptr<VertexArray> _triVertexArray;
+		std::shared_ptr<VertexArray> _quadVertexArray;
 
 	private:
 		static Application* s_instance;
