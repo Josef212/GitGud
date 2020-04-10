@@ -56,8 +56,8 @@ namespace GitGud
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool s = true;
-		ImGui::ShowDemoWindow(&s);
+		//static bool s = false;
+		//ImGui::ShowDemoWindow(&s);
 	}
 
 	void ImGuiLayer::Begin()
