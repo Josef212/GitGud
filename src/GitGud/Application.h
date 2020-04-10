@@ -6,6 +6,8 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 
+#include "Core/TimeStep.h"
+
 #include "GitGud/ImGui/ImGuiLayer.h"
 
 namespace GitGud
@@ -34,6 +36,7 @@ namespace GitGud
 		ImGuiLayer* _imguiLayer;
 		bool _running = true;
 		LayerStack _layerStack;
+		float _lastFrameTime = 0.0f;
 
 	private:
 		static Application* s_instance;

@@ -1,6 +1,8 @@
 #include "ggpch.h"
 #include "Application.h"
 
+#include <GLFW/glfw3.h> // TMP
+
 namespace GitGud
 {
 #define BIND_APPLICATION_EVENT_FN(x) GG_BIND_EVENT_FN(Application::x)
@@ -28,9 +30,13 @@ namespace GitGud
 	{
 		while (_running)
 		{
+			float time = (float)glfwGetTime(); // TMP
+			Timestep timeStep = time - _lastFrameTime;
+			_lastFrameTime = time;
+
 			for (Layer* layer : _layerStack)
 			{
-				layer->OnUpdate();
+				layer->OnUpdate(timeStep);
 			}
 
 			_imguiLayer->Begin();

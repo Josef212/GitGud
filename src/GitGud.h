@@ -5,6 +5,8 @@
 #include "GitGud/Layer.h"
 #include "GitGud/Log.h"
 
+#include "GitGud/Core/TimeStep.h"
+
 #include "GitGud/Input.h"
 #include "GitGud/KeyCodes.h"
 #include "GitGud/MouseButtonCodes.h"
