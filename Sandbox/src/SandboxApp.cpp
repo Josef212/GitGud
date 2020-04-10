@@ -114,21 +114,24 @@ public:
 		_camera.SetRotation(-30.0f);
 	}
 
-	virtual void OnUpdate() override
+	virtual void OnUpdate(GitGud::Timestep ts) override
 	{
+
+		GG_TRACE("DT: {0}s ({1}ms)", ts.GetSeconds(), ts.GetMilliseconds());
+
 		if (GitGud::Input::IsKey(GG_KEY_A))
-			_cameraPos.x -= _cameraMoveSpeed;
+			_cameraPos.x -= _cameraMoveSpeed * ts;
 		if (GitGud::Input::IsKey(GG_KEY_D))
-			_cameraPos.x += _cameraMoveSpeed;
+			_cameraPos.x += _cameraMoveSpeed * ts;
 		if (GitGud::Input::IsKey(GG_KEY_S))
-			_cameraPos.y -= _cameraMoveSpeed;
+			_cameraPos.y -= _cameraMoveSpeed * ts;
 		if (GitGud::Input::IsKey(GG_KEY_W))
-			_cameraPos.y += _cameraMoveSpeed;
+			_cameraPos.y += _cameraMoveSpeed * ts;
 
 		if (GitGud::Input::IsKey(GG_KEY_Q))
-			_cameraRotation += _cameraRotSpeed;
+			_cameraRotation += _cameraRotSpeed * ts;
 		if (GitGud::Input::IsKey(GG_KEY_E))
-			_cameraRotation -= _cameraRotSpeed;
+			_cameraRotation -= _cameraRotSpeed * ts;
 
 		_camera.SetPosition(_cameraPos);
 		_camera.SetRotation(_cameraRotation);
@@ -165,8 +168,8 @@ private:
 	glm::vec3 _cameraPos;
 	float _cameraRotation = 0.0f;
 
-	float _cameraMoveSpeed = 0.1f;
-	float _cameraRotSpeed = 2.0f;
+	float _cameraMoveSpeed = 3.0f;
+	float _cameraRotSpeed = 45.0f;
 };
 
 class SandboxApp : public GitGud::Application

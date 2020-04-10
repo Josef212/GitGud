@@ -2,6 +2,7 @@
 
 #include "GitGud/Core.h"
 #include "GitGud/Events/Event.h"
+#include "GitGud/Core/TimeStep.h"
 
 namespace GitGud
 {
@@ -13,7 +14,7 @@ namespace GitGud
 
 		virtual void OnAtach() {}
 		virtual void OnDeatach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
