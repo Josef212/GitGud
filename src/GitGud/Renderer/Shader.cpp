@@ -1,6 +1,7 @@
 #include "ggpch.h"
 #include "Shader.h"
 
+#include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 
 namespace GitGud
@@ -96,5 +97,11 @@ namespace GitGud
 	void Shader::UnBind() const
 	{
 		glUseProgram(0);
+	}
+
+	void Shader::UploadUniformMat4(const std::string& name, const glm::mat4& value) const
+	{
+		int loc = glGetUniformLocation(_rendererId, name.c_str());
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 	}
 }
