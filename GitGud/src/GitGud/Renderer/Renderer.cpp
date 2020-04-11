@@ -1,6 +1,8 @@
 #include "ggpch.h"
 #include "Renderer.h"
 
+#include "Platform/OpenGL/OpenGLShader.h" // TMP
+
 namespace GitGud
 {
 	Renderer::SceneData* Renderer::_sceneData = new Renderer::SceneData();
@@ -17,8 +19,8 @@ namespace GitGud
 	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transfrom)
 	{
 		shader->Bind();
-		shader->UploadUniformMat4("u_vp", _sceneData->ViewProjectMatrix);
-		shader->UploadUniformMat4("u_model", transfrom);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_vp", _sceneData->ViewProjectMatrix);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_model", transfrom);
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);

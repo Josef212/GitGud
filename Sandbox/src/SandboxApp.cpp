@@ -1,5 +1,7 @@
 #include <GitGud.h>
 
+#include "Platform/OpenGL/OpenGLShader.h" // TMP
+
 #include <imgui/imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -114,7 +116,7 @@ public:
 			}
 		)";
 
-		_shader.reset(new GitGud::Shader(vertexSrc, fragmentSrc));
+		_shader.reset(GitGud::Shader::Create(vertexSrc, fragmentSrc));
 	}
 
 	virtual void OnUpdate(GitGud::Timestep ts) override
@@ -133,6 +135,8 @@ public:
 		glm::vec4 red(0.8f, 0.2f, 0.3f, 1.0f);
 		glm::vec4 blue(0.2f, 0.3f, 0.8f, 1.0f);
 
+		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->Bind();
+
 		for (int y = 0; y < 20; ++y)
 		{
 			for (int x = 0; x < 20; ++x)
@@ -140,7 +144,7 @@ public:
 				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 
-				_shader->UploadUniformFloat4("u_color", (x % 2 == 0) ? red : blue);
+				std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->UploadUniformFloat4("u_color", (x % 2 == 0) ? red : blue);
 
 				GitGud::Renderer::Submit(_shader, _tileVA, transform);
 			}
@@ -152,7 +156,7 @@ public:
 		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.z), { 0.0f, 0.0f, 1.0f });
 		triangleTransform = glm::scale(triangleTransform, _triangleScale);
 
-		_shader->UploadUniformFloat4("u_color", {1.0f, 1.0f, 1.0f, 1.0f});
+		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->UploadUniformFloat4("u_color", {1.0f, 1.0f, 1.0f, 1.0f});
 		GitGud::Renderer::Submit(_shader, _triangleVA, triangleTransform);
 
 		GitGud::Renderer::EndScene();
@@ -165,7 +169,31 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
+		ImGui::Begin("Triangle transform");
 
+		ImGui::DragFloat3("Position", &_trianglePos.x, 0.1f);
+		ImGui::DragFloat3("Rotation", &_triangleEuler.x, 0.1f);
+		ImGui::DragFloat3("Scale", &_triangleScale.x, 0.1f);
+
+		ImGui::End();
+
+		ImGui::Begin("Camera");
+
+		ImGui::DragFloat3("Position", &_cameraPos.x, 0.1f);
+		ImGui::DragFloat("Rotation", &_cameraRotation, 0.1f);
+
+		if (ImGui::Button("Reset"))
+		{
+			_cameraPos = { 0.0f, 0.0f, 0.0f };
+			_cameraRotation = 0.0f;
+			_camera.SetPosition(_cameraPos);
+			_camera.SetRotation(_cameraRotation);
+		}
+
+		ImGui::DragFloat("Camera move speed", &_cameraMoveSpeed, 0.5f);
+		ImGui::DragFloat("Camera rotation speed", &_cameraRotSpeed, 0.5f);
+
+		ImGui::End();
 	}
 
 private:
