@@ -7,6 +7,11 @@ namespace GitGud
 {
 	Renderer::SceneData* Renderer::_sceneData = new Renderer::SceneData();
 	
+	void Renderer::Init()
+	{
+		RenderCommand::Init();
+	}
+
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		_sceneData->ViewProjectMatrix = camera.GetViewProjectionMatrix();

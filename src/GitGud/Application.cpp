@@ -1,6 +1,8 @@
 #include "ggpch.h"
 #include "Application.h"
 
+#include "Renderer/Renderer.h"
+
 #include <GLFW/glfw3.h> // TMP
 
 namespace GitGud
@@ -16,6 +18,8 @@ namespace GitGud
 
 		_window = Scope<Window>(Window::Create());
 		_window->SetEventCallback(BIND_APPLICATION_EVENT_FN(OnEvent));
+
+		Renderer::Init();
 
 		_imguiLayer = new ImGuiLayer();
 		PushOverlay(_imguiLayer);

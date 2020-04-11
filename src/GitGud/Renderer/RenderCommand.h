@@ -7,6 +7,11 @@ namespace GitGud
 	class RenderCommand
 	{
 	public:
+		inline static void Init()
+		{
+			s_rendererAPI->Init();
+		}
+
 		inline static void SetClearColor(const glm::vec4& color)
 		{
 			s_rendererAPI->SetClearColor(color);
