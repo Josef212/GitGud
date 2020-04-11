@@ -83,7 +83,46 @@ public:
 
 		// -----------
 
-		std::string vertexSrc = R"(
+		// TileQuad
+		{
+			float vertices[4 * 9] =
+			{
+				-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,		0.0f, 0.0f,
+				 0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,		1.0f, 0.0f,
+				 0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,		1.0f, 1.0f,
+				-0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,		0.0f, 1.0f
+			};
+
+			uint indices[] =
+			{
+				0, 1, 2, 0, 2, 3
+			};
+
+			_quadVA.reset(GitGud::VertexArray::Create());
+
+			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
+			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
+
+			std::shared_ptr<GitGud::VertexBuffer> vertexBuffer;
+			vertexBuffer.reset(GitGud::VertexBuffer::Create(vertices, sizeof(vertices)));
+
+			GitGud::BufferLayout layout =
+			{
+				{GitGud::ShaderDataType::Float3, "a_position"},
+				{GitGud::ShaderDataType::Float4, "a_color"},
+				{GitGud::ShaderDataType::Float2, "a_texCords"}
+			};
+
+			vertexBuffer->SetLayout(layout);
+			_quadVA->AddVertexBuffer(vertexBuffer);
+			_quadVA->AddIndexBuffer(indexBuffer);
+		}
+
+		// -----------
+		
+		// Shaders
+		{
+			std::string vertexSrc = R"(
 			#version 330 core
 
 			layout(location = 0) in vec3 a_position;
@@ -101,7 +140,7 @@ public:
 			}
 		)";
 
-		std::string fragmentSrc = R"(
+			std::string fragmentSrc = R"(
 			#version 330 core
 
 			layout(location = 0) out vec4 color;
@@ -116,7 +155,55 @@ public:
 			}
 		)";
 
-		_shader.reset(GitGud::Shader::Create(vertexSrc, fragmentSrc));
+			_shader.reset(GitGud::Shader::Create(vertexSrc, fragmentSrc));
+		}
+
+		{
+			std::string vertexSrc = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_position;
+			layout(location = 1) in vec4 a_color;
+			layout(location = 2) in vec2 a_texCords;
+
+			uniform mat4 u_vp;
+			uniform mat4 u_model;
+
+			out vec4 v_color;
+			out vec2 v_uv;
+
+			void main()
+			{
+				v_uv = a_texCords;
+				v_color = a_color;
+				gl_Position = u_vp * u_model * vec4(a_position, 1.0);
+			}
+		)";
+
+			std::string fragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			uniform vec4 u_color;
+			uniform sampler2D u_texture;
+
+			in vec4 v_color;
+			in vec2 v_uv;
+
+			void main()
+			{
+				color = texture(u_texture, v_uv);// u_color * v_color;
+			}
+		)";
+
+			_texturedShader.reset(GitGud::Shader::Create(vertexSrc, fragmentSrc));
+			_texturedShader->Bind();
+			std::dynamic_pointer_cast<GitGud::OpenGLShader>(_texturedShader)->UploadUniformInt("u_texture", 0);
+		}
+
+		// -----------
+		_checkerTexture = GitGud::Texture2D::Create("assets/textures/Checkerboard.png");
 	}
 
 	virtual void OnUpdate(GitGud::Timestep ts) override
@@ -158,6 +245,10 @@ public:
 
 		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->UploadUniformFloat4("u_color", {1.0f, 1.0f, 1.0f, 1.0f});
 		GitGud::Renderer::Submit(_shader, _triangleVA, triangleTransform);
+
+		
+		_checkerTexture->Bind();
+		GitGud::Renderer::Submit(_texturedShader, _quadVA);
 
 		GitGud::Renderer::EndScene();
 	}
@@ -218,9 +309,12 @@ private:
 	}
 
 private:
-	GitGud::Ref<GitGud::Shader> _shader;
+	GitGud::Ref<GitGud::Shader> _shader, _texturedShader;
 	GitGud::Ref<GitGud::VertexArray> _triangleVA;
 	GitGud::Ref<GitGud::VertexArray> _tileVA;
+	GitGud::Ref<GitGud::VertexArray> _quadVA;
+	GitGud::Ref<GitGud::Texture> _checkerTexture;
+
 	GitGud::OrthographicCamera _camera;
 	
 	glm::vec3 _cameraPos;
