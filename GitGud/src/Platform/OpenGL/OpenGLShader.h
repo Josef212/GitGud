@@ -3,11 +3,17 @@
 #include "GitGud/Renderer/Shader.h"
 #include <glm/glm.hpp>
 
+#include <unordered_map>
+
+// TODO: Remove
+typedef unsigned int GLenum;
+
 namespace GitGud
 {
 	class OpenGLShader : public Shader
 	{
 	public:
+		OpenGLShader(const std::string& filePath);
 		OpenGLShader(const std::string& vertexSrc, const std::string fragSrc);
 		virtual ~OpenGLShader();
 
@@ -23,6 +29,11 @@ namespace GitGud
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& value) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& value) const;
+
+	private:
+		std::string ReadFile(const std::string& filePath);
+		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
+		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 
 	private:
 		uint32_t _rendererId;
