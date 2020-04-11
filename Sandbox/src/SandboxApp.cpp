@@ -26,13 +26,10 @@ public:
 				0, 1, 2
 			};
 
-			_triangleVA.reset(GitGud::VertexArray::Create());
+			_triangleVA = GitGud::VertexArray::Create();
 
-			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
-			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
-
-			std::shared_ptr<GitGud::VertexBuffer> vertexBuffer;
-			vertexBuffer.reset(GitGud::VertexBuffer::Create(vertices, sizeof(vertices)));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =
 			{
@@ -62,13 +59,10 @@ public:
 				0, 1, 2, 0, 2, 3
 			};
 
-			_tileVA.reset(GitGud::VertexArray::Create());
+			_tileVA = GitGud::VertexArray::Create();
 
-			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
-			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
-
-			std::shared_ptr<GitGud::VertexBuffer> vertexBuffer;
-			vertexBuffer.reset(GitGud::VertexBuffer::Create(vertices, sizeof(vertices)));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =
 			{
@@ -98,13 +92,10 @@ public:
 				0, 1, 2, 0, 2, 3
 			};
 
-			_quadVA.reset(GitGud::VertexArray::Create());
+			_quadVA = GitGud::VertexArray::Create();
 
-			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
-			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
-
-			std::shared_ptr<GitGud::VertexBuffer> vertexBuffer;
-			vertexBuffer.reset(GitGud::VertexBuffer::Create(vertices, sizeof(vertices)));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =
 			{
