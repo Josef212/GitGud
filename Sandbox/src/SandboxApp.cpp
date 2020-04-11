@@ -8,14 +8,15 @@ class ExampleLayer : public GitGud::Layer
 public:
 	ExampleLayer() : Layer("Example"), _camera(-1.6f, 1.6f, -0.9f, 0.9f), _cameraPos(0.0f), _trianglePos(0.0f), _triangleEuler(0.0f), _triangleScale(1.0f)
 	{
-		// ----------------------------
+		// -----------
+
 		// Triangle
 		{
 			float vertices[3 * 7] =
 			{
-				-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.2f, 1.0f,
-				 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.2f, 1.0f,
-				 0.0f,  0.5f, 0.0f,		0.2f, 0.2f, 0.8f, 1.0f
+				-0.5f, -0.5f, 0.0f,		0.8f, 0.1f, 0.1f, 1.0f,
+				 0.5f, -0.5f, 0.0f,		0.1f, 0.1f, 0.8f, 1.0f,
+				 0.0f,  0.5f, 0.0f,		0.1f, 0.8f, 0.1f, 1.0f
 			};
 
 			uint indices[] =
@@ -23,7 +24,7 @@ public:
 				0, 1, 2
 			};
 
-			_triVertexArray.reset(GitGud::VertexArray::Create());
+			_triangleVA.reset(GitGud::VertexArray::Create());
 
 			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
 			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
@@ -38,54 +39,20 @@ public:
 			};
 
 			vertexBuffer->SetLayout(layout);
-			_triVertexArray->AddVertexBuffer(vertexBuffer);
-			_triVertexArray->AddIndexBuffer(indexBuffer);
+			_triangleVA->AddVertexBuffer(vertexBuffer);
+			_triangleVA->AddIndexBuffer(indexBuffer);
 		}
 
 		// -----------
-		// Quad
-		{
-			float vertices[4 * 7] =
-			{
-				-0.5f, -0.5f, 0.0f,		0.7f, 0.7f, 0.7f, 1.0f,
-				 0.5f, -0.5f, 0.0f,		0.7f, 0.7f, 0.7f, 1.0f,
-				 0.5f,  0.5f, 0.0f,		0.7f, 0.7f, 0.7f, 1.0f,
-				-0.5f,  0.5f, 0.0f,		0.7f, 0.7f, 0.7f, 1.0f
-			};
 
-			uint indices[] =
-			{
-				0, 1, 2, 0, 2, 3
-			};
-
-			_quadVertexArray.reset(GitGud::VertexArray::Create());
-
-			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
-			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
-
-			std::shared_ptr<GitGud::VertexBuffer> vertexBuffer;
-			vertexBuffer.reset(GitGud::VertexBuffer::Create(vertices, sizeof(vertices)));
-
-			GitGud::BufferLayout layout =
-			{
-				{GitGud::ShaderDataType::Float3, "a_position"},
-				{GitGud::ShaderDataType::Float4, "a_color"}
-			};
-
-			vertexBuffer->SetLayout(layout);
-			_quadVertexArray->AddVertexBuffer(vertexBuffer);
-			_quadVertexArray->AddIndexBuffer(indexBuffer);
-		}
-
-		// -----------
 		// TileQuad
 		{
 			float vertices[4 * 7] =
 			{
-				-0.5f, -0.5f, 0.0f,		0.2f, 0.3f, 0.82f, 1.0f,
-				 0.5f, -0.5f, 0.0f,		0.2f, 0.3f, 0.82f, 1.0f,
-				 0.5f,  0.5f, 0.0f,		0.2f, 0.3f, 0.82f, 1.0f,
-				-0.5f,  0.5f, 0.0f,		0.2f, 0.3f, 0.82f, 1.0f
+				-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,
+				 0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,
+				 0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f,
+				-0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f
 			};
 
 			uint indices[] =
@@ -93,7 +60,7 @@ public:
 				0, 1, 2, 0, 2, 3
 			};
 
-			_quadTileVertexArray.reset(GitGud::VertexArray::Create());
+			_tileVA.reset(GitGud::VertexArray::Create());
 
 			std::shared_ptr<GitGud::IndexBuffer> indexBuffer;
 			indexBuffer.reset(GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint)));
@@ -108,8 +75,8 @@ public:
 			};
 
 			vertexBuffer->SetLayout(layout);
-			_quadTileVertexArray->AddVertexBuffer(vertexBuffer);
-			_quadTileVertexArray->AddIndexBuffer(indexBuffer);
+			_tileVA->AddVertexBuffer(vertexBuffer);
+			_tileVA->AddIndexBuffer(indexBuffer);
 		}
 
 		// -----------
@@ -137,18 +104,17 @@ public:
 
 			layout(location = 0) out vec4 color;
 
+			uniform vec4 u_color;
+
 			in vec4 v_color;
 
 			void main()
 			{
-				color = v_color;
+				color = u_color * v_color;
 			}
 		)";
 
 		_shader.reset(new GitGud::Shader(vertexSrc, fragmentSrc));
-
-		_camera.SetPosition({ 0.3f, 0.3f, 0.0f });
-		_camera.SetRotation(-30.0f);
 	}
 
 	virtual void OnUpdate(GitGud::Timestep ts) override
@@ -157,23 +123,37 @@ public:
 
 		UpdateCamera(ts);
 
-		glm::mat4 triangleTransform = glm::translate(glm::mat4(1.0f), _trianglePos);
-		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.z), { 0.0f, 0.0f, 1.0f });
-		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.y), { 0.0f, 1.0f, 0.0f });
-		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.x), { 1.0f, 0.0f, 0.0f });
-		triangleTransform = glm::scale(triangleTransform, _triangleScale);
-
 		GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		GitGud::RenderCommand::Clear();
 
 		GitGud::Renderer::BeginScene(_camera);
 
-		DrawGrid();
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		static glm::mat4 quadTransform = glm::scale(glm::mat4(1.0f), { 1.2f, 1.2f, 1.0f });
+		glm::vec4 red(0.8f, 0.2f, 0.3f, 1.0f);
+		glm::vec4 blue(0.2f, 0.3f, 0.8f, 1.0f);
 
-		GitGud::Renderer::Submit(_shader, _quadVertexArray, quadTransform);
-		GitGud::Renderer::Submit(_shader, _triVertexArray, triangleTransform);
+		for (int y = 0; y < 20; ++y)
+		{
+			for (int x = 0; x < 20; ++x)
+			{
+				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+
+				_shader->UploadUniformFloat4("u_color", (x % 2 == 0) ? red : blue);
+
+				GitGud::Renderer::Submit(_shader, _tileVA, transform);
+			}
+		}
+
+		glm::mat4 triangleTransform = glm::translate(glm::mat4(1.0f), _trianglePos);
+		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.x), { 1.0f, 0.0f, 0.0f });
+		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.y), { 0.0f, 1.0f, 0.0f });
+		triangleTransform = glm::rotate(triangleTransform, glm::radians(_triangleEuler.z), { 0.0f, 0.0f, 1.0f });
+		triangleTransform = glm::scale(triangleTransform, _triangleScale);
+
+		_shader->UploadUniformFloat4("u_color", {1.0f, 1.0f, 1.0f, 1.0f});
+		GitGud::Renderer::Submit(_shader, _triangleVA, triangleTransform);
 
 		GitGud::Renderer::EndScene();
 	}
@@ -185,13 +165,7 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		ImGui::Begin("Triangle transform");
 
-		ImGui::DragFloat3("Position", &_trianglePos.x, 0.1f);
-		ImGui::DragFloat3("Rotation", &_triangleEuler.x, 0.1f);
-		ImGui::DragFloat3("Scale", &_triangleScale.x, 0.1f);
-
-		ImGui::End();
 	}
 
 private:
@@ -215,26 +189,10 @@ private:
 		_camera.SetRotation(_cameraRotation);
 	}
 
-	void DrawGrid()
-	{
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-
-		for (int y = 0; y < 20; ++y)
-		{
-			for (int x = 0; x < 20; ++x)
-			{
-				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				GitGud::Renderer::Submit(_shader, _quadTileVertexArray, transform);
-			}
-		}
-	}
-
 private:
 	std::shared_ptr<GitGud::Shader> _shader;
-	std::shared_ptr<GitGud::VertexArray> _triVertexArray;
-	std::shared_ptr<GitGud::VertexArray> _quadVertexArray;
-	std::shared_ptr<GitGud::VertexArray> _quadTileVertexArray;
+	std::shared_ptr<GitGud::VertexArray> _triangleVA;
+	std::shared_ptr<GitGud::VertexArray> _tileVA;
 	GitGud::OrthographicCamera _camera;
 	
 	glm::vec3 _cameraPos;
