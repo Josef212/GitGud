@@ -14,10 +14,12 @@ namespace GitGud
 	{
 	}
 
-	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transfrom)
 	{
 		shader->Bind();
 		shader->UploadUniformMat4("u_vp", _sceneData->ViewProjectMatrix);
+		shader->UploadUniformMat4("u_model", transfrom);
+
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
