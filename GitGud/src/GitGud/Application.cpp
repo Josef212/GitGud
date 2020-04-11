@@ -14,7 +14,7 @@ namespace GitGud
 		GG_CORE_ASSERT(!s_instance, "Application already exists!");
 		s_instance = this;
 
-		_window = std::unique_ptr<Window>(Window::Create());
+		_window = Scope<Window>(Window::Create());
 		_window->SetEventCallback(BIND_APPLICATION_EVENT_FN(OnEvent));
 
 		_imguiLayer = new ImGuiLayer();

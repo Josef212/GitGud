@@ -218,9 +218,9 @@ private:
 	}
 
 private:
-	std::shared_ptr<GitGud::Shader> _shader;
-	std::shared_ptr<GitGud::VertexArray> _triangleVA;
-	std::shared_ptr<GitGud::VertexArray> _tileVA;
+	GitGud::Ref<GitGud::Shader> _shader;
+	GitGud::Ref<GitGud::VertexArray> _triangleVA;
+	GitGud::Ref<GitGud::VertexArray> _tileVA;
 	GitGud::OrthographicCamera _camera;
 	
 	glm::vec3 _cameraPos;
