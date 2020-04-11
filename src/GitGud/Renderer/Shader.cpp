@@ -99,6 +99,12 @@ namespace GitGud
 		glUseProgram(0);
 	}
 
+	void Shader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) const
+	{
+		int loc = glGetUniformLocation(_rendererId, name.c_str());
+		glUniform4f(loc, value.r, value.g, value.b, value.a);
+	}
+
 	void Shader::UploadUniformMat4(const std::string& name, const glm::mat4& value) const
 	{
 		int loc = glGetUniformLocation(_rendererId, name.c_str());
