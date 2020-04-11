@@ -204,6 +204,7 @@ public:
 
 		// -----------
 		_checkerTexture = GitGud::Texture2D::Create("assets/textures/Checkerboard.png");
+		_chernoTexture = GitGud::Texture2D::Create("assets/textures/ChernoLogo.png");
 	}
 
 	virtual void OnUpdate(GitGud::Timestep ts) override
@@ -248,6 +249,9 @@ public:
 
 		
 		_checkerTexture->Bind();
+		GitGud::Renderer::Submit(_texturedShader, _quadVA);
+		
+		_chernoTexture->Bind();
 		GitGud::Renderer::Submit(_texturedShader, _quadVA);
 
 		GitGud::Renderer::EndScene();
@@ -313,7 +317,7 @@ private:
 	GitGud::Ref<GitGud::VertexArray> _triangleVA;
 	GitGud::Ref<GitGud::VertexArray> _tileVA;
 	GitGud::Ref<GitGud::VertexArray> _quadVA;
-	GitGud::Ref<GitGud::Texture> _checkerTexture;
+	GitGud::Ref<GitGud::Texture> _checkerTexture, _chernoTexture;
 
 	GitGud::OrthographicCamera _camera;
 	
