@@ -12,7 +12,7 @@ namespace GitGud
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::API::None: GG_CORE_ASSERT(false, "RendererAPI::None is not supported!");
-			case RendererAPI::API::OpenGL: return CreateRef<VertexBuffer>();
+			case RendererAPI::API::OpenGL: return CreateRef<OpenGLVertexBuffer>(vertices, size);
 		}
 
 		GG_CORE_ASSERT(false, "Unknown RendererAPI");
