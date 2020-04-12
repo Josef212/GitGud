@@ -16,10 +16,7 @@ public:
 	virtual void OnImGuiRender() override;
 
 private:
-	// TMP
 	GitGud::OrthographicCameraController _cameraController;
-	GitGud::Ref<GitGud::Shader> _shader;
-	GitGud::Ref<GitGud::VertexArray> _va;
 
-	glm::vec4 _color = { 0.8f, 0.2f, 0.6f, 1.0f };
+	glm::vec4 _color = { 0.8f, 0.2f, 0.3f, 1.0f };
 };

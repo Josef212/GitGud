@@ -13,6 +13,7 @@
 
 // ---- Renderer -----------------------------
 #include "GitGud/Renderer/Renderer.h"
+#include "GitGud/Renderer/Renderer2D.h"
 #include "GitGud/Renderer/RenderCommand.h"
 
 #include "GitGud/Renderer/Buffer.h"
