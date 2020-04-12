@@ -1,8 +1,6 @@
 #include "Sandbox2D.h"
 #include <imgui/imgui.h>
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 Sandbox2D::Sandbox2D() : GitGud::Layer("2D Sandbos"), _cameraController(1280.0f / 720.0f)
 {
 }
@@ -28,11 +26,7 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 
 	GitGud::Renderer2D::BeginScene(_cameraController.GetCamera());
 
-	GitGud::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, _color);
-	
-	//_shader->Bind();
-	//std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->UploadUniformFloat4("u_color", _color);
-	//GitGud::Renderer::Submit(_shader, _va);
+	GitGud::Renderer2D::DrawQuad(_pos, _size, _angle, _color);
 
 	GitGud::Renderer2D::EndScene();
 }
@@ -47,6 +41,11 @@ void Sandbox2D::OnImGuiRender()
 	_cameraController.OnImGuiRender();
 
 	ImGui::Begin("Settings");
+
 	ImGui::ColorEdit4("Color", &_color.r);
+	ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
+	ImGui::DragFloat2("Size", &_size.x, 0.1f);
+	ImGui::DragFloat("Angle", &_angle);
+	
 	ImGui::End();
 }

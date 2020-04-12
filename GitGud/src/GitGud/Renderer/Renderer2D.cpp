@@ -5,7 +5,7 @@
 #include "Shader.h"
 #include "RenderCommand.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace GitGud
 {
@@ -58,7 +58,7 @@ namespace GitGud
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		s_Data->FlatColorShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data->FlatColorShader)->UploadUniformMat4("u_vp", camera.GetViewProjectionMatrix());
+		s_Data->FlatColorShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
@@ -67,14 +67,28 @@ namespace GitGud
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color);
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, color);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
+		DrawQuad(position, size, 0.0f, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const glm::vec4& color)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, angle, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, 1.0f });
+		transform = glm::scale(transform, { size.x, size.y, 1.0f });
+
 		s_Data->FlatColorShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data->FlatColorShader)->UploadUniformFloat4("u_color", color);
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data->FlatColorShader)->UploadUniformMat4("u_model", glm::mat4(1.0f));
+		s_Data->FlatColorShader->SetFloat4("u_color", color);
+		s_Data->FlatColorShader->SetMat4("u_model", transform);
 
 		s_Data->QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
