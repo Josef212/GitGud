@@ -19,6 +19,8 @@ namespace GitGud
 		const glm::mat4& GetViewMatrix() const { return _view; }
 		const glm::mat4& GetViewProjectionMatrix() const { return _viewProjection; }
 
+		void SetProjection(float left, float right, float bottom, float top);
+
 	private:
 		void RecalculateViewMatrix();
 

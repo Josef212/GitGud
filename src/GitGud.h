@@ -21,6 +21,7 @@
 #include "GitGud/Renderer/Texture.h"
 
 #include "GitGud/Renderer/Cameras/OrthographicCamera.h"
+#include "GitGud/Renderer/Cameras/OrthographicCameraController.h"
 // --------------------------------------------
 
 #include "GitGud/ImGui/ImGuiLayer.h"
