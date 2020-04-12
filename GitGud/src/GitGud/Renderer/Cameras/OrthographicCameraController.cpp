@@ -49,17 +49,29 @@ namespace GitGud
 	{
 		ImGui::Begin("Camera");
 		
-		ImGui::Checkbox("Rotation", &_rotation);
+		ImGui::Checkbox("Rotation enabled", &_rotation);
 
-		ImGui::DragFloat3("Position", &_cameraPos.x, 0.1f);
-		ImGui::DragFloat("Rotation", &_cameraRotation, 0.1f);
+		bool posChanged = ImGui::DragFloat3("Position", &_cameraPos.x, 0.1f);
+		bool rotChanged = _rotation ? ImGui::DragFloat("Rotation", &_cameraRotation, 0.1f) : false;
+		if (posChanged || rotChanged)
+		{
+			ViewChanged();
+		}
+		
+		if(ImGui::DragFloat("Zoom", &_zoomLevel, 0.1f))
+		{
+			ProjectionChanged();
+		}
 		
 		if (ImGui::Button("Reset"))
 		{
 			_cameraPos = { 0.0f, 0.0f, 0.0f };
 			_cameraRotation = 0.0f;
-			_camera.SetPosition(_cameraPos);
-			_camera.SetRotation(_cameraRotation);
+			_zoomLevel = 1.0f;
+			_rotation = false;
+
+			ViewChanged();
+			ProjectionChanged();
 		}
 		
 		ImGui::DragFloat("Camera move speed", &_cameraMoveSpeed, 0.5f);
@@ -74,7 +86,7 @@ namespace GitGud
 		_zoomLevel = std::max(_zoomLevel, 0.25f);
 		_cameraMoveSpeed = _zoomLevel;
 
-		_camera.SetProjection(-_aspectRatio * _zoomLevel, _aspectRatio * _zoomLevel, -_zoomLevel, _zoomLevel);
+		ProjectionChanged();
 
 		return false;
 	}
@@ -82,9 +94,19 @@ namespace GitGud
 	bool OrthographicCameraController::OnWindowResize(WindowResizeEvent& e)
 	{
 		_aspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
-		_camera.SetProjection(-_aspectRatio * _zoomLevel, _aspectRatio * _zoomLevel, -_zoomLevel, _zoomLevel);
+		ProjectionChanged();
 
 		return false;
 	}
 
+	void OrthographicCameraController::ProjectionChanged()
+	{
+		_camera.SetProjection(-_aspectRatio * _zoomLevel, _aspectRatio * _zoomLevel, -_zoomLevel, _zoomLevel);
+	}
+
+	void OrthographicCameraController::ViewChanged()
+	{
+		_camera.SetPosition(_cameraPos);
+		_camera.SetRotation(_cameraRotation);
+	}
 }

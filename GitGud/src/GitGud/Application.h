@@ -29,12 +29,14 @@ namespace GitGud
 		inline static Application& Get() { return *s_instance; }
 
 	private:
-		bool OnWindowClosed(WindowCloseEvent& e);
+		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 	private:
 		Scope<Window> _window;
 		ImGuiLayer* _imguiLayer;
 		bool _running = true;
+		bool _minimized = false;
 		LayerStack _layerStack;
 		float _lastFrameTime = 0.0f;
 
