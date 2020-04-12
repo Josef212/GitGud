@@ -22,6 +22,14 @@ namespace GitGud
 		GG_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
 		GG_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
 		GG_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+
+#ifdef GG_ENABLE_ASSERTS
+		int major, minor;
+		glGetIntegerv(GL_MAJOR_VERSION, &major);
+		glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+		GG_CORE_ASSERT(major > 4 || (major == 4 && minor >= 5), "GitGud requires at least OpenGL version 4.5");
+#endif
 	}
 
 	void OpenGLContext::SwapBuffers()
