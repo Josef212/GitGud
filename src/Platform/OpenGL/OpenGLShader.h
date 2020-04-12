@@ -14,11 +14,13 @@ namespace GitGud
 	{
 	public:
 		OpenGLShader(const std::string& filePath);
-		OpenGLShader(const std::string& vertexSrc, const std::string fragSrc);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string fragSrc);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
 		virtual void UnBind() const override;
+
+		virtual const std::string& GetName() const override { return _name; }
 
 		void UploadUniformInt(const std::string& name, int value) const;
 
@@ -37,5 +39,6 @@ namespace GitGud
 
 	private:
 		uint32_t _rendererId;
+		std::string _name;
 	};
 }
