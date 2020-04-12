@@ -30,6 +30,7 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	GitGud::Renderer2D::DrawQuad(_pos, _size, _angle, _color);
 	GitGud::Renderer2D::DrawQuad({ -1.0f, 2.0f }, { 1.0f, 1.0f }, 0.0f, {0.2f, 0.3f, 0.8f, 1.0f});
 	GitGud::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, {10.0f, 10.0f}, 0.0f, _texture);
+	GitGud::Renderer2D::DrawQuad({ 1.2f, 1.4f, 0.0f }, { 1.0f, 1.0f }, 0.0f, {0.2f, 0.8f, 0.4f, 1.0f}, _texture);
 
 	GitGud::Renderer2D::EndScene();
 }
