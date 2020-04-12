@@ -1,8 +1,8 @@
 #include "ggpch.h"
 #include "OrthographicCameraController.h"
 
-#include "GitGud/Input.h"
-#include "GitGud/KeyCodes.h"
+#include "GitGud/Core/Input.h"
+#include "GitGud/Core/KeyCodes.h"
 
 #include "imgui.h"
 

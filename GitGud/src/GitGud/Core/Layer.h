@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GitGud/Core.h"
+#include "Core.h"
 #include "GitGud/Events/Event.h"
 #include "GitGud/Core/TimeStep.h"
 

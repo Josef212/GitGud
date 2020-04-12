@@ -1,15 +1,15 @@
 #pragma once
 
-#include "GitGud/Core.h"
-#include "GitGud/Application.h"
-#include "GitGud/Layer.h"
-#include "GitGud/Log.h"
+#include "GitGud/Core/Core.h"
+#include "GitGud/Core/Application.h"
+#include "GitGud/Core/Layer.h"
+#include "GitGud/Core/Log.h"
 
 #include "GitGud/Core/TimeStep.h"
 
-#include "GitGud/Input.h"
-#include "GitGud/KeyCodes.h"
-#include "GitGud/MouseButtonCodes.h"
+#include "GitGud/Core/Input.h"
+#include "GitGud/Core/KeyCodes.h"
+#include "GitGud/Core/MouseButtonCodes.h"
 
 // ---- Renderer -----------------------------
 #include "GitGud/Renderer/Renderer.h"
@@ -28,5 +28,5 @@
 
 
 // ---- EntryPoint ----------------------------
-#include "GitGud/EntryPoint.h"
+#include "GitGud/Core/EntryPoint.h"
 // --------------------------------------------

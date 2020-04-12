@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GitGud/Core.h"
+#include "Core.h"
 #include "Layer.h"
 
 #include <vector>

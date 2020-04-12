@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GitGud/Input.h"
+#include "GitGud/Core/Input.h"
 
 namespace GitGud
 {
