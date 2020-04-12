@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GitGud/Window.h"
+#include "GitGud/Core/Window.h"
 #include "GitGud/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>

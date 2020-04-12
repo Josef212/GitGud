@@ -21,6 +21,9 @@ namespace GitGud
 			case GitGud::ShaderDataType::Int4:		return GL_INT;
 			case GitGud::ShaderDataType::Bool:		return GL_BOOL;
 		}
+
+		GG_CORE_ASSERT(false, "Unknown shader data type!");
+		return 0;
 	}
 
 	OpenGLVertexArray::OpenGLVertexArray()

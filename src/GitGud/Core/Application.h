@@ -3,10 +3,10 @@
 #include "Core.h"
 
 #include "Window.h"
-#include "Events/ApplicationEvent.h"
+#include "GitGud/Events/ApplicationEvent.h"
 #include "LayerStack.h"
 
-#include "Core/TimeStep.h"
+#include "TimeStep.h"
 
 #include "GitGud/ImGui/ImGuiLayer.h"
 

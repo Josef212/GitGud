@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "GitGud/Log.h"
+#include "GitGud/Core/Log.h"
 
 #ifdef GG_PLATFORM_WINDOWS
 	#include <Windows.h>

@@ -1,7 +1,7 @@
 #include "ggpch.h"
 #include "Application.h"
 
-#include "Renderer/Renderer.h"
+#include "GitGud/Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h> // TMP
 

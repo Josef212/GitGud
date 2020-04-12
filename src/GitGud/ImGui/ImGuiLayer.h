@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GitGud/Layer.h"
+#include "GitGud/Core/Layer.h"
 #include "GitGud/Events/KeyEvent.h"
 #include "GitGud/Events/MouseEvent.h"
 #include "GitGud/Events/ApplicationEvent.h"

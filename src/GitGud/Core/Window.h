@@ -2,7 +2,7 @@
 
 #include "ggpch.h"
 
-#include "GitGud/Core.h"
+#include "Core.h"
 #include "GitGud/Events/Event.h"
 
 namespace GitGud

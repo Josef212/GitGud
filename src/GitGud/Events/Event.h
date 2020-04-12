@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ggpch.h"
-#include "GitGud/Core.h"
+#include "GitGud/Core/Core.h"
 
 namespace GitGud
 {

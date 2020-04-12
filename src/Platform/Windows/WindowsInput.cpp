@@ -1,7 +1,7 @@
 #include "ggpch.h"
 #include "WindowsInput.h"
-#include "GitGud/Application.h"
-#include "GitGud/Window.h"
+#include "GitGud/Core/Application.h"
+#include "GitGud/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 
