@@ -1,9 +1,12 @@
 #include <GitGud.h>
+#include <GitGud/Core/EntryPoint.h>
 
 #include "Platform/OpenGL/OpenGLShader.h" // TMP
 
 #include <imgui/imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "Sandbox2D.h"
 
 class ExampleLayer : public GitGud::Layer
 {
@@ -250,7 +253,8 @@ class SandboxApp : public GitGud::Application
 public:
 	SandboxApp() 
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~SandboxApp() {}

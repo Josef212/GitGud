@@ -13,8 +13,8 @@ namespace GitGud
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		virtual void OnAtach() override;
-		virtual void OnDeatach() override;
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
 		virtual void OnImGuiRender() override;
 
 		void Begin();

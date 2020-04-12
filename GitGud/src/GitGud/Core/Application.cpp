@@ -76,13 +76,13 @@ namespace GitGud
 	void Application::PushLayer(Layer* layer)
 	{
 		_layerStack.PushLayer(layer);
-		layer->OnAtach();
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
 		_layerStack.PushOverlay(overlay);
-		overlay->OnAtach();
+		overlay->OnAttach();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
