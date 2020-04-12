@@ -12,8 +12,8 @@ namespace GitGud
 	struct Renderer2DStorage
 	{
 		Ref<VertexArray> QuadVertexArray;
-		Ref<Shader> FlatColorShader;
-		Ref<Shader> TextureShader;
+		Ref<Shader> SpriteShader;
+		Ref<Texture2D> WhiteTexture;
 	};
 
 	static Renderer2DStorage* s_Data;
@@ -49,11 +49,14 @@ namespace GitGud
 		s_Data->QuadVertexArray->AddVertexBuffer(vertexBuffer);
 		s_Data->QuadVertexArray->AddIndexBuffer(indexBuffer);
 
-		s_Data->FlatColorShader = Shader::Create("assets/shaders/FlatColor.glsl");
-		s_Data->TextureShader = Shader::Create("assets/shaders/Texture.glsl");
+		s_Data->WhiteTexture = Texture2D::Create(1, 1);
+		uint32_t whiteData = 0xffffffff;
+		s_Data->WhiteTexture->SetData(&whiteData, sizeof(uint32_t));
+
+		s_Data->SpriteShader = Shader::Create("assets/shaders/SpriteShader.glsl");
 		
-		s_Data->TextureShader->Bind();
-		s_Data->TextureShader->SetInt("u_texture", 0);
+		s_Data->SpriteShader->Bind();
+		s_Data->SpriteShader->SetInt("u_texture", 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -63,11 +66,8 @@ namespace GitGud
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
-		s_Data->FlatColorShader->Bind();
-		s_Data->FlatColorShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
-
-		s_Data->TextureShader->Bind();
-		s_Data->TextureShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
+		s_Data->SpriteShader->Bind();
+		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
@@ -76,48 +76,44 @@ namespace GitGud
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, color);
+		DrawQuad({ position.x, position.y, 0.0f }, size, 0.0f, color, s_Data->WhiteTexture);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad(position, size, 0.0f, color);
+		DrawQuad(position, size, 0.0f, color, s_Data->WhiteTexture);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const glm::vec4& color)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, color);
+		DrawQuad({ position.x, position.y, 0.0f }, size, angle, color, s_Data->WhiteTexture);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color)
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
-		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, 1.0f });
-		transform = glm::scale(transform, { size.x, size.y, 1.0f });
-
-		s_Data->FlatColorShader->Bind();
-		s_Data->FlatColorShader->SetFloat4("u_color", color);
-		s_Data->FlatColorShader->SetMat4("u_model", transform);
-
-		s_Data->QuadVertexArray->Bind();
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+		DrawQuad(position, size, angle, color, s_Data->WhiteTexture);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, texture);
+		DrawQuad({ position.x, position.y, 0.0f }, size, angle, glm::vec4(1.0f), texture);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture)
 	{
+		DrawQuad(position, size, angle, glm::vec4(1.0f), texture);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color, const Ref<Texture2D>& texture)
+	{
+		s_Data->SpriteShader->SetFloat4("u_color", color);
+		texture->Bind();
+
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
 		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, 1.0f });
 		transform = glm::scale(transform, { size.x, size.y, 1.0f });
 
-		s_Data->TextureShader->Bind();
-		s_Data->TextureShader->SetMat4("u_model", transform);
-
-		texture->Bind();
+		s_Data->SpriteShader->SetMat4("u_model", transform);
 
 		s_Data->QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
