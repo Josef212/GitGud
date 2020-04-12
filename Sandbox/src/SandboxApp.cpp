@@ -8,7 +8,7 @@
 class ExampleLayer : public GitGud::Layer
 {
 public:
-	ExampleLayer() : Layer("Example"), _camera(-1.6f, 1.6f, -0.9f, 0.9f), _cameraPos(0.0f), _trianglePos(0.0f), _triangleEuler(0.0f), _triangleScale(1.0f)
+	ExampleLayer() : Layer("Example"), _cameraController(1280.0f / 720.0f), _trianglePos(0.0f), _triangleEuler(0.0f), _triangleScale(1.0f)
 	{
 		// -----------
 
@@ -161,12 +161,12 @@ public:
 	{
 		//GG_TRACE("DT: {0}s ({1}ms)", ts.GetSeconds(), ts.GetMilliseconds());
 
-		UpdateCamera(ts);
+		_cameraController.OnUpdate(ts);
 
 		GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		GitGud::RenderCommand::Clear();
 
-		GitGud::Renderer::BeginScene(_camera);
+		GitGud::Renderer::BeginScene(_cameraController.GetCamera());
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -211,11 +211,13 @@ public:
 
 	virtual void OnEvent(GitGud::Event& event) override
 	{
-
+		_cameraController.OnEvent(event);
 	}
 
 	virtual void OnImGuiRender() override
 	{
+		_cameraController.OnImGuiRender();
+
 		ImGui::Begin("Triangle transform");
 
 		ImGui::DragFloat3("Position", &_trianglePos.x, 0.1f);
@@ -223,46 +225,9 @@ public:
 		ImGui::DragFloat3("Scale", &_triangleScale.x, 0.1f);
 
 		ImGui::End();
-
-		ImGui::Begin("Camera");
-
-		ImGui::DragFloat3("Position", &_cameraPos.x, 0.1f);
-		ImGui::DragFloat("Rotation", &_cameraRotation, 0.1f);
-
-		if (ImGui::Button("Reset"))
-		{
-			_cameraPos = { 0.0f, 0.0f, 0.0f };
-			_cameraRotation = 0.0f;
-			_camera.SetPosition(_cameraPos);
-			_camera.SetRotation(_cameraRotation);
-		}
-
-		ImGui::DragFloat("Camera move speed", &_cameraMoveSpeed, 0.5f);
-		ImGui::DragFloat("Camera rotation speed", &_cameraRotSpeed, 0.5f);
-
-		ImGui::End();
 	}
 
 private:
-	void UpdateCamera(GitGud::Timestep& ts)
-	{
-		if (GitGud::Input::IsKey(GG_KEY_A))
-			_cameraPos.x -= _cameraMoveSpeed * ts;
-		if (GitGud::Input::IsKey(GG_KEY_D))
-			_cameraPos.x += _cameraMoveSpeed * ts;
-		if (GitGud::Input::IsKey(GG_KEY_S))
-			_cameraPos.y -= _cameraMoveSpeed * ts;
-		if (GitGud::Input::IsKey(GG_KEY_W))
-			_cameraPos.y += _cameraMoveSpeed * ts;
-
-		if (GitGud::Input::IsKey(GG_KEY_Q))
-			_cameraRotation += _cameraRotSpeed * ts;
-		if (GitGud::Input::IsKey(GG_KEY_E))
-			_cameraRotation -= _cameraRotSpeed * ts;
-
-		_camera.SetPosition(_cameraPos);
-		_camera.SetRotation(_cameraRotation);
-	}
 
 private:
 	GitGud::Ref<GitGud::Shader> _shader;
@@ -273,14 +238,8 @@ private:
 
 	GitGud::ShaderLibrary _shaderLib;
 
-	GitGud::OrthographicCamera _camera;
+	GitGud::OrthographicCameraController _cameraController;
 	
-	glm::vec3 _cameraPos;
-	float _cameraRotation = 0.0f;
-
-	float _cameraMoveSpeed = 3.0f;
-	float _cameraRotSpeed = 45.0f;
-
 	glm::vec3 _trianglePos;
 	glm::vec3 _triangleEuler;
 	glm::vec3 _triangleScale;
