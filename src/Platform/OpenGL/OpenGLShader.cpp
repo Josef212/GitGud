@@ -92,7 +92,7 @@ namespace GitGud
 	std::string OpenGLShader::ReadFile(const std::string& filePath)
 	{
 		std::string result;
-		std::ifstream in(filePath, std::ios::in, std::ios::binary);
+		std::ifstream in(filePath, std::ios::in | std::ios::binary);
 		if (in)
 		{
 			in.seekg(0, std::ios::end);
@@ -135,8 +135,11 @@ namespace GitGud
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		std::vector<GLuint> glShaderIds(shaderSources.size());
 
+		GG_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders supported.");
+		std::array<GLuint, 2> glShaderIds;
+
+		int index = 0;
 		for (auto& kv : shaderSources)
 		{
 			GLenum type = kv.first;
@@ -166,7 +169,7 @@ namespace GitGud
 			}
 
 			glAttachShader(program, shader);
-			glShaderIds.push_back(shader);
+			glShaderIds[index++] = shader;
 		}
 
 		glLinkProgram(program);
