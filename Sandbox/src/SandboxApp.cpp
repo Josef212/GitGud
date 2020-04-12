@@ -145,12 +145,12 @@ public:
 			}
 		)";
 
-			_shader = GitGud::Shader::Create(vertexSrc, fragmentSrc);
+			_shader = GitGud::Shader::Create("ColorShader", vertexSrc, fragmentSrc);
 		}
 
-		_texturedShader = GitGud::Shader::Create("assets/shaders/Texture.glsl");
-		_texturedShader->Bind();
-		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_texturedShader)->UploadUniformInt("u_texture", 0);
+		auto texutreShader = _shaderLib.Load("assets/shaders/Texture.glsl");
+		texutreShader->Bind();
+		std::dynamic_pointer_cast<GitGud::OpenGLShader>(texutreShader)->UploadUniformInt("u_texture", 0);
 
 		// -----------
 		_checkerTexture = GitGud::Texture2D::Create("assets/textures/Checkerboard.png");
@@ -197,13 +197,14 @@ public:
 		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_shader)->UploadUniformFloat4("u_color", {1.0f, 1.0f, 1.0f, 1.0f});
 		GitGud::Renderer::Submit(_shader, _triangleVA, triangleTransform);
 
-		_texturedShader->Bind();
-		std::dynamic_pointer_cast<GitGud::OpenGLShader>(_texturedShader)->UploadUniformFloat4("u_color", { 1.0f, 1.0f, 1.0f, 1.0f });
+		auto texutreShader = _shaderLib.Get("Texture");
+		texutreShader->Bind();
+		std::dynamic_pointer_cast<GitGud::OpenGLShader>(texutreShader)->UploadUniformFloat4("u_color", { 1.0f, 1.0f, 1.0f, 1.0f });
 		_checkerTexture->Bind();
-		GitGud::Renderer::Submit(_texturedShader, _quadVA);
+		GitGud::Renderer::Submit(texutreShader, _quadVA);
 		
 		_chernoTexture->Bind();
-		GitGud::Renderer::Submit(_texturedShader, _quadVA);
+		GitGud::Renderer::Submit(texutreShader, _quadVA);
 
 		GitGud::Renderer::EndScene();
 	}
@@ -264,11 +265,13 @@ private:
 	}
 
 private:
-	GitGud::Ref<GitGud::Shader> _shader, _texturedShader;
+	GitGud::Ref<GitGud::Shader> _shader;
 	GitGud::Ref<GitGud::VertexArray> _triangleVA;
 	GitGud::Ref<GitGud::VertexArray> _tileVA;
 	GitGud::Ref<GitGud::VertexArray> _quadVA;
 	GitGud::Ref<GitGud::Texture> _checkerTexture, _chernoTexture;
+
+	GitGud::ShaderLibrary _shaderLib;
 
 	GitGud::OrthographicCamera _camera;
 	
