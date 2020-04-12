@@ -22,9 +22,15 @@ namespace GitGud
 		inline OrthographicCamera& GetCamera() { return _camera; }
 		inline const OrthographicCamera& GetCamera() const { return _camera; }
 
+		float GetZoomLevel() const { return _zoomLevel; }
+		void SetZoomLevel(float level) { _zoomLevel = level; ProjectionChanged(); }
+
 	private:
 		bool OnMouseScroll(MouseScrollEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
+
+		void ProjectionChanged();
+		void ViewChanged();
 
 	private:
 		float _aspectRatio;

@@ -38,11 +38,14 @@ namespace GitGud
 			Timestep timeStep = time - _lastFrameTime;
 			_lastFrameTime = time;
 
-			for (Layer* layer : _layerStack)
+			if (!_minimized)
 			{
-				layer->OnUpdate(timeStep);
+				for (Layer* layer : _layerStack)
+				{
+					layer->OnUpdate(timeStep);
+				}
 			}
-
+			
 			_imguiLayer->Begin();
 			for (Layer* layer : _layerStack)
 			{
@@ -57,7 +60,8 @@ namespace GitGud
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClosed));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowResize));
 
 		for (auto it = _layerStack.end(); it != _layerStack.begin(); )
 		{
@@ -81,10 +85,24 @@ namespace GitGud
 		overlay->OnAtach();
 	}
 
-	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		_running = false;
 
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			_minimized = true;
+			return false;
+		}
+
+		_minimized = false;
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 }
