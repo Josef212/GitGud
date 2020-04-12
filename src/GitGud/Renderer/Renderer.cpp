@@ -1,5 +1,6 @@
 #include "ggpch.h"
 #include "Renderer.h"
+#include "Renderer2D.h"
 
 #include "Platform/OpenGL/OpenGLShader.h" // TMP
 
@@ -10,6 +11,13 @@ namespace GitGud
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
+		Renderer2D::Init();
+	}
+
+	void Renderer::Shutdown()
+	{
+		//RenderCommand::Shutdown();
+		Renderer2D::Shutdown();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

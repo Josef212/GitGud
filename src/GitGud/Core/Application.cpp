@@ -27,7 +27,7 @@ namespace GitGud
 
 	Application::~Application()
 	{
-
+		Renderer::Shutdown();
 	}
 
 	void Application::Run()
