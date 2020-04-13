@@ -3,23 +3,30 @@
 
 Sandbox2D::Sandbox2D() : GitGud::Layer("2D Sandbos"), _cameraController(1280.0f / 720.0f)
 {
+	GG_PROFILE_FUNCTION();
 }
 
 Sandbox2D::~Sandbox2D()
 {
+	GG_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnAttach()
 {
+	GG_PROFILE_FUNCTION();
+
 	_texture = GitGud::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
 {
+	GG_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 {
+	GG_PROFILE_FUNCTION();
+
 	_cameraController.OnUpdate(ts);
 
 	GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
@@ -37,11 +44,15 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 
 void Sandbox2D::OnEvent(GitGud::Event& e)
 {
+	GG_PROFILE_FUNCTION();
+
 	_cameraController.OnEvent(e);
 }
 
 void Sandbox2D::OnImGuiRender()
 {
+	GG_PROFILE_FUNCTION();
+
 	_cameraController.OnImGuiRender();
 
 	ImGui::Begin("Settings");
@@ -50,6 +61,18 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
 	ImGui::DragFloat2("Size", &_size.x, 0.1f);
 	ImGui::DragFloat("Angle", &_angle);
+
+	if (ImGui::Button("Begin session"))
+	{
+		GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("End session"))
+	{
+		GG_PROFILE_END_SESSION();
+	}
 	
 	ImGui::End();
 }

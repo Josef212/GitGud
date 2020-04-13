@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "GitGud/Core/Log.h"
+#include "GitGud/Debug/Instrumentor.h"
 
 #ifdef GG_PLATFORM_WINDOWS
 	#include <Windows.h>

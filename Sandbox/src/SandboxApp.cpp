@@ -24,14 +24,14 @@ public:
 				 0.0f,  0.5f, 0.0f,		0.1f, 0.8f, 0.1f, 1.0f
 			};
 
-			uint indices[] =
+			uint32_t indices[] =
 			{
 				0, 1, 2
 			};
 
 			_triangleVA = GitGud::VertexArray::Create();
 
-			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =
@@ -57,14 +57,14 @@ public:
 				-0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 1.0f
 			};
 
-			uint indices[] =
+			uint32_t indices[] =
 			{
 				0, 1, 2, 0, 2, 3
 			};
 
 			_tileVA = GitGud::VertexArray::Create();
 
-			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =
@@ -90,14 +90,14 @@ public:
 				-0.5f,  0.5f, 0.0f,		0.0f, 1.0f
 			};
 
-			uint indices[] =
+			uint32_t indices[] =
 			{
 				0, 1, 2, 0, 2, 3
 			};
 
 			_quadVA = GitGud::VertexArray::Create();
 
-			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+			GitGud::Ref<GitGud::IndexBuffer> indexBuffer = GitGud::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 			GitGud::Ref<GitGud::VertexBuffer> vertexBuffer = GitGud::VertexBuffer::Create(vertices, sizeof(vertices));
 
 			GitGud::BufferLayout layout =

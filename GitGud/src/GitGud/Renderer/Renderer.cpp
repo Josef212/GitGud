@@ -10,12 +10,16 @@ namespace GitGud
 	
 	void Renderer::Init()
 	{
+		GG_PROFILE_FUNCTION();
+
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
+		GG_PROFILE_FUNCTION();
+
 		//RenderCommand::Shutdown();
 		Renderer2D::Shutdown();
 	}
