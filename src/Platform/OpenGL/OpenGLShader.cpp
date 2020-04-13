@@ -72,6 +72,13 @@ namespace GitGud
 		UploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetIntArray(const std::string& name, int* value, uint32_t count)
+	{
+		GG_PROFILE_FUNCTION();
+
+		UploadUniformIntArray(name, value, count);
+	}
+
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
 		GG_PROFILE_FUNCTION();
@@ -118,6 +125,12 @@ namespace GitGud
 	{
 		int loc = glGetUniformLocation(_rendererId, name.c_str());
 		glUniform1i(loc, value);
+	}
+
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, int* value, uint32_t count) const
+	{
+		int loc = glGetUniformLocation(_rendererId, name.c_str());
+		glUniform1iv(loc, count, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value) const
