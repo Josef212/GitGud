@@ -7,8 +7,6 @@
 
 namespace GitGud
 {
-	Input* Input::s_instance = new WindowsInput();
-
 	bool WindowsInput::IsKeyImpl(int keyCode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
