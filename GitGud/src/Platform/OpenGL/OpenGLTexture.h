@@ -19,6 +19,11 @@ namespace GitGud
 		virtual void SetData(void* data, uint32_t size) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
+		
+		virtual bool operator==(const Texture& other) const override
+		{
+			return _rendererId == ((OpenGLTexture2D&)other)._rendererId;
+		}
 
 	private:
 		std::string _path;

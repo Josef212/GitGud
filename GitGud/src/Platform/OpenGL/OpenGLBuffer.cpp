@@ -3,6 +3,15 @@
 
 #include <glad/glad.h>
 
+GitGud::OpenGLVertexBuffer::OpenGLVertexBuffer(size_t size)
+{
+	GG_PROFILE_FUNCTION();
+
+	glCreateBuffers(1, &_rendererId);
+	glBindBuffer(GL_ARRAY_BUFFER, _rendererId);
+	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+}
+
 GitGud::OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, size_t size)
 {
 	GG_PROFILE_FUNCTION();
@@ -31,6 +40,14 @@ void GitGud::OpenGLVertexBuffer::UnBind() const
 	GG_PROFILE_FUNCTION();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void GitGud::OpenGLVertexBuffer::SetData(const void* data, uint32_t size)
+{
+	GG_PROFILE_FUNCTION();
+
+	glBindBuffer(GL_ARRAY_BUFFER, _rendererId);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }
 
 // ===============================================================================================

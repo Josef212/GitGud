@@ -7,6 +7,7 @@ namespace GitGud
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
+		OpenGLVertexBuffer(size_t size);
 		OpenGLVertexBuffer(float* vertices, size_t size);
 		~OpenGLVertexBuffer();
 
@@ -15,6 +16,8 @@ namespace GitGud
 
 		virtual const BufferLayout& GetLayout() const override { return _layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { _layout = layout; }
+
+		virtual void SetData(const void* data, uint32_t size) override;
 
 	private:
 		uint32_t _rendererId;

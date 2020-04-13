@@ -133,7 +133,7 @@ project "Sandbox"
 
 		defines
 		{
-			"GG_PLATFORM_WINDOWS"
+			--"GG_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"
