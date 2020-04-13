@@ -19,6 +19,8 @@ namespace GitGud
 		inline static float GetMouseY() { return s_instance->GetMouseYImpl(); }
 		inline static std::pair<float, float> GetMousePos() { return s_instance->GetMousePosImpl(); }
 
+		static Scope<Input> Create();
+
 	protected:
 		virtual bool IsKeyImpl(int keyCode) = 0;
 		virtual bool IsKeyImplDown(int keyCode) = 0;
@@ -33,6 +35,6 @@ namespace GitGud
 		virtual std::pair<float, float> GetMousePosImpl() = 0;
 
 	private:
-		static Input* s_instance;
+		static Scope<Input> s_instance;
 	};
 }
