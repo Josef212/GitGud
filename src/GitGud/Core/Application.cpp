@@ -13,10 +13,12 @@ namespace GitGud
 
 	Application::Application()
 	{
+		GG_PROFILE_FUNCTION();
+
 		GG_CORE_ASSERT(!s_instance, "Application already exists!");
 		s_instance = this;
 
-		_window = Scope<Window>(Window::Create());
+		_window = Window::Create();
 		_window->SetEventCallback(BIND_APPLICATION_EVENT_FN(OnEvent));
 
 		Renderer::Init();
@@ -27,31 +29,43 @@ namespace GitGud
 
 	Application::~Application()
 	{
+		GG_PROFILE_FUNCTION();
+
 		Renderer::Shutdown();
 	}
 
 	void Application::Run()
 	{
+		GG_PROFILE_FUNCTION();
+
 		while (_running)
 		{
+			GG_PROFILE_SCOPE("MainLoop");
+
 			float time = (float)glfwGetTime(); // TMP
 			Timestep timeStep = time - _lastFrameTime;
 			_lastFrameTime = time;
 
 			if (!_minimized)
 			{
+				GG_PROFILE_SCOPE("LayerStack OnUpdate");
+
 				for (Layer* layer : _layerStack)
 				{
 					layer->OnUpdate(timeStep);
 				}
 			}
 			
-			_imguiLayer->Begin();
-			for (Layer* layer : _layerStack)
 			{
-				layer->OnImGuiRender();
+				GG_PROFILE_SCOPE("LayerStack OnImGuiRender");
+
+				_imguiLayer->Begin();
+				for (Layer* layer : _layerStack)
+				{
+					layer->OnImGuiRender();
+				}
+				_imguiLayer->End();
 			}
-			_imguiLayer->End();
 
 			_window->OnUpdate();
 		}
@@ -59,6 +73,8 @@ namespace GitGud
 
 	void Application::OnEvent(Event& e)
 	{
+		GG_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowResize));
@@ -75,12 +91,16 @@ namespace GitGud
 
 	void Application::PushLayer(Layer* layer)
 	{
+		GG_PROFILE_FUNCTION();
+
 		_layerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
+		GG_PROFILE_FUNCTION();
+
 		_layerStack.PushOverlay(overlay);
 		overlay->OnAttach();
 	}
@@ -94,6 +114,8 @@ namespace GitGud
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		GG_PROFILE_FUNCTION();
+
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
 			_minimized = true;

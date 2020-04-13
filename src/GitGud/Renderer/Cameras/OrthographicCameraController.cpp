@@ -16,6 +16,8 @@ namespace GitGud
 
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
+		GG_PROFILE_FUNCTION();
+
 		if (Input::IsKey(GG_KEY_A))
 			_cameraPos.x -= _cameraMoveSpeed * ts;
 		if (Input::IsKey(GG_KEY_D))
@@ -40,6 +42,8 @@ namespace GitGud
 
 	void OrthographicCameraController::OnEvent(Event& e)
 	{
+		GG_PROFILE_FUNCTION();
+
 		EventDispatcher dispathcer(e);
 		dispathcer.Dispatch<MouseScrollEvent>(GG_BIND_EVENT_FN(OrthographicCameraController::OnMouseScroll));
 		dispathcer.Dispatch<WindowResizeEvent>(GG_BIND_EVENT_FN(OrthographicCameraController::OnWindowResize));
@@ -47,6 +51,8 @@ namespace GitGud
 
 	void OrthographicCameraController::OnImGuiRender()
 	{
+		GG_PROFILE_FUNCTION();
+
 		ImGui::Begin("Camera");
 		
 		ImGui::Checkbox("Rotation enabled", &_rotation);
@@ -82,6 +88,8 @@ namespace GitGud
 
 	bool OrthographicCameraController::OnMouseScroll(MouseScrollEvent& e)
 	{
+		GG_PROFILE_FUNCTION();
+
 		_zoomLevel -= e.GetYOffset() * 0.25f;
 		_zoomLevel = std::max(_zoomLevel, 0.25f);
 		_cameraMoveSpeed = _zoomLevel;
@@ -93,6 +101,8 @@ namespace GitGud
 
 	bool OrthographicCameraController::OnWindowResize(WindowResizeEvent& e)
 	{
+		GG_PROFILE_FUNCTION();
+
 		_aspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
 		ProjectionChanged();
 
@@ -101,11 +111,15 @@ namespace GitGud
 
 	void OrthographicCameraController::ProjectionChanged()
 	{
+		GG_PROFILE_FUNCTION();
+
 		_camera.SetProjection(-_aspectRatio * _zoomLevel, _aspectRatio * _zoomLevel, -_zoomLevel, _zoomLevel);
 	}
 
 	void OrthographicCameraController::ViewChanged()
 	{
+		GG_PROFILE_FUNCTION();
+
 		_camera.SetPosition(_cameraPos);
 		_camera.SetRotation(_cameraRotation);
 	}

@@ -14,6 +14,8 @@ namespace GitGud
 
 	void OpenGLContext::Init()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(_windowHandle);
 		int gladStatus = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		GG_CORE_ASSERT(gladStatus, "Failed to initialize Glad!");
@@ -34,6 +36,8 @@ namespace GitGud
 
 	void OpenGLContext::SwapBuffers()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(_windowHandle);
 	}
 }

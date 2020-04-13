@@ -31,6 +31,7 @@ namespace GitGud
 		auto it = std::find(_layers.begin(), _layers.end(), layer);
 		if (it != end())
 		{
+			layer->OnDetach();
 			_layers.erase(it);
 			_layerInsertIndex--;
 		}
@@ -41,6 +42,7 @@ namespace GitGud
 		auto it = std::find(_layers.begin(), _layers.end(), overlay);
 		if (it != end())
 		{
+			overlay->OnDetach();
 			_layers.erase(it);
 		}
 	}

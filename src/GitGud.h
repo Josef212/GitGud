@@ -5,6 +5,8 @@
 #include "GitGud/Core/Layer.h"
 #include "GitGud/Core/Log.h"
 
+#include "GitGud/Debug/Instrumentor.h"
+
 #include "GitGud/Core/TimeStep.h"
 
 #include "GitGud/Core/Input.h"

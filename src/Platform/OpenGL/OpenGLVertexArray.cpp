@@ -28,26 +28,36 @@ namespace GitGud
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glCreateVertexArrays(1, &_rendererId);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glDeleteVertexArrays(1, &_rendererId);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
+		GG_PROFILE_FUNCTION();
+
 		glBindVertexArray(_rendererId);
 	}
 
 	void OpenGLVertexArray::UnBind() const
 	{
+		GG_PROFILE_FUNCTION();
+
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
+		GG_PROFILE_FUNCTION();
+
 		GG_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layout!");
 
 		glBindVertexArray(_rendererId);
@@ -73,6 +83,8 @@ namespace GitGud
 
 	void OpenGLVertexArray::AddIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
+		GG_PROFILE_FUNCTION();
+
 		glBindVertexArray(_rendererId);
 		indexBuffer->Bind();
 		_indexBuffer = indexBuffer;

@@ -16,29 +16,32 @@ namespace GitGud
 		GG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
-	{
-		return new WindowsWindow(props);
-	}
-
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		GG_PROFILE_FUNCTION();
+
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		GG_PROFILE_FUNCTION();
+
 		Shutdown();
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		_context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
+		GG_PROFILE_FUNCTION();
+
 		glfwSwapInterval(enabled ? 1 : 0);
 		_data.VSync = enabled;
 	}
@@ -50,6 +53,8 @@ namespace GitGud
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		GG_PROFILE_FUNCTION();
+
 		_data.Title = props.Title;
 		_data.Width = props.Width;
 		_data.Height = props.Height;
@@ -119,7 +124,7 @@ namespace GitGud
 				}
 		});
 
-		glfwSetCharCallback(_window, [](GLFWwindow* window, uint keyCode)
+		glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int keyCode)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -165,6 +170,8 @@ namespace GitGud
 
 	void WindowsWindow::Shutdown()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(_window);
 	}
 }

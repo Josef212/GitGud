@@ -20,6 +20,8 @@ namespace GitGud
 
 	void Renderer2D::Init()
 	{
+		GG_PROFILE_FUNCTION();
+
 		s_Data = new Renderer2DStorage();
 
 		float vertices[4 * 5] =
@@ -36,7 +38,7 @@ namespace GitGud
 		};
 
 		s_Data->QuadVertexArray = VertexArray::Create();
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint));
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 
 		BufferLayout layout =
@@ -61,17 +63,22 @@ namespace GitGud
 
 	void Renderer2D::Shutdown()
 	{
+		GG_PROFILE_FUNCTION();
+
 		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		GG_PROFILE_FUNCTION();
+
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
 	{
+		GG_PROFILE_FUNCTION();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -106,6 +113,8 @@ namespace GitGud
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color, const Ref<Texture2D>& texture)
 	{
+		GG_PROFILE_FUNCTION();
+
 		s_Data->SpriteShader->SetFloat4("u_color", color);
 		texture->Bind();
 

@@ -7,6 +7,8 @@ namespace GitGud
 {
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height) : _path(""), _width(width), _height(height), _rendererId(0), _internalFormat(GL_RGBA8), _dataFormat(GL_RGBA)
 	{
+		GG_PROFILE_FUNCTION();
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &_rendererId);
 		glTextureStorage2D(_rendererId, 1, _internalFormat, _width, _height);
 
@@ -19,10 +21,17 @@ namespace GitGud
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : _path(path), _width(0), _height(0), _rendererId(0), _internalFormat(0), _dataFormat(0)
 	{
+		GG_PROFILE_FUNCTION();
+
 		stbi_set_flip_vertically_on_load(1);
 
 		int width, height, channels;
-		void* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		void* data = nullptr;
+		
+		{
+			GG_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&");
+			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		}
 
 		GG_CORE_ASSERT(data, "Failed to load image at path: {0}", path.c_str());
 
@@ -62,11 +71,15 @@ namespace GitGud
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glDeleteTextures(1, &_rendererId);
 	}
 
 	void OpenGLTexture2D::SetData(void* data, uint32_t size)
 	{
+		GG_PROFILE_FUNCTION();
+
 		uint32_t bpp = _dataFormat == GL_RGBA ? 4 : 3;
 		GG_CORE_ASSERT(size == _width * _height * bpp, "Data size do not match texture size!");
 
@@ -75,6 +88,8 @@ namespace GitGud
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
+		GG_PROFILE_FUNCTION();
+
 		glBindTextureUnit(slot, _rendererId);
 	}
 }

@@ -19,6 +19,8 @@ namespace GitGud
 
 	OpenGLShader::OpenGLShader(const std::string& filePath) : _rendererId(0)
 	{
+		GG_PROFILE_FUNCTION();
+
 		std::string fileSrc = ReadFile(filePath);
 		auto shaderSources = PreProcess(fileSrc);
 		Compile(shaderSources);
@@ -34,6 +36,8 @@ namespace GitGud
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string fragSrc) : _rendererId(0), _name(name)
 	{
+		GG_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragSrc;
@@ -42,51 +46,71 @@ namespace GitGud
 
 	OpenGLShader::~OpenGLShader()
 	{
+		GG_PROFILE_FUNCTION();
+
 		glDeleteProgram(_rendererId);
 	}
 
 	void OpenGLShader::Bind() const
 	{
+		GG_PROFILE_FUNCTION();
+
 		glUseProgram(_rendererId);
 	}
 
 	void OpenGLShader::UnBind() const
 	{
+		GG_PROFILE_FUNCTION();
+
 		glUseProgram(0);
 	}
 
 	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformInt(name, value);
 	}
 
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformFloat(name, value);
 	}
 
 	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformFloat2(name, value);
 	}
 
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformFloat3(name, value);
 	}
 
 	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformFloat4(name, value);
 	}
 
 	void OpenGLShader::SetMat3(const std::string& name, const glm::mat3& value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformMat3(name, value);
 	}
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
+		GG_PROFILE_FUNCTION();
+
 		UploadUniformMat4(name, value);
 	}
 
@@ -134,6 +158,8 @@ namespace GitGud
 
 	std::string OpenGLShader::ReadFile(const std::string& filePath)
 	{
+		GG_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(filePath, std::ios::in | std::ios::binary);
 		if (in)
@@ -154,6 +180,8 @@ namespace GitGud
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
+		GG_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
@@ -177,6 +205,8 @@ namespace GitGud
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		GG_PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 
 		GG_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders supported.");
