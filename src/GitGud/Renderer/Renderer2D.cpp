@@ -9,7 +9,7 @@
 
 namespace GitGud
 {
-	struct QuadVertex
+	struct Vertex
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
@@ -18,23 +18,44 @@ namespace GitGud
 		glm::vec2 Tiling;
 	};
 
+	/*struct TriRenderer2DData
+	{
+		const uint32_t MaxShapes = 10000;
+		const uint32_t MaxVertices = MaxShapes * 3;
+		const uint32_t MaxIndices = MaxShapes * 3;
+
+		Ref<VertexArray> VertexArray;
+		Ref<VertexBuffer> VertexBuffer;
+
+		uint32_t IndexCount = 0;
+		Vertex* VertexBufferBase = nullptr;
+		Vertex* VertexBufferPtr = nullptr;
+	};*/
+
+	struct QuadRenderer2DData
+	{
+		const uint32_t MaxShapes = 10000;
+		const uint32_t MaxVertices = MaxShapes * 4;
+		const uint32_t MaxIndices = MaxShapes * 6;
+
+		Ref<VertexArray> VertexArray;
+		Ref<VertexBuffer> VertexBuffer;
+
+		uint32_t IndexCount = 0;
+		Vertex* VertexBufferBase = nullptr;
+		Vertex* VertexBufferPtr = nullptr;
+	};
+
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
-
-		static const uint32_t MaxTextureCount = 32; // TODO: Assign querying GPU
-
-		Ref<VertexArray> QuadVertexArray;
-		Ref<VertexBuffer> QuadVertexBuffer;
+		//TriRenderer2DData TriShapeData;
+		QuadRenderer2DData QuadShapeData;
+				
 		Ref<Shader> SpriteShader;
 		Ref<Texture2D> WhiteTexture;
 
-		uint32_t QuadIndexCount = 0;
-		QuadVertex* QuadVertexBufferBase = nullptr;
-		QuadVertex* QuadVertexBufferPtr = nullptr;
-
+		
+		static const uint32_t MaxTextureCount = 32; // TODO: Assign querying GPU
 		// TODO: Using OpenGL texture id to identify the asset. Need to Change for a unique asset id
 		std::array<Ref<Texture2D>, MaxTextureCount> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0: White
@@ -64,43 +85,8 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		s_Data = new Renderer2DData();
-		s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
-
-		uint32_t* quadIndices = new uint32_t[s_Data->MaxIndices];
-		
-		uint32_t offset = 0;
-		for (uint32_t i = 0; i < s_Data->MaxIndices; i += 6)
-		{
-			quadIndices[i + 0] = offset + 0;
-			quadIndices[i + 1] = offset + 1;
-			quadIndices[i + 2] = offset + 2;
-
-			quadIndices[i + 3] = offset + 2;
-			quadIndices[i + 4] = offset + 3;
-			quadIndices[i + 5] = offset + 0;
-
-			offset += 4;
-		}
-
-		s_Data->QuadVertexArray = VertexArray::Create();
-		
-		Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data->MaxIndices);
-		s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
-		
-		delete[] quadIndices;
-
-		BufferLayout layout =
-		{
-			{ShaderDataType::Float3, "a_position"},
-			{ShaderDataType::Float4, "a_color"},
-			{ShaderDataType::Float2, "a_texCords"},
-			{ShaderDataType::Float, "a_texIndex"},
-			{ShaderDataType::Float2, "a_tiling"}
-		};
-
-		s_Data->QuadVertexBuffer->SetLayout(layout);
-		s_Data->QuadVertexArray->AddVertexBuffer(s_Data->QuadVertexBuffer);
-		s_Data->QuadVertexArray->AddIndexBuffer(quadIndexBuffer);
+		//TriInfoInit();
+		QuadInfoInit();
 
 		uint32_t whiteData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
@@ -121,7 +107,7 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		delete s_Data->QuadVertexBufferBase;
+		delete s_Data->QuadShapeData.VertexBufferBase;
 		delete s_Data;
 	}
 
@@ -132,8 +118,11 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 
-		s_Data->QuadIndexCount = 0;
-		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+		//s_Data->TriShapeData.IndexCount = 0;
+		//s_Data->TriShapeData.VertexBufferPtr = s_Data->TriShapeData.VertexBufferBase;
+
+		s_Data->QuadShapeData.IndexCount = 0;
+		s_Data->QuadShapeData.VertexBufferPtr = s_Data->QuadShapeData.VertexBufferBase;
 		s_Data->TextureSlotIndex = 1;
 	}
 
@@ -141,8 +130,11 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		uint32_t dataSize = (uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase;
-		s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
+		uint32_t dataSize = (uint8_t*)s_Data->QuadShapeData.VertexBufferPtr - (uint8_t*)s_Data->QuadShapeData.VertexBufferBase;
+		s_Data->QuadShapeData.VertexBuffer->SetData(s_Data->QuadShapeData.VertexBufferBase, dataSize);
+
+		//dataSize = (uint8_t*)s_Data->TriShapeData.VertexBufferPtr - (uint8_t*)s_Data->TriShapeData.VertexBufferBase;
+		//s_Data->TriShapeData.VertexBuffer->SetData(s_Data->TriShapeData.VertexBufferBase, dataSize);
 
 		Flush();
 	}
@@ -154,22 +146,17 @@ namespace GitGud
 		for (uint32_t i = 0; i < s_Data->TextureSlotIndex; ++i)
 			s_Data->TextureSlots[i]->Bind(i);
 
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
+		RenderCommand::DrawIndexed(s_Data->QuadShapeData.VertexArray, s_Data->QuadShapeData.IndexCount);
+		//RenderCommand::DrawIndexed(s_Data->TriShapeData.VertexArray, s_Data->TriShapeData.IndexCount);
 	}
 	
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
-	}
+	// ------------------------------------------------------------------------------------------
+	// ----- DrawQuad ---------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		DrawQuad(position, size, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const glm::vec4& color)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color)
@@ -177,9 +164,9 @@ namespace GitGud
 		DrawQuad(position, size, angle, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& tiling)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, glm::vec4(1.0f), texture, tiling);
+		DrawQuad(position, size, glm::vec4(1.0f), texture, tiling);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)
@@ -216,17 +203,163 @@ namespace GitGud
 
 		for (uint32_t i = 0; i < 4; ++i)
 		{
-			s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
-			s_Data->QuadVertexBufferPtr->Color = color;
-			s_Data->QuadVertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
-			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
-			s_Data->QuadVertexBufferPtr->Tiling = tiling;
-			s_Data->QuadVertexBufferPtr++;
+			s_Data->QuadShapeData.VertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
+			s_Data->QuadShapeData.VertexBufferPtr->Color = color;
+			s_Data->QuadShapeData.VertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
+			s_Data->QuadShapeData.VertexBufferPtr->TextureId = textureIndex;
+			s_Data->QuadShapeData.VertexBufferPtr->Tiling = tiling;
+			s_Data->QuadShapeData.VertexBufferPtr++;
 		}
 
-		s_Data->QuadIndexCount += 6;
+		s_Data->QuadShapeData.IndexCount += 6;
 	}
+
+	// ------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------
 	
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		DrawTriangle(position, size, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
+	}
+
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color)
+	{
+		DrawTriangle(position, size, angle, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
+	}
+
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	{
+		DrawTriangle(position, size, glm::vec4(1.0f), texture, tiling);
+	}
+
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	{
+		DrawTriangle(position, size, angle, glm::vec4(1.0f), texture, tiling);
+	}
+
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		glm::mat4& transform = glm::translate(glm::mat4(1.0f), position);
+		DrawTriangle(transform, size, color, texture, tiling);
+	}
+
+	void Renderer2D::DrawTriangle(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		glm::mat4& transform = glm::translate(glm::mat4(1.0f), position);
+		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, -1.0f });
+		DrawTriangle(transform, size, color, texture, tiling);
+	}
+
+	void Renderer2D::DrawTriangle(const glm::mat4& transform, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		float textureIndex = GetTextureIndex(texture);
+		float halfWidth = size.x * 0.5f;
+
+		//s_Data->TriShapeData.VertexBufferPtr->Position = transform * glm::vec4(-halfWidth, 0.0f, 0.0f, 1.0f);
+		//s_Data->TriShapeData.VertexBufferPtr->Color = color;
+		//s_Data->TriShapeData.VertexBufferPtr->TexCoord = { 0.0f, 0.0f };
+		//s_Data->TriShapeData.VertexBufferPtr->TextureId = textureIndex;
+		//s_Data->TriShapeData.VertexBufferPtr->Tiling = tiling;
+		//s_Data->TriShapeData.VertexBufferPtr++;
+		//
+		//s_Data->TriShapeData.VertexBufferPtr->Position = transform * glm::vec4(halfWidth, 0.0f, 0.0f, 1.0f);
+		//s_Data->TriShapeData.VertexBufferPtr->Color = color;
+		//s_Data->TriShapeData.VertexBufferPtr->TexCoord = { 1.0f, 0.0f };
+		//s_Data->TriShapeData.VertexBufferPtr->TextureId = textureIndex;
+		//s_Data->TriShapeData.VertexBufferPtr->Tiling = tiling;
+		//s_Data->TriShapeData.VertexBufferPtr++;
+		//
+		//s_Data->TriShapeData.VertexBufferPtr->Position = transform * glm::vec4(0.0f, size.y, 0.0f, 1.0f);
+		//s_Data->TriShapeData.VertexBufferPtr->Color = color;
+		//s_Data->TriShapeData.VertexBufferPtr->TexCoord = { 0.5f, 1.0f };
+		//s_Data->TriShapeData.VertexBufferPtr->TextureId = textureIndex;
+		//s_Data->TriShapeData.VertexBufferPtr->Tiling = tiling;
+		//s_Data->TriShapeData.VertexBufferPtr++;
+		//
+		//s_Data->TriShapeData.IndexCount += 3;
+	}
+
+	/*void Renderer2D::TriInfoInit()
+	{
+		s_Data->TriShapeData.VertexBufferBase = new Vertex[s_Data->TriShapeData.MaxVertices];
+
+		uint32_t* triIndices = new uint32_t[s_Data->TriShapeData.MaxIndices];
+		for (uint32_t i = 0, offset = 0; i < s_Data->TriShapeData.MaxIndices; i += 6)
+		{
+			triIndices[i + 0] = offset + 0;
+			triIndices[i + 1] = offset + 1;
+			triIndices[i + 2] = offset + 2;
+
+			offset += 3;
+		}
+
+		s_Data->TriShapeData.VertexArray = VertexArray::Create();
+
+		Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(triIndices, s_Data->TriShapeData.MaxIndices);
+		s_Data->TriShapeData.VertexBuffer = VertexBuffer::Create(s_Data->TriShapeData.MaxVertices * sizeof(Vertex));
+
+		delete[] triIndices;
+
+		BufferLayout layout =
+		{
+			{ShaderDataType::Float3, "a_position"},
+			{ShaderDataType::Float4, "a_color"},
+			{ShaderDataType::Float2, "a_texCords"},
+			{ShaderDataType::Float, "a_texIndex"},
+			{ShaderDataType::Float2, "a_tiling"}
+		};
+
+		s_Data->TriShapeData.VertexBuffer->SetLayout(layout);
+		s_Data->TriShapeData.VertexArray->AddVertexBuffer(s_Data->TriShapeData.VertexBuffer);
+		s_Data->TriShapeData.VertexArray->AddIndexBuffer(quadIndexBuffer);
+	}*/
+
+	void Renderer2D::QuadInfoInit()
+	{
+		s_Data->QuadShapeData.VertexBufferBase = new Vertex[s_Data->QuadShapeData.MaxVertices];
+
+		uint32_t* quadIndices = new uint32_t[s_Data->QuadShapeData.MaxIndices];
+		for (uint32_t i = 0, offset = 0; i < s_Data->QuadShapeData.MaxIndices; i += 6)
+		{
+			quadIndices[i + 0] = offset + 0;
+			quadIndices[i + 1] = offset + 1;
+			quadIndices[i + 2] = offset + 2;
+
+			quadIndices[i + 3] = offset + 2;
+			quadIndices[i + 4] = offset + 3;
+			quadIndices[i + 5] = offset + 0;
+
+			offset += 4;
+		}
+
+		s_Data->QuadShapeData.VertexArray = VertexArray::Create();
+
+		Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data->QuadShapeData.MaxIndices);
+		s_Data->QuadShapeData.VertexBuffer = VertexBuffer::Create(s_Data->QuadShapeData.MaxVertices * sizeof(Vertex));
+
+		delete[] quadIndices;
+
+		BufferLayout layout =
+		{
+			{ShaderDataType::Float3, "a_position"},
+			{ShaderDataType::Float4, "a_color"},
+			{ShaderDataType::Float2, "a_texCords"},
+			{ShaderDataType::Float, "a_texIndex"},
+			{ShaderDataType::Float2, "a_tiling"}
+		};
+
+		s_Data->QuadShapeData.VertexBuffer->SetLayout(layout);
+		s_Data->QuadShapeData.VertexArray->AddVertexBuffer(s_Data->QuadShapeData.VertexBuffer);
+		s_Data->QuadShapeData.VertexArray->AddIndexBuffer(quadIndexBuffer);
+	}
+
 	float Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
 	{
 		if (*s_Data->WhiteTexture.get() == *texture.get())
