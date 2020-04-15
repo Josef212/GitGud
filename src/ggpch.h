@@ -16,6 +16,10 @@
 #include "GitGud/Core/Log.h"
 #include "GitGud/Debug/Instrumentor.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 #ifdef GG_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif // GG_PLATFORM_WINDOWS
