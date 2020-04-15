@@ -157,19 +157,9 @@ namespace GitGud
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
 	}
 	
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
-	}
-
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		DrawQuad(position, size, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const glm::vec4& color)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color)
@@ -177,9 +167,9 @@ namespace GitGud
 		DrawQuad(position, size, angle, color, s_Data->WhiteTexture, { 1.0f, 1.0f });
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& tiling)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, angle, glm::vec4(1.0f), texture, tiling);
+		DrawQuad(position, size, glm::vec4(1.0F), texture, tiling);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)

@@ -44,9 +44,6 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	GitGud::Renderer2D::DrawQuad({ 4.0f, -4.0f, 0.0f }, {1.0f, 1.0f}, 0.0f, _logoTexture);
 	GitGud::Renderer2D::DrawQuad({ 1.2f, 1.4f, 0.0f }, { 1.0f, 1.0f }, 45.0f, { 0.2f, 0.8f, 0.4f, 1.0f }, _checkerTexture, glm::vec2(1.0f));
 
-	//GitGud::Renderer2D::DrawTriangle({ -2.0f, -2.5f, 0.0f }, { 1.0f, 1.0f }, _logoTexture);
-	//GitGud::Renderer2D::DrawTriangle({ 2.0f, 2.5f, 0.0f }, { 1.0f, 1.0f }, { 0.2f, 0.8f, 0.2f, 1.0f });
-
 	GitGud::Renderer2D::EndScene();
 }
 
