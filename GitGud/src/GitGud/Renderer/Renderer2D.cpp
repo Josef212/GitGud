@@ -20,9 +20,9 @@ namespace GitGud
 
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxVertices = MaxQuads * 4;
+		static const uint32_t MaxIndices = MaxQuads * 6;
 
 		static const uint32_t MaxTextureCount = 32; // TODO: Assign querying GPU
 
@@ -55,6 +55,8 @@ namespace GitGud
 			{1.0f, 1.0f},
 			{0.0f, 1.0f}
 		};
+
+		Renderer2D::Statistics Stats;
 	};
 
 	static Renderer2DData* s_Data;
@@ -155,6 +157,7 @@ namespace GitGud
 			s_Data->TextureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
+		s_Data->Stats.DrawCalls++;
 	}
 	
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
@@ -202,6 +205,11 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
+		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			FlushAndReset();
+		}
+
 		float textureIndex = GetTextureIndex(texture);
 
 		for (uint32_t i = 0; i < 4; ++i)
@@ -215,8 +223,29 @@ namespace GitGud
 		}
 
 		s_Data->QuadIndexCount += 6;
+
+		s_Data->Stats.QuadCount++;
 	}
 	
+	Renderer2D::Statistics Renderer2D::GetStatistics()
+	{
+		return s_Data->Stats;
+	}
+
+	void Renderer2D::ResetStats()
+	{
+		memset(&s_Data->Stats, 0, sizeof(Statistics));
+	}
+
+	void Renderer2D::FlushAndReset()
+	{
+		EndScene();
+
+		s_Data->QuadIndexCount = 0;
+		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+		s_Data->TextureSlotIndex = 1;
+	}
+
 	float Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
 	{
 		if (*s_Data->WhiteTexture.get() == *texture.get())

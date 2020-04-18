@@ -30,6 +30,8 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 
 	_cameraController.OnUpdate(ts);
 
+	GitGud::Renderer2D::ResetStats();
+
 	GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	GitGud::RenderCommand::Clear();
 	
@@ -40,9 +42,22 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 
 	GitGud::Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
 	GitGud::Renderer2D::DrawQuad({ -1.0f, 2.0f, 0.0f }, { 1.0f, 1.0f }, rot, {0.2f, 0.3f, 0.8f, 1.0f});
-	GitGud::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, {10.0f, 10.0f}, 0.0f, _checkerTexture, glm::vec2(10.0f, 10.0f));
+	GitGud::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, 0.0f, _checkerTexture, glm::vec2(10.0f, 10.0f));
 	GitGud::Renderer2D::DrawQuad({ 4.0f, -4.0f, 0.0f }, {1.0f, 1.0f}, 0.0f, _logoTexture);
 	GitGud::Renderer2D::DrawQuad({ 1.2f, 1.4f, 0.0f }, { 1.0f, 1.0f }, 45.0f, { 0.2f, 0.8f, 0.4f, 1.0f }, _checkerTexture, glm::vec2(1.0f));
+
+	GitGud::Renderer2D::EndScene();
+	
+	GitGud::Renderer2D::BeginScene(_cameraController.GetCamera());
+
+	for (float y = -5.0f; y < 5.0f; y += 0.5f)
+	{
+		for (float x = -5.0f; x < 5.0f; x += 0.5f)
+		{
+			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+			GitGud::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, color);
+		}
+	}
 
 	GitGud::Renderer2D::EndScene();
 }
@@ -61,6 +76,13 @@ void Sandbox2D::OnImGuiRender()
 	_cameraController.OnImGuiRender();
 
 	ImGui::Begin("Settings");
+
+	auto stats = GitGud::Renderer2D::GetStatistics();
+	ImGui::Text("Renderer2D Stats:");
+	ImGui::Text("Draw calls: %d", stats.DrawCalls);
+	ImGui::Text("Quads: %d", stats.QuadCount);
+	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
 
 	ImGui::ColorEdit4("Color", &_color.r);
 	ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
