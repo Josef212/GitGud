@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "spdlog/spdlog.h"
-#include "spdlog/fmt/ostr.h"
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 namespace GitGud
 {
@@ -19,14 +19,14 @@ namespace GitGud
 	};
 }
 
-#define GG_CORE_TRACE(...)     ::GitGud::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define GG_CORE_INFO(...)      ::GitGud::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define GG_CORE_WARN(...)      ::GitGud::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define GG_CORE_ERROR(...)     ::GitGud::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define GG_CORE_FATAL(...)     ::GitGud::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+#define GG_CORE_TRACE(...)        ::GitGud::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define GG_CORE_INFO(...)         ::GitGud::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define GG_CORE_WARN(...)         ::GitGud::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define GG_CORE_ERROR(...)        ::GitGud::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define GG_CORE_CRITICAL(...)     ::GitGud::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
-#define GG_TRACE(...)          ::GitGud::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define GG_INFO(...)           ::GitGud::Log::GetClientLogger()->info(__VA_ARGS__)
-#define GG_WARN(...)           ::GitGud::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define GG_ERROR(...)          ::GitGud::Log::GetClientLogger()->error(__VA_ARGS__)
-#define GG_FATAL(...)          ::GitGud::Log::GetClientLogger()->fatal(__VA_ARGS__)
+#define GG_TRACE(...)             ::GitGud::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define GG_INFO(...)              ::GitGud::Log::GetClientLogger()->info(__VA_ARGS__)
+#define GG_WARN(...)              ::GitGud::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define GG_ERROR(...)             ::GitGud::Log::GetClientLogger()->error(__VA_ARGS__)
+#define GG_CRITICAL(...)          ::GitGud::Log::GetClientLogger()->critical(__VA_ARGS__)
