@@ -10,6 +10,8 @@
 
 #include "GitGud/ImGui/ImGuiLayer.h"
 
+int main(int argc, char** argv);
+
 namespace GitGud
 {
 	class Application
@@ -17,8 +19,6 @@ namespace GitGud
 	public:
 		Application();
 		~Application();
-
-		void Run();
 
 		void OnEvent(Event& e);
 
@@ -29,6 +29,7 @@ namespace GitGud
 		inline static Application& Get() { return *s_instance; }
 
 	private:
+		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
@@ -42,6 +43,7 @@ namespace GitGud
 
 	private:
 		static Application* s_instance;
+		friend int ::main(int argc, char** argv);
 	};
 
 	Application* CreateApplication();
