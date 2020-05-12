@@ -22,6 +22,7 @@
 #include "GitGud/Renderer/VertexArray.h"
 #include "GitGud/Renderer/Shader.h"
 #include "GitGud/Renderer/Texture.h"
+#include "GitGud/Renderer/SubTexture2D.h"
 
 #include "GitGud/Renderer/Cameras/OrthographicCamera.h"
 #include "GitGud/Renderer/Cameras/OrthographicCameraController.h"

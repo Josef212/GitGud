@@ -172,7 +172,7 @@ namespace GitGud
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& tiling)
 	{
-		DrawQuad(position, size, glm::vec4(1.0F), texture, tiling);
+		DrawQuad(position, size, glm::vec4(1.0f), texture, tiling);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<Texture2D>& texture, const glm::vec2& tiling)
@@ -217,6 +217,64 @@ namespace GitGud
 			s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
 			s_Data->QuadVertexBufferPtr->Color = color;
 			s_Data->QuadVertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
+			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
+			s_Data->QuadVertexBufferPtr->Tiling = tiling;
+			s_Data->QuadVertexBufferPtr++;
+		}
+
+		s_Data->QuadIndexCount += 6;
+
+		s_Data->Stats.QuadCount++;
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	{
+		DrawQuad(position, size, glm::vec4(1.0f), subTexture, tiling);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	{
+		DrawQuad(position, size, angle, glm::vec4(1.0f), subTexture, tiling);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+		transform = glm::scale(transform, { size.x, size.y, 1.0f });
+
+		DrawQuad(transform, color, subTexture, tiling);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, -1.0f });
+		transform = glm::scale(transform, { size.x, size.y, 1.0f });
+
+		DrawQuad(transform, color, subTexture, tiling);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	{
+		GG_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			FlushAndReset();
+		}
+
+		float textureIndex = GetTextureIndex(subTexture->GetTexture());
+		const glm::vec2* texCoords = subTexture->GetTexCoords();
+
+		for (uint32_t i = 0; i < 4; ++i)
+		{
+			s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
+			s_Data->QuadVertexBufferPtr->Color = color;
+			s_Data->QuadVertexBufferPtr->TexCoord = texCoords[i];
 			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
 			s_Data->QuadVertexBufferPtr->Tiling = tiling;
 			s_Data->QuadVertexBufferPtr++;
