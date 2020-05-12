@@ -53,8 +53,8 @@ namespace GitGud
 			case GitGud::ShaderDataType::Float2:	return 2;
 			case GitGud::ShaderDataType::Float3:	return 3;
 			case GitGud::ShaderDataType::Float4:	return 4;
-			case GitGud::ShaderDataType::Mat3:		return 3 * 3;
-			case GitGud::ShaderDataType::Mat4:		return 4 * 4;
+			case GitGud::ShaderDataType::Mat3:		return 3; // 3 * float3
+			case GitGud::ShaderDataType::Mat4:		return 4; // 4 * float4
 			case GitGud::ShaderDataType::Int:		return 1;
 			case GitGud::ShaderDataType::Int2:		return 2;
 			case GitGud::ShaderDataType::Int3:		return 3;

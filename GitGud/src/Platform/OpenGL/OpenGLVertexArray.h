@@ -22,6 +22,7 @@ namespace GitGud
 
 	private:
 		uint32_t _rendererId;
+		uint32_t _vertexBufferIndex = 0;
 		std::vector<Ref<VertexBuffer>> _vertexBuffers;
 		Ref<IndexBuffer> _indexBuffer;
 	};

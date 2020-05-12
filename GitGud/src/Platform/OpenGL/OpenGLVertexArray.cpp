@@ -64,18 +64,52 @@ namespace GitGud
 		vertexBuffer->Bind();
 				
 		const auto& layout = vertexBuffer->GetLayout();
-		uint32_t index = 0;
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(
-				index,
-				element.GetComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.Type),
-				element.Normalized ? GL_TRUE : GL_FALSE,
-				layout.GetStride(),
-				(const void*)element.Offset);
-			++index;
+			switch (element.Type)
+			{
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Bool:
+			{
+				glEnableVertexAttribArray(_vertexBufferIndex);
+				glVertexAttribPointer(
+					_vertexBufferIndex,
+					element.GetComponentCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type),
+					element.Normalized ? GL_TRUE : GL_FALSE,
+					layout.GetStride(),
+					(const void*)element.Offset);
+				++_vertexBufferIndex;
+				break;
+			}
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4:
+			{
+				uint8_t count = element.GetComponentCount();
+				for (uint8_t i = 0; i < count; ++i)
+				{
+					glEnableVertexAttribArray(_vertexBufferIndex);
+					glVertexAttribPointer(
+						_vertexBufferIndex, 
+						count,
+						ShaderDataTypeToOpenGLBaseType(element.Type),
+						element.Normalized ? GL_TRUE : GL_FALSE,
+						layout.GetStride(),
+						(const void*)(sizeof(float) * count * i));
+					glVertexAttribDivisor(_vertexBufferIndex, 1);
+					++_vertexBufferIndex;
+				}
+				break;
+			}
+			default: GG_CORE_ASSERT(false, "Unkown ShaderDataType!");
+			}
 		}
 
 		_vertexBuffers.push_back(vertexBuffer);
