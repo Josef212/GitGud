@@ -24,7 +24,7 @@ namespace GitGud
 		static const uint32_t MaxVertices = MaxQuads * 4;
 		static const uint32_t MaxIndices = MaxQuads * 6;
 
-		static const uint32_t MaxTextureCount = 32; // TODO: Assign querying GPU
+		static const uint32_t MaxTextureSlots = 32; // TODO: Assign querying GPU
 
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
@@ -36,7 +36,7 @@ namespace GitGud
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
 		// TODO: Using OpenGL texture id to identify the asset. Need to Change for a unique asset id
-		std::array<Ref<Texture2D>, MaxTextureCount> TextureSlots;
+		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0: White
 
 		// ---
@@ -111,12 +111,12 @@ namespace GitGud
 
 		s_Data->SpriteShader = Shader::Create("assets/shaders/SpriteShader.glsl");
 		
-		int32_t samplers[s_Data->MaxTextureCount];
-		for (uint32_t i = 0; i < s_Data->MaxTextureCount; ++i)
+		int32_t samplers[s_Data->MaxTextureSlots];
+		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
 			samplers[i] = i;
 
 		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetIntArray("u_textures", samplers, s_Data->MaxTextureCount);
+		s_Data->SpriteShader->SetIntArray("u_textures", samplers, s_Data->MaxTextureSlots);
 	}
 
 	void Renderer2D::Shutdown()
@@ -265,6 +265,11 @@ namespace GitGud
 
 		if (textureIndex == 0.0f)
 		{
+			if (s_Data->TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+			{
+				FlushAndReset();
+			}
+
 			textureIndex = (float)s_Data->TextureSlotIndex;
 			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 			s_Data->TextureSlotIndex++;
