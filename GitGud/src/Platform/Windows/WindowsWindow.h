@@ -30,7 +30,7 @@ namespace GitGud
 	
 	private:
 		GLFWwindow* _window;
-		GraphicsContext* _context;
+		Scope<GraphicsContext> _context;
 
 		struct WindowData
 		{

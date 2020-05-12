@@ -11,6 +11,7 @@ namespace GitGud
 	{
 		for (Layer* layer : _layers)
 		{
+			layer->OnDetach();
 			delete layer;
 		}
 	}

@@ -9,17 +9,17 @@ namespace GitGud
 	{
 		switch (type)
 		{
-			case GitGud::ShaderDataType::Float:		return GL_FLOAT;
-			case GitGud::ShaderDataType::Float2:	return GL_FLOAT;
-			case GitGud::ShaderDataType::Float3:	return GL_FLOAT;
-			case GitGud::ShaderDataType::Float4:	return GL_FLOAT;
-			case GitGud::ShaderDataType::Mat3:		return GL_FLOAT;
-			case GitGud::ShaderDataType::Mat4:		return GL_FLOAT;
-			case GitGud::ShaderDataType::Int:		return GL_INT;
-			case GitGud::ShaderDataType::Int2:		return GL_INT;
-			case GitGud::ShaderDataType::Int3:		return GL_INT;
-			case GitGud::ShaderDataType::Int4:		return GL_INT;
-			case GitGud::ShaderDataType::Bool:		return GL_BOOL;
+			case ShaderDataType::Float:		return GL_FLOAT;
+			case ShaderDataType::Float2:	return GL_FLOAT;
+			case ShaderDataType::Float3:	return GL_FLOAT;
+			case ShaderDataType::Float4:	return GL_FLOAT;
+			case ShaderDataType::Mat3:		return GL_FLOAT;
+			case ShaderDataType::Mat4:		return GL_FLOAT;
+			case ShaderDataType::Int:		return GL_INT;
+			case ShaderDataType::Int2:		return GL_INT;
+			case ShaderDataType::Int3:		return GL_INT;
+			case ShaderDataType::Int4:		return GL_INT;
+			case ShaderDataType::Bool:		return GL_BOOL;
 		}
 
 		GG_CORE_ASSERT(false, "Unknown shader data type!");

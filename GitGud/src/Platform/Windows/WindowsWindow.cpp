@@ -5,11 +5,12 @@
 #include "GitGud/Events/KeyEvent.h"
 #include "GitGud/Events/MouseEvent.h"
 
+#include "GitGud/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace GitGud
 {
-	static bool s_glfwInitialized = false;
+	static uint8_t s_glfwWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
@@ -61,18 +62,27 @@ namespace GitGud
 		
 		GG_CORE_INFO("Creating window {0} ({1} x {2})", _data.Title, _data.Width, _data.Height);
 
-		if (!s_glfwInitialized)
+		if (s_glfwWindowCount == 0)
 		{
+			GG_PROFILE_SCOPE("glfwInit");
 			bool ret = glfwInit();
 			GG_CORE_ASSERT(ret, "Could not initialize GLFW!");
-
 			glfwSetErrorCallback(GLFWErrorCallback);
-			s_glfwInitialized = true;
 		}
 
-		_window = glfwCreateWindow(_data.Width, _data.Height, _data.Title.c_str(), nullptr, nullptr);
+		{
+			GG_PROFILE_SCOPE("glfwCreateWindow");
+#if defined(GG_DEBUG)
+			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+			{
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+#endif
+			_window = glfwCreateWindow(_data.Width, _data.Height, _data.Title.c_str(), nullptr, nullptr);
+			++s_glfwWindowCount;
+		}
 		
-		_context = new OpenGLContext(_window);
+		_context = GraphicsContext::Create(_window);
 		_context->Init();
 
 		glfwSetWindowUserPointer(_window, &_data);
@@ -173,5 +183,11 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		glfwDestroyWindow(_window);
+		--s_glfwWindowCount;
+
+		if (s_glfwWindowCount == 0)
+		{
+			glfwTerminate();
+		}
 	}
 }
