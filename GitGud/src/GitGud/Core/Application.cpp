@@ -79,9 +79,9 @@ namespace GitGud
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowResize));
 
-		for (auto it = _layerStack.end(); it != _layerStack.begin(); )
+		for (auto it = _layerStack.rbegin(); it != _layerStack.rend(); ++it)
 		{
-			(*--it)->OnEvent(e);
+			(*it)->OnEvent(e);
 			if (e.Handled)
 			{
 				break;
