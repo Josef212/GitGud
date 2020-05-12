@@ -18,6 +18,8 @@ public:
 private:
 	GitGud::OrthographicCameraController _cameraController;
 	GitGud::Ref<GitGud::Texture2D> _checkerTexture, _logoTexture;
+	GitGud::Ref<GitGud::Texture2D> _spriteSheet;
+	GitGud::Ref<GitGud::SubTexture2D> _stairsSprite, _barrelSprite, _orangeTree;
 
 	glm::vec4 _color = { 0.8f, 0.2f, 0.3f, 1.0f };
 	glm::vec2 _pos = { 0.0f, 0.0f };

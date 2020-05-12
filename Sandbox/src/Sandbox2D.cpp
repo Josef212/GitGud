@@ -17,6 +17,11 @@ void Sandbox2D::OnAttach()
 
 	_checkerTexture = GitGud::Texture2D::Create("assets/textures/Checkerboard.png");
 	_logoTexture = GitGud::Texture2D::Create("assets/textures/GitGudIconLogo.png");
+	_spriteSheet = GitGud::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
+
+	_stairsSprite = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 7, 6 }, { 128, 128 });
+	_barrelSprite = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 8, 2 }, { 128, 128 });
+	_orangeTree = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 2, 1 }, { 128, 128 }, { 1, 2 });
 }
 
 void Sandbox2D::OnDetach()
@@ -35,6 +40,7 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	GitGud::RenderCommand::Clear();
 	
+#if 0
 	GitGud::Renderer2D::BeginScene(_cameraController.GetCamera());
 
 	static float rot = 0.0f;
@@ -58,6 +64,15 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 			GitGud::Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, color);
 		}
 	}
+
+	GitGud::Renderer2D::EndScene();
+#endif
+
+	GitGud::Renderer2D::BeginScene(_cameraController.GetCamera());
+
+	GitGud::Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _stairsSprite);
+	GitGud::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _barrelSprite);
+	GitGud::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 2.0f }, _orangeTree);
 
 	GitGud::Renderer2D::EndScene();
 }
