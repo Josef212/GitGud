@@ -57,12 +57,22 @@
 #endif // GG_PLATFORM_WINDOWS
 
 #ifdef GG_DEBUG
+	#if defined(GG_PLATFORM_WINDOWS)
+		#define GG_DEBUG_BREAK() __debugbreak()
+	#elif defined(GG_PLATFORM_LINUX)
+		#include <signal.h>
+		#define GG_DEBUG_BREAK() raise(SIGTRAP)
+	#else
+		#error	"Platform doesn't support debugbreak yet!"
+	#endif
 	#define GG_ENABLE_ASSERTS
+#else
+	#define GG_DEBUG_BREAK()
 #endif
 
 #ifdef GG_ENABLE_ASSERTS
-	#define GG_ASSERT(x, ...) { if(!(x)) { GG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define GG_CORE_ASSERT(x, ...) { if(!(x)) { GG_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#define GG_ASSERT(x, ...) { if(!(x)) { GG_ERROR("Assertion Failed: {0}", __VA_ARGS__); GG_DEBUG_BREAK(); } }
+	#define GG_CORE_ASSERT(x, ...) { if(!(x)) { GG_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); GG_DEBUG_BREAK(); } }
 #else
 	#define GG_ASSERT(x, ...)
 	#define GG_CORE_ASSERT(x, ...)
