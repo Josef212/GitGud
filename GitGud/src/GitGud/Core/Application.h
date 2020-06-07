@@ -28,6 +28,8 @@ namespace GitGud
 		inline Window& GetWindow() { return *_window; }
 		inline static Application& Get() { return *s_instance; }
 
+		void Close();
+
 	private:
 		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);

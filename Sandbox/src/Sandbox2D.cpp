@@ -40,7 +40,7 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	GitGud::RenderCommand::Clear();
 	
-#if 0
+#if 1
 	GitGud::Renderer2D::BeginScene(_cameraController.GetCamera());
 
 	static float rot = 0.0f;
@@ -87,34 +87,86 @@ void Sandbox2D::OnEvent(GitGud::Event& e)
 void Sandbox2D::OnImGuiRender()
 {
 	GG_PROFILE_FUNCTION();
-
-	_cameraController.OnImGuiRender();
-
-	ImGui::Begin("Settings");
-
-	auto stats = GitGud::Renderer2D::GetStatistics();
-	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw calls: %d", stats.DrawCalls);
-	ImGui::Text("Quads: %d", stats.QuadCount);
-	ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-	ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
-
-	ImGui::ColorEdit4("Color", &_color.r);
-	ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
-	ImGui::DragFloat2("Size", &_size.x, 0.1f);
-	ImGui::DragFloat("Angle", &_angle);
-
-	if (ImGui::Button("Begin session"))
+	
+	static bool dockspaceOpen = true;
+	static bool opt_fullscreen_persistant = true;
+	bool opt_fullscreen = opt_fullscreen_persistant;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+	
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen)
 	{
-		GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("End session"))
-	{
-		GG_PROFILE_END_SESSION();
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 	
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+	    window_flags |= ImGuiWindowFlags_NoBackground;
+	
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+	ImGui::PopStyleVar();
+	
+	if (opt_fullscreen) ImGui::PopStyleVar(2);
+	
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+	    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+	    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
+	
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit", "")) GitGud::Application::Get().Close();
+			ImGui::EndMenu();
+		}
+		
+		ImGui::EndMenuBar();
+	}
+
+	{
+		_cameraController.OnImGuiRender();
+
+		ImGui::Begin("Settings");
+
+		auto stats = GitGud::Renderer2D::GetStatistics();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("Draw calls: %d", stats.DrawCalls);
+		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
+
+		ImGui::ColorEdit4("Color", &_color.r);
+		ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
+		ImGui::DragFloat2("Size", &_size.x, 0.1f);
+		ImGui::DragFloat("Angle", &_angle);
+
+		if (ImGui::Button("Begin session"))
+		{
+			GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("End session"))
+		{
+			GG_PROFILE_END_SESSION();
+		}
+
+		ImGui::Image((void*)_checkerTexture->GetRendererID(), ImVec2(256, 256));
+
+		ImGui::End();
+	}
+
 	ImGui::End();
 }

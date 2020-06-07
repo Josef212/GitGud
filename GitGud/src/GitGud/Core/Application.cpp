@@ -34,6 +34,11 @@ namespace GitGud
 		Renderer::Shutdown();
 	}
 
+	void Application::Close()
+	{
+		_running = false;
+	}
+
 	void Application::Run()
 	{
 		GG_PROFILE_FUNCTION();

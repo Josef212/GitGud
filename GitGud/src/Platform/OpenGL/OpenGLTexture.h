@@ -16,6 +16,8 @@ namespace GitGud
 		virtual uint32_t GetWidth() const override { return _width; }
 		virtual uint32_t GetHeight() const override { return _height; }
 
+		virtual uint32_t GetRendererID() const override { return _rendererId; }
+
 		virtual void SetData(void* data, uint32_t size) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
