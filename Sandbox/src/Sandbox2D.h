@@ -21,6 +21,8 @@ private:
 	GitGud::Ref<GitGud::Texture2D> _spriteSheet;
 	GitGud::Ref<GitGud::SubTexture2D> _stairsSprite, _barrelSprite, _orangeTree;
 
+	GitGud::Ref<GitGud::Framebuffer> _frambuffer;
+
 	glm::vec4 _color = { 0.8f, 0.2f, 0.3f, 1.0f };
 	glm::vec2 _pos = { 0.0f, 0.0f };
 	glm::vec2 _size = { 1.0f, 1.0f };

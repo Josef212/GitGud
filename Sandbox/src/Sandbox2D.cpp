@@ -22,6 +22,11 @@ void Sandbox2D::OnAttach()
 	_stairsSprite = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 7, 6 }, { 128, 128 });
 	_barrelSprite = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 8, 2 }, { 128, 128 });
 	_orangeTree = GitGud::SubTexture2D::CreateFromCoords(_spriteSheet, { 2, 1 }, { 128, 128 }, { 1, 2 });
+
+	GitGud::FramebufferSpecification specs;
+	specs.Width = 1280;
+	specs.Height = 720;
+	_frambuffer = GitGud::Framebuffer::Create(specs);
 }
 
 void Sandbox2D::OnDetach()
@@ -36,6 +41,8 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	_cameraController.OnUpdate(ts);
 
 	GitGud::Renderer2D::ResetStats();
+
+	_frambuffer->Bind();
 
 	GitGud::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	GitGud::RenderCommand::Clear();
@@ -75,6 +82,8 @@ void Sandbox2D::OnUpdate(GitGud::Timestep ts)
 	GitGud::Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 2.0f }, _orangeTree);
 
 	GitGud::Renderer2D::EndScene();
+
+	_frambuffer->Unbind();
 }
 
 void Sandbox2D::OnEvent(GitGud::Event& e)
@@ -163,7 +172,7 @@ void Sandbox2D::OnImGuiRender()
 			GG_PROFILE_END_SESSION();
 		}
 
-		ImGui::Image((void*)_checkerTexture->GetRendererID(), ImVec2(256, 256));
+		ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 	}
