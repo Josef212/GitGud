@@ -17,7 +17,7 @@ namespace GitGud
 	class Application
 	{
 	public:
-		Application();
+		Application(const std:: string& name = "GitGud Engine");
 		~Application();
 
 		void OnEvent(Event& e);

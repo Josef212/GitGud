@@ -11,14 +11,14 @@ namespace GitGud
 
 	Application* Application::s_instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		GG_PROFILE_FUNCTION();
 
 		GG_CORE_ASSERT(!s_instance, "Application already exists!");
 		s_instance = this;
 
-		_window = Window::Create();
+		_window = Window::Create(WindowProps(name));
 		_window->SetEventCallback(BIND_APPLICATION_EVENT_FN(OnEvent));
 
 		Renderer::Init();
