@@ -1,5 +1,5 @@
 workspace "GitGud"
-	startproject "Sandbox"
+	startproject "GitGud-Editor"
 	architecture "x86_64"
 
 	configurations

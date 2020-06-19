@@ -3,7 +3,7 @@
 
 namespace GitGud
 {
-	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f)
+	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0})
 	{
 		GG_PROFILE_FUNCTION();
 	}
@@ -174,8 +174,24 @@ namespace GitGud
 				GG_PROFILE_END_SESSION();
 			}
 
-			ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
+			{
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+				ImGui::Begin("Viewport");
 
+				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+				if (_viewportSize != *((glm::vec2*) & viewportPanelSize))
+				{
+					_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+					_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+
+					_cameraController.OnEvent(WindowResizeEvent((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y));
+				}
+
+				ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+				ImGui::End();
+				ImGui::PopStyleVar();
+			}
+			
 			ImGui::End();
 		}
 

@@ -14,10 +14,19 @@ namespace GitGud
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &_rendererId);
+		glDeleteTextures(1, &_colorAttachment);
+		glDeleteTextures(1, &_depthAttachment);
 	}
 
 	void OpenGLFramebuffer::Invalidate()
 	{
+		if (_rendererId)
+		{
+			glDeleteFramebuffers(1, &_rendererId);
+			glDeleteTextures(1, &_colorAttachment);
+			glDeleteTextures(1, &_depthAttachment);
+		}
+
 		glCreateFramebuffers(1, &_rendererId);
 		glBindFramebuffer(GL_FRAMEBUFFER, _rendererId);
 
@@ -30,8 +39,7 @@ namespace GitGud
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &_depthAttachment);
 		glBindTexture(GL_TEXTURE_2D, _depthAttachment);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, _specification.Width, _specification.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
-		//glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, _specification.Width, _specification.Height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, _specification.Width, _specification.Height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, _depthAttachment, 0);
 
 		GG_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
@@ -42,10 +50,18 @@ namespace GitGud
 	void OpenGLFramebuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, _rendererId);
+		glViewport(0, 0, _specification.Width, _specification.Height);
 	}
 
 	void OpenGLFramebuffer::Unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
+	{
+		_specification.Width = width;
+		_specification.Height = height;
+
+		Invalidate();
 	}
 }
