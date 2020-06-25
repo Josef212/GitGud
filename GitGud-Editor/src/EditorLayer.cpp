@@ -6,11 +6,13 @@ namespace GitGud
 	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0})
 	{
 		GG_PROFILE_FUNCTION();
+		_transform = new Transform();
 	}
 
 	EditorLayer::~EditorLayer()
 	{
 		GG_PROFILE_FUNCTION();
+		delete _transform;
 	}
 
 	void EditorLayer::OnAttach()
@@ -55,8 +57,11 @@ namespace GitGud
 		static float rot = 0.0f;
 		rot += ts * 20.0f;
 
-		Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
-		Renderer2D::DrawQuad({ -1.0f, 2.0f, 0.0f }, { 1.0f, 1.0f }, rot, { 0.2f, 0.3f, 0.8f, 1.0f });
+		//Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
+		auto scl = _transform->GetLocalScale();
+		float zAngle = _transform->GetEulerRotation().z;
+		Renderer2D::DrawQuad(_transform->GetLocalPosition(), {scl.x, scl.y}, glm::radians(zAngle), _color);
+		Renderer2D::DrawQuad({ -1.0f, 2.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(rot), { 0.2f, 0.3f, 0.8f, 1.0f });
 		Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, 0.0f, _checkerTexture, glm::vec2(10.0f, 10.0f));
 		Renderer2D::DrawQuad({ 4.0f, -4.0f, 0.0f }, { 1.0f, 1.0f }, 0.0f, _logoTexture);
 		Renderer2D::DrawQuad({ 1.2f, 1.4f, 0.0f }, { 1.0f, 1.0f }, 45.0f, { 0.2f, 0.8f, 0.4f, 1.0f }, _checkerTexture, glm::vec2(1.0f));
@@ -192,6 +197,30 @@ namespace GitGud
 				ImGui::PopStyleVar();
 			}
 			
+			ImGui::End();
+		}
+
+		{
+			ImGui::Begin("Test transform");
+
+			glm::vec3 pos = _transform->GetLocalPosition();
+			if (ImGui::DragFloat3("Local position", &pos.x, 0.1f))
+			{
+				_transform->SetLocalPosition(pos);
+			}
+
+			glm::vec3 euler = _transform->GetEulerRotation();
+			if (ImGui::DragFloat3("Local rotation", &euler.x, 0.1f))
+			{
+				_transform->SetEulerLocalPosition(euler);
+			}
+
+			glm::vec3 scl = _transform->GetLocalScale();
+			if (ImGui::DragFloat3("Local scale", &scl.x, 0.1f))
+			{
+				_transform->SetLocalScale(scl);
+			}
+
 			ImGui::End();
 		}
 

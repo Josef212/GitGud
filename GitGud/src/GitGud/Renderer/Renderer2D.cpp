@@ -195,7 +195,7 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
-		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, -1.0f });
+		transform = glm::rotate(transform, angle, { 0.0f, 0.0f, -1.0f });
 		transform = glm::scale(transform, { size.x, size.y, 1.0f });
 		
 		DrawQuad(transform, color, texture, tiling);
@@ -252,7 +252,7 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
-		transform = glm::rotate(transform, glm::radians(angle), { 0.0f, 0.0f, -1.0f });
+		transform = glm::rotate(transform, angle, { 0.0f, 0.0f, -1.0f });
 		transform = glm::scale(transform, { size.x, size.y, 1.0f });
 
 		DrawQuad(transform, color, subTexture, tiling);

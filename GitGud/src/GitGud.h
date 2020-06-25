@@ -14,6 +14,10 @@
 #include "GitGud/Core/MouseButtonCodes.h"
 
 // ---- Renderer -----------------------------
+#include "GitGud/EntitySystem/Transform.h"
+// --------------------------------------------
+
+// ---- Renderer -----------------------------
 #include "GitGud/Renderer/Renderer.h"
 #include "GitGud/Renderer/Renderer2D.h"
 #include "GitGud/Renderer/RenderCommand.h"
