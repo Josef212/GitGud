@@ -108,12 +108,11 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		static bool dockspaceOpen = true;
-		static bool opt_fullscreen_persistant = true;
-		bool opt_fullscreen = opt_fullscreen_persistant;
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		bool optFullscreen = true;
+		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (opt_fullscreen)
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (optFullscreen)
 		{
 			ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGui::SetNextWindowPos(viewport->Pos);
@@ -121,25 +120,30 @@ namespace GitGud
 			ImGui::SetNextWindowViewport(viewport->ID);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 		}
 
-		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-			window_flags |= ImGuiWindowFlags_NoBackground;
+		if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+		{
+			windowFlags |= ImGuiWindowFlags_NoBackground;
+		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
 		ImGui::PopStyleVar();
 
-		if (opt_fullscreen) ImGui::PopStyleVar(2);
+		if (optFullscreen)
+		{
+			ImGui::PopStyleVar(2);
+		}
 
 		// DockSpace
 		ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
-			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+			ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
 		}
 
 		if (ImGui::BeginMenuBar())
@@ -154,32 +158,36 @@ namespace GitGud
 		}
 
 		{
-			_cameraController.OnImGuiRender();
-
-			ImGui::Begin("Settings");
-
-			auto stats = Renderer2D::GetStatistics();
-			ImGui::Text("Renderer2D Stats:");
-			ImGui::Text("Draw calls: %d", stats.DrawCalls);
-			ImGui::Text("Quads: %d", stats.QuadCount);
-			ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-			ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
-
-			ImGui::ColorEdit4("Color", &_color.r);
-			ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
-			ImGui::DragFloat2("Size", &_size.x, 0.1f);
-			ImGui::DragFloat("Angle", &_angle);
-
-			if (ImGui::Button("Begin session"))
 			{
-				GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
-			}
+				_cameraController.OnImGuiRender();
 
-			ImGui::SameLine();
+				ImGui::Begin("Settings");
 
-			if (ImGui::Button("End session"))
-			{
-				GG_PROFILE_END_SESSION();
+				auto stats = Renderer2D::GetStatistics();
+				ImGui::Text("Renderer2D Stats:");
+				ImGui::Text("Draw calls: %d", stats.DrawCalls);
+				ImGui::Text("Quads: %d", stats.QuadCount);
+				ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+				ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
+
+				ImGui::ColorEdit4("Color", &_color.r);
+				ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
+				ImGui::DragFloat2("Size", &_size.x, 0.1f);
+				ImGui::DragFloat("Angle", &_angle);
+
+				if (ImGui::Button("Begin session"))
+				{
+					GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("End session"))
+				{
+					GG_PROFILE_END_SESSION();
+				}
+
+				ImGui::End();
 			}
 
 			{
@@ -203,8 +211,6 @@ namespace GitGud
 				ImGui::End();
 				ImGui::PopStyleVar();
 			}
-			
-			ImGui::End();
 		}
 
 		{
