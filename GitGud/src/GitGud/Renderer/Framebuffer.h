@@ -19,6 +19,8 @@ namespace GitGud
 		static Ref<Framebuffer> Create(FramebufferSpecification specs);
 
 	public:
+		virtual ~Framebuffer() = default;
+
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
 
 		virtual void Bind() = 0;
