@@ -28,6 +28,8 @@ namespace GitGud
 		inline Window& GetWindow() { return *_window; }
 		inline static Application& Get() { return *s_instance; }
 
+		ImGuiLayer* GetImGuiLayer() { return _imguiLayer; }
+
 		void Close();
 
 	private:

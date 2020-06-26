@@ -26,6 +26,7 @@ namespace GitGud
 		Ref<Framebuffer> _frambuffer;
 
 		glm::vec2 _viewportSize;
+		bool _viewportFocused = false, _viewportHovered = false;
 
 		glm::vec4 _color = { 0.8f, 0.2f, 0.3f, 1.0f };
 		glm::vec2 _pos = { 0.0f, 0.0f };

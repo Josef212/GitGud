@@ -3,7 +3,7 @@
 
 namespace GitGud
 {
-	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0})
+	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0}), _viewportFocused(false), _viewportHovered(false)
 	{
 		GG_PROFILE_FUNCTION();
 		_transform = new Transform();
@@ -42,7 +42,10 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		_cameraController.OnUpdate(ts);
+		if (_viewportFocused)
+		{
+			_cameraController.OnUpdate(ts);
+		}
 
 		Renderer2D::ResetStats();
 
@@ -182,6 +185,10 @@ namespace GitGud
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 				ImGui::Begin("Viewport");
+
+				_viewportFocused = ImGui::IsWindowFocused();
+				_viewportHovered = ImGui::IsWindowHovered();
+				Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused || !_viewportHovered);
 
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 				if (_viewportSize != *((glm::vec2*) & viewportPanelSize))

@@ -64,6 +64,16 @@ namespace GitGud
 		//ImGui::ShowDemoWindow(&s);
 	}
 
+	void ImGuiLayer::OnEvent(Event& event)
+	{
+		if (_blockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		GG_PROFILE_FUNCTION();
