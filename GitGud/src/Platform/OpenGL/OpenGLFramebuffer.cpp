@@ -6,6 +6,8 @@
 
 namespace GitGud
 {
+	static const uint32_t s_MaxFramebufferSize = 8192; // TODO: Value should be driven by GPU capabilities
+
 	OpenGLFramebuffer::OpenGLFramebuffer(FramebufferSpecification specs) : _rendererId(0), _colorAttachment(0), _depthAttachment(0), _specification(specs)
 	{
 		Invalidate();
@@ -57,8 +59,20 @@ namespace GitGud
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
+
 	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
+		if (width == _specification.Width && height == _specification.Height)
+		{
+			return;
+		}
+
+		if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
+		{
+			GG_CORE_WARN("Attempted to resize frambefugger to {0} - {1}", width, height);
+			return;
+		}
+
 		_specification.Width = width;
 		_specification.Height = height;
 

@@ -199,7 +199,7 @@ namespace GitGud
 				Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused || !_viewportHovered);
 
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-				if (_viewportSize != *((glm::vec2*) & viewportPanelSize))
+				if (_viewportSize != *((glm::vec2*)&viewportPanelSize))
 				{
 					_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 					_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
