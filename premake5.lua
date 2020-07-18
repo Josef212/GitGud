@@ -40,7 +40,8 @@ project "Sandbox"
 		"GitGud/vendor/spdlog/include",
 		"GitGud/src",
 		"GitGud/vendor",
-		"GitGud/vendor/glm"
+		"GitGud/vendor/glm",
+		"GitGud/vendor/entt"
 	}
 
 	links
@@ -92,7 +93,8 @@ project "GitGud-Editor"
 		"GitGud/vendor/spdlog/include",
 		"GitGud/src",
 		"GitGud/vendor",
-		"GitGud/vendor/glm"
+		"GitGud/vendor/glm",
+		"GitGud/vendor/entt"
 	}
 
 	links

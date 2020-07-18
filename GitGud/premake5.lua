@@ -7,6 +7,7 @@ IncludeDir["Glad"] = "vendor/glad/include"
 IncludeDir["ImGui"] = "vendor/imgui"
 IncludeDir["Glm"] = "vendor/glm"
 IncludeDir["stb_image"] = "vendor/stb_image"
+IncludeDir["entt"] = "vendor/entt"
 
 project "GitGud"
 	--location "GitGud"
@@ -39,7 +40,8 @@ project "GitGud"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	defines
