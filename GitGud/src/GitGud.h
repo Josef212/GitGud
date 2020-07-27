@@ -13,8 +13,10 @@
 #include "GitGud/Core/KeyCodes.h"
 #include "GitGud/Core/MouseButtonCodes.h"
 
-// ---- Renderer -----------------------------
-#include "GitGud/EntitySystem/Transform.h"
+// ---- ECS -----------------------------------
+#include "GitGud/Scene/Scene.h"
+#include "GitGud/Scene/Components.h"
+#include "GitGud/Scene/Entity.h"
 // --------------------------------------------
 
 // ---- Renderer -----------------------------

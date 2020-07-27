@@ -32,6 +32,8 @@ namespace GitGud
 		glm::vec2 _pos = { 0.0f, 0.0f };
 		glm::vec2 _size = { 1.0f, 1.0f };
 		float _angle = 0.0f;
-		Transform* _transform = nullptr;
+		
+		Ref<Scene> _activeScene;
+		Entity _entity;
 	};
 }

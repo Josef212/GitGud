@@ -6,13 +6,11 @@ namespace GitGud
 	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0}), _viewportFocused(false), _viewportHovered(false)
 	{
 		GG_PROFILE_FUNCTION();
-		_transform = new Transform();
 	}
 
 	EditorLayer::~EditorLayer()
 	{
 		GG_PROFILE_FUNCTION();
-		delete _transform;
 	}
 
 	void EditorLayer::OnAttach()
@@ -31,6 +29,11 @@ namespace GitGud
 		specs.Width = 1280;
 		specs.Height = 720;
 		_frambuffer = Framebuffer::Create(specs);
+
+		_activeScene = CreateRef<Scene>();
+		Entity e = _activeScene->CreateEntity("Square");
+		e.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		_entity = e;
 	}
 
 	void EditorLayer::OnDetach()
@@ -54,16 +57,13 @@ namespace GitGud
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
-#if 1
+#if 0
 		Renderer2D::BeginScene(_cameraController.GetCamera());
 
 		static float rot = 0.0f;
 		rot += ts * 20.0f;
 
-		//Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
-		auto scl = _transform->GetLocalScale();
-		float zAngle = _transform->GetEulerRotation().z;
-		Renderer2D::DrawQuad(_transform->GetLocalPosition(), {scl.x, scl.y}, glm::radians(zAngle), _color);
+		Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
 		Renderer2D::DrawQuad({ -1.0f, 2.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(rot), { 0.2f, 0.3f, 0.8f, 1.0f });
 		Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, 0.0f, _checkerTexture, glm::vec2(10.0f, 10.0f));
 		Renderer2D::DrawQuad({ 4.0f, -4.0f, 0.0f }, { 1.0f, 1.0f }, 0.0f, _logoTexture);
@@ -85,11 +85,19 @@ namespace GitGud
 		Renderer2D::EndScene();
 #endif
 
+#if 0
 		Renderer2D::BeginScene(_cameraController.GetCamera());
 
 		Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _stairsSprite);
 		Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _barrelSprite);
 		Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 2.0f }, _orangeTree);
+
+		Renderer2D::EndScene();
+#endif
+
+		Renderer2D::BeginScene(_cameraController.GetCamera());
+
+		_activeScene->OnUpdate(ts);
 
 		Renderer2D::EndScene();
 
@@ -107,43 +115,45 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		static bool dockspaceOpen = true;
-		bool optFullscreen = true;
-		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
-
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (optFullscreen)
 		{
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->Pos);
-			ImGui::SetNextWindowSize(viewport->Size);
-			ImGui::SetNextWindowViewport(viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
+			static bool dockspaceOpen = true;
+			bool optFullscreen = true;
+			static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-		if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
-		{
-			windowFlags |= ImGuiWindowFlags_NoBackground;
-		}
+			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+			if (optFullscreen)
+			{
+				ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImGui::SetNextWindowPos(viewport->Pos);
+				ImGui::SetNextWindowSize(viewport->Size);
+				ImGui::SetNextWindowViewport(viewport->ID);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+				windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			}
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
-		ImGui::PopStyleVar();
+			if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+			{
+				windowFlags |= ImGuiWindowFlags_NoBackground;
+			}
 
-		if (optFullscreen)
-		{
-			ImGui::PopStyleVar(2);
-		}
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
+			ImGui::PopStyleVar();
 
-		// DockSpace
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-		{
-			ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+			if (optFullscreen)
+			{
+				ImGui::PopStyleVar(2);
+			}
+
+			// DockSpace
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+			{
+				ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
+				ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+			}
 		}
 
 		if (ImGui::BeginMenuBar())
@@ -214,24 +224,13 @@ namespace GitGud
 		}
 
 		{
-			ImGui::Begin("Test transform");
-
-			glm::vec3 pos = _transform->GetLocalPosition();
-			if (ImGui::DragFloat3("Local position", &pos.x, 0.1f))
+			ImGui::Begin("Test entity");
+			if (_entity)
 			{
-				_transform->SetLocalPosition(pos);
-			}
+				ImGui::Text("%s", _entity.GetComponent<TagComponent>().Tag.c_str());
 
-			glm::vec3 euler = _transform->GetEulerRotation();
-			if (ImGui::DragFloat3("Local rotation", &euler.x, 0.1f))
-			{
-				_transform->SetEulerLocalPosition(euler);
-			}
-
-			glm::vec3 scl = _transform->GetLocalScale();
-			if (ImGui::DragFloat3("Local scale", &scl.x, 0.1f))
-			{
-				_transform->SetLocalScale(scl);
+				auto& col = _entity.GetComponent<SpriteRendererComponent>();
+				ImGui::ColorEdit4("Entity color", &col.Color.r);
 			}
 
 			ImGui::End();
