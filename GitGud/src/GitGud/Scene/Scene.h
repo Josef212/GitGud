@@ -19,8 +19,10 @@ namespace GitGud
 		Entity CreateEntity(const std::string& name = "Entity");
 
 		void OnUpdate(Timestep ts);
+		void OnViewportResize(uint32_t width, uint32_t height);
 
 	private:
 		entt::registry _registry;
+		uint32_t _viewportWidth = 0, _viewportHeight = 0;
 	};
 }

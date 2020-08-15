@@ -139,6 +139,20 @@ namespace GitGud
 		s_Data->TextureSlotIndex = 1;
 	}
 
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		GG_PROFILE_FUNCTION();
+
+		glm::mat4 vp = camera.GetProjection() * glm::inverse(transform);
+
+		s_Data->SpriteShader->Bind();
+		s_Data->SpriteShader->SetMat4("u_vp", vp);
+
+		s_Data->QuadIndexCount = 0;
+		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+		s_Data->TextureSlotIndex = 1;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		GG_PROFILE_FUNCTION();

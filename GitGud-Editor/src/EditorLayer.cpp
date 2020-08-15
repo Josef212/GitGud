@@ -18,12 +18,6 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		_checkerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-		_logoTexture = Texture2D::Create("assets/textures/GitGudIconLogo.png");
-		_spriteSheet = Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
-
-		_stairsSprite = SubTexture2D::CreateFromCoords(_spriteSheet, { 7, 6 }, { 128, 128 });
-		_barrelSprite = SubTexture2D::CreateFromCoords(_spriteSheet, { 8, 2 }, { 128, 128 });
-		_orangeTree = SubTexture2D::CreateFromCoords(_spriteSheet, { 2, 1 }, { 128, 128 }, { 1, 2 });
 
 		FramebufferSpecification specs;
 		specs.Width = 1280;
@@ -31,9 +25,14 @@ namespace GitGud
 		_frambuffer = Framebuffer::Create(specs);
 
 		_activeScene = CreateRef<Scene>();
+
+		// Entity tests
 		Entity e = _activeScene->CreateEntity("Square");
 		e.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 		_entity = e;
+
+		_cameraEntity = _activeScene->CreateEntity("CameraEntity");
+		_cameraEntity.AddComponent<CameraComponent>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -45,62 +44,25 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
+		// Resize
+		if (FramebufferSpecification spec = _frambuffer->GetSpecification();
+			_viewportSize.x > 0.0f && _viewportSize.y > 0.0f && (spec.Width != _viewportSize.x || spec.Height != _viewportSize.y))
+		{
+			_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+			//_cameraController.OnResize(_viewportSize.x, _viewportSize.y); // TODO
+			_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+		}
+
 		if (_viewportFocused)
 		{
 			_cameraController.OnUpdate(ts);
 		}
 
 		Renderer2D::ResetStats();
-
 		_frambuffer->Bind();
-
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
-
-#if 0
-		Renderer2D::BeginScene(_cameraController.GetCamera());
-
-		static float rot = 0.0f;
-		rot += ts * 20.0f;
-
-		Renderer2D::DrawQuad({ _pos.x, _pos.y, 0.0f }, _size, _angle, _color);
-		Renderer2D::DrawQuad({ -1.0f, 2.0f, 0.0f }, { 1.0f, 1.0f }, glm::radians(rot), { 0.2f, 0.3f, 0.8f, 1.0f });
-		Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, 0.0f, _checkerTexture, glm::vec2(10.0f, 10.0f));
-		Renderer2D::DrawQuad({ 4.0f, -4.0f, 0.0f }, { 1.0f, 1.0f }, 0.0f, _logoTexture);
-		Renderer2D::DrawQuad({ 1.2f, 1.4f, 0.0f }, { 1.0f, 1.0f }, 45.0f, { 0.2f, 0.8f, 0.4f, 1.0f }, _checkerTexture, glm::vec2(1.0f));
-
-		Renderer2D::EndScene();
-
-		Renderer2D::BeginScene(_cameraController.GetCamera());
-
-		for (float y = -5.0f; y < 5.0f; y += 0.5f)
-		{
-			for (float x = -5.0f; x < 5.0f; x += 0.5f)
-			{
-				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-				Renderer2D::DrawQuad({ x, y, 0.0f }, { 0.45f, 0.45f }, color);
-			}
-		}
-
-		Renderer2D::EndScene();
-#endif
-
-#if 0
-		Renderer2D::BeginScene(_cameraController.GetCamera());
-
-		Renderer2D::DrawQuad({ -1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _stairsSprite);
-		Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, _barrelSprite);
-		Renderer2D::DrawQuad({ 1.0f, 0.0f, 0.0f }, { 1.0f, 2.0f }, _orangeTree);
-
-		Renderer2D::EndScene();
-#endif
-
-		Renderer2D::BeginScene(_cameraController.GetCamera());
-
 		_activeScene->OnUpdate(ts);
-
-		Renderer2D::EndScene();
-
 		_frambuffer->Unbind();
 	}
 
@@ -167,8 +129,8 @@ namespace GitGud
 			ImGui::EndMenuBar();
 		}
 
+		
 		{
-			{
 				_cameraController.OnImGuiRender();
 
 				ImGui::Begin("Settings");
@@ -200,29 +162,22 @@ namespace GitGud
 				ImGui::End();
 			}
 
-			{
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-				ImGui::Begin("Viewport");
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+			ImGui::Begin("Viewport");
 
-				_viewportFocused = ImGui::IsWindowFocused();
-				_viewportHovered = ImGui::IsWindowHovered();
-				Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused || !_viewportHovered);
+			_viewportFocused = ImGui::IsWindowFocused();
+			_viewportHovered = ImGui::IsWindowHovered();
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused || !_viewportHovered);
 
-				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-				if (_viewportSize != *((glm::vec2*)&viewportPanelSize))
-				{
-					_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-					_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+			_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-					_cameraController.OnEvent(WindowResizeEvent((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y));
-				}
-
-				ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-				ImGui::End();
-				ImGui::PopStyleVar();
-			}
+			ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::End();
+			ImGui::PopStyleVar();
 		}
-
+		
 		{
 			ImGui::Begin("Test entity");
 			if (_entity)
