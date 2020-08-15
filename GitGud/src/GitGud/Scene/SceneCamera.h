@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "GitGud/Renderer/Cameras/Camera.h"
 
 namespace GitGud

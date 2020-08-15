@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "GitGud/Renderer/Cameras/SceneCamera.h"
+#include "SceneCamera.h"
 
 namespace GitGud
 {
