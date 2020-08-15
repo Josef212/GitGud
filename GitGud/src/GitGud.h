@@ -9,9 +9,11 @@
 
 #include "GitGud/Core/TimeStep.h"
 
+// ---- Input ---------------------------------
 #include "GitGud/Core/Input.h"
 #include "GitGud/Core/KeyCodes.h"
 #include "GitGud/Core/MouseButtonCodes.h"
+// --------------------------------------------
 
 // ---- ECS -----------------------------------
 #include "GitGud/Scene/Scene.h"
@@ -19,7 +21,7 @@
 #include "GitGud/Scene/Entity.h"
 // --------------------------------------------
 
-// ---- Renderer -----------------------------
+// ---- Renderer ------------------------------
 #include "GitGud/Renderer/Renderer.h"
 #include "GitGud/Renderer/Renderer2D.h"
 #include "GitGud/Renderer/RenderCommand.h"
