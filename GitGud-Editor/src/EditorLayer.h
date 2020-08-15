@@ -19,20 +19,13 @@ namespace GitGud
 
 	private:
 		OrthographicCameraController _cameraController;
-		Ref<Texture2D> _checkerTexture, _logoTexture;
-		Ref<Texture2D> _spriteSheet;
-		Ref<SubTexture2D> _stairsSprite, _barrelSprite, _orangeTree;
+		Ref<Texture2D> _checkerTexture;
 
 		Ref<Framebuffer> _frambuffer;
 
 		glm::vec2 _viewportSize;
 		bool _viewportFocused = false, _viewportHovered = false;
-
-		glm::vec4 _color = { 0.8f, 0.2f, 0.3f, 1.0f };
-		glm::vec2 _pos = { 0.0f, 0.0f };
-		glm::vec2 _size = { 1.0f, 1.0f };
-		float _angle = 0.0f;
-		
+				
 		Ref<Scene> _activeScene;
 		Entity _entity;
 		Entity _cameraEntity;

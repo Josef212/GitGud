@@ -142,11 +142,6 @@ namespace GitGud
 				ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 				ImGui::Text("Indicies: %d", stats.GetTotalIndexCount());
 
-				ImGui::ColorEdit4("Color", &_color.r);
-				ImGui::DragFloat2("Pos", &_pos.x, 0.1f);
-				ImGui::DragFloat2("Size", &_size.x, 0.1f);
-				ImGui::DragFloat("Angle", &_angle);
-
 				if (ImGui::Button("Begin session"))
 				{
 					GG_PROFILE_BEGIN_SESSION("TestSession", "testSession.json");
@@ -193,5 +188,4 @@ namespace GitGud
 
 		ImGui::End();
 	}
-
 }
