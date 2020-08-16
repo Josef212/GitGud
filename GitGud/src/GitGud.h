@@ -17,8 +17,9 @@
 
 // ---- ECS -----------------------------------
 #include "GitGud/Scene/Scene.h"
-#include "GitGud/Scene/Components.h"
 #include "GitGud/Scene/Entity.h"
+#include "GitGud/Scene/ScriptableEntity.h"
+#include "GitGud/Scene/Components.h"
 // --------------------------------------------
 
 // ---- Renderer ------------------------------

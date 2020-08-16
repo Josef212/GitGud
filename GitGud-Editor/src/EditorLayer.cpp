@@ -33,6 +33,38 @@ namespace GitGud
 
 		_cameraEntity = _activeScene->CreateEntity("CameraEntity");
 		_cameraEntity.AddComponent<CameraComponent>();
+
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+
+			}
+
+			void OnDestroy()
+			{
+
+			}
+
+			void OnUpdate(Timestep ts)
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+
+				float speed = 5.0f;
+
+				if (Input::IsKey(GG_KEY_A))
+					transform[3][0] -= speed * ts;
+				if (Input::IsKey(GG_KEY_D))
+					transform[3][0] += speed * ts;
+				if (Input::IsKey(GG_KEY_W))
+					transform[3][1] += speed * ts;
+				if (Input::IsKey(GG_KEY_S))
+					transform[3][1] -= speed * ts;
+			}
+		};
+
+		_cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()

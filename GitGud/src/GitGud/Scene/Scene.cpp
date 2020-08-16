@@ -26,6 +26,21 @@ namespace GitGud
 
 	void Scene::OnUpdate(Timestep ts)
 	{
+		// Update scripts
+		{
+			_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) 
+			{
+				if (!nsc.Instance)
+				{
+					nsc.InstantiateFunction();
+					nsc.Instance->_entity = Entity{ entity , this };
+					nsc.OnCreateFunction(nsc.Instance);
+				}
+
+				nsc.OnUpdateFunction(nsc.Instance, ts);
+			});
+		}
+
 		// Render 2D
 
 		Camera* mainCamera = nullptr;
