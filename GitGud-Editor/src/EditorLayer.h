@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GitGud.h>
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace GitGud
 {
@@ -29,5 +30,8 @@ namespace GitGud
 		Ref<Scene> _activeScene;
 		Entity _entity;
 		Entity _cameraEntity;
+
+		// Panels
+		SceneHierarchyPanel _sceneHiararchyPanel;
 	};
 }

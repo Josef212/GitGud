@@ -41,6 +41,10 @@ namespace GitGud
 		}
 
 		operator bool() const { return _entityHandle != entt::null; }
+		operator uint32_t() const { return (uint32_t)_entityHandle; }
+		
+		bool operator==(const Entity& other) const { return _entityHandle == other._entityHandle && _scene == other._scene; }
+		bool operator!=(const Entity& other) const { return _entityHandle != other._entityHandle || _scene != other._scene; }
 
 	private:
 		entt::entity _entityHandle = entt::null;

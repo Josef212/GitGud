@@ -55,6 +55,8 @@ namespace GitGud
 		};
 
 		_cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -149,6 +151,11 @@ namespace GitGud
 			}
 
 			ImGui::EndMenuBar();
+		}
+
+		// Panels
+		{
+			_sceneHiararchyPanel.OnImGui();
 		}
 
 		
