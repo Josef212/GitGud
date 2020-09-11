@@ -37,17 +37,7 @@ namespace GitGud
 		class CameraController : public ScriptableEntity
 		{
 		public:
-			void OnCreate()
-			{
-
-			}
-
-			void OnDestroy()
-			{
-
-			}
-
-			void OnUpdate(Timestep ts)
+			void OnUpdate(Timestep ts) override
 			{
 				auto& transform = GetComponent<TransformComponent>().Transform;
 

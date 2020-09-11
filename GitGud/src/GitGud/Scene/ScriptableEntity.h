@@ -16,6 +16,11 @@ namespace GitGud
 			return _entity.GetComponent<T>();
 		}
 
+	protected:
+		virtual void OnCreate() {}
+		virtual void OnDestroy() {}
+		virtual void OnUpdate(Timestep ts) {}
+
 	private:
 		Entity _entity;
 		friend class Scene;
