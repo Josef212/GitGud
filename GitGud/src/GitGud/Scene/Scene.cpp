@@ -50,7 +50,7 @@ namespace GitGud
 			auto view = _registry.view<TransformComponent, CameraComponent>();
 			for (auto e : view)
 			{
-				auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(e);
+				auto [transform, camera] = view.get<TransformComponent, CameraComponent>(e);
 				
 				if (camera.Primary)
 				{
@@ -72,7 +72,7 @@ namespace GitGud
 			auto group = _registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto e : group)
 			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
 				Renderer2D::DrawQuad(transform, sprite.Color);
 			}
 		}
