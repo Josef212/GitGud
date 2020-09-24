@@ -34,6 +34,8 @@ namespace GitGud
 		_cameraEntity = _activeScene->CreateEntity("CameraEntity");
 		_cameraEntity.AddComponent<CameraComponent>();
 
+		_activeScene->CreateEntity("TestCamera").AddComponent<CameraComponent>().Primary = false;
+
 		class CameraController : public ScriptableEntity
 		{
 		public:
@@ -160,8 +162,6 @@ namespace GitGud
 
 		
 		{
-				_cameraController.OnImGuiRender();
-
 				ImGui::Begin("Settings");
 
 				auto stats = Renderer2D::GetStatistics();
