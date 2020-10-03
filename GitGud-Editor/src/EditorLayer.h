@@ -28,7 +28,6 @@ namespace GitGud
 		bool _viewportFocused = false, _viewportHovered = false;
 				
 		Ref<Scene> _activeScene;
-		Entity _entity;
 		Entity _cameraEntity;
 
 		// Panels

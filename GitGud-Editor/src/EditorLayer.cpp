@@ -27,9 +27,8 @@ namespace GitGud
 		_activeScene = CreateRef<Scene>();
 
 		// Entity tests
-		Entity e = _activeScene->CreateEntity("Square");
-		e.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-		_entity = e;
+		_activeScene->CreateEntity("Square A").AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		_activeScene->CreateEntity("Square B").AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
 
 		_cameraEntity = _activeScene->CreateEntity("CameraEntity");
 		_cameraEntity.AddComponent<CameraComponent>();
@@ -162,7 +161,7 @@ namespace GitGud
 
 		
 		{
-				ImGui::Begin("Settings");
+				ImGui::Begin("Stats");
 
 				auto stats = Renderer2D::GetStatistics();
 				ImGui::Text("Renderer2D Stats:");
@@ -200,19 +199,6 @@ namespace GitGud
 			ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
-		}
-		
-		{
-			ImGui::Begin("Test entity");
-			if (_entity)
-			{
-				ImGui::Text("%s", _entity.GetComponent<TagComponent>().Tag.c_str());
-
-				auto& col = _entity.GetComponent<SpriteRendererComponent>();
-				ImGui::ColorEdit4("Entity color", &col.Color.r);
-			}
-
-			ImGui::End();
 		}
 
 		ImGui::End();
