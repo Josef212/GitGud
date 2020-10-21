@@ -44,7 +44,7 @@ namespace GitGud
 		// Render 2D
 
 		Camera* mainCamera = nullptr;
-		glm::mat4* cameraTransform = nullptr;
+		glm::mat4 cameraTransform;
 
 		{
 			auto view = _registry.view<TransformComponent, CameraComponent>();
@@ -55,25 +55,25 @@ namespace GitGud
 				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
-					cameraTransform = &transform.Transform;
+					cameraTransform = transform.GetTransform();
 					break;
 				}
 			}
 		}
 
-		if (!mainCamera || !cameraTransform)
+		if (!mainCamera)
 		{
 			return;
 		}
 
-		Renderer2D::BeginScene(*mainCamera, *cameraTransform);
+		Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 		{
 			auto group = _registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto e : group)
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
-				Renderer2D::DrawQuad(transform, sprite.Color);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
 		}
 

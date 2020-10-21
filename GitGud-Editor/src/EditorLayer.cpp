@@ -40,18 +40,18 @@ namespace GitGud
 		public:
 			void OnUpdate(Timestep ts) override
 			{
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				auto& transform = GetComponent<TransformComponent>();
 
 				float speed = 5.0f;
 
 				if (Input::IsKey(GG_KEY_A))
-					transform[3][0] -= speed * ts;
+					transform.Translation.x -= speed * ts;
 				if (Input::IsKey(GG_KEY_D))
-					transform[3][0] += speed * ts;
+					transform.Translation.x += speed * ts;
 				if (Input::IsKey(GG_KEY_W))
-					transform[3][1] += speed * ts;
+					transform.Translation.y += speed * ts;
 				if (Input::IsKey(GG_KEY_S))
-					transform[3][1] -= speed * ts;
+					transform.Translation.y -= speed * ts;
 			}
 		};
 
