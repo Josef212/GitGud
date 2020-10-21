@@ -21,6 +21,16 @@ namespace GitGud
 		_context = scene;
 	}
 
+	template<typename T>
+	static void AddComponentEntry(const std::string& label, Entity entity)
+	{
+		if (ImGui::MenuItem(label.c_str()))
+		{
+			entity.AddComponent<T>();
+			ImGui::CloseCurrentPopup();
+		}
+	}
+
 	void SceneHierarchyPanel::OnImGui()
 	{
 		ImGui::Begin("Scene Hierarchy");
@@ -36,6 +46,16 @@ namespace GitGud
 			_selectionContext = {};
 		}
 
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				_context->CreateEntity("New Entity");
+			}
+
+			ImGui::EndPopup();
+		}
+
 		ImGui::End();
 
 		ImGui::Begin("Inspector");
@@ -43,6 +63,17 @@ namespace GitGud
 		if (_selectionContext)
 		{
 			EntityInspector(_selectionContext);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+				AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", _selectionContext);
+				AddComponentEntry<CameraComponent>("Camera", _selectionContext);
+
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();
@@ -59,18 +90,60 @@ namespace GitGud
 			_selectionContext = entity;
 		}
 
+		bool deleted = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				deleted = true;
+			}
+
+			ImGui::EndPopup();
+		}
+
 		if (opened)
 		{
 			ImGui::TreePop();
 		}
+
+		if (deleted)
+		{
+			if (_selectionContext == entity)
+			{
+				_selectionContext = {};
+			}
+
+			_context->DestroyEntity(entity);
+		}
 	}
 
-	template<class T>
+	template<typename T>
 	static void ComponentInspector(Entity entity, const std::string& label, std::function<void(T&)> drawCbk, bool forceShow = false)
 	{
 		if (entity.HasComponent<T>())
 		{
-			if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, label.c_str()) || forceShow)
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+			const auto nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+			
+			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), nodeFlags, label.c_str());
+			ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			{
+				ImGui::OpenPopup("ComponentSettings");
+			}
+
+			ImGui::PopStyleVar();
+
+			bool remove = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if(ImGui::MenuItem("Remove component"))
+					remove = true;
+
+				ImGui::EndPopup();
+			}
+
+			if (open || forceShow)
 			{
 				if (drawCbk != nullptr)
 				{
@@ -78,6 +151,11 @@ namespace GitGud
 				}
 
 				ImGui::TreePop();
+			}
+
+			if (remove)
+			{
+				entity.RemoveComponent<T>();
 			}
 		}
 	}

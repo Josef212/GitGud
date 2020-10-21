@@ -24,6 +24,11 @@ namespace GitGud
 		return e;
 	}
 
+	void Scene::DestroyEntity(Entity entity)
+	{
+		_registry.destroy(entity);
+	}
+
 	void Scene::OnUpdate(Timestep ts)
 	{
 		// Update scripts
@@ -94,5 +99,41 @@ namespace GitGud
 				cameraCmp.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
+
+	template <typename T>
+	void Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		static_assert(false);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& tag)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& transform)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& spriteRenderer)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& camera)
+	{
+		camera.Camera.SetViewportSize(_viewportWidth, _viewportHeight);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& nativeScript)
+	{
+
 	}
 }

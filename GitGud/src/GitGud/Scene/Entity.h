@@ -17,7 +17,9 @@ namespace GitGud
 		T& AddComponent(Args&&... args)
 		{
 			GG_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-			return _scene->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);
+			T& cmp = _scene->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);
+			_scene->OnComponentAdded<T>(*this, cmp);
+			return cmp;
 		}
 
 		template<typename T>
@@ -42,6 +44,7 @@ namespace GitGud
 
 		operator bool() const { return _entityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)_entityHandle; }
+		operator entt::entity() const { return _entityHandle; }
 		
 		bool operator==(const Entity& other) const { return _entityHandle == other._entityHandle && _scene == other._scene; }
 		bool operator!=(const Entity& other) const { return _entityHandle != other._entityHandle || _scene != other._scene; }
