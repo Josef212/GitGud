@@ -65,6 +65,23 @@ namespace GitGud
 		}
 	}
 
+	template<class T>
+	static void ComponentInspector(Entity entity, const std::string& label, std::function<void(T&)> drawCbk, bool forceShow = false)
+	{
+		if (entity.HasComponent<T>())
+		{
+			if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, label.c_str()) || forceShow)
+			{
+				if (drawCbk != nullptr)
+				{
+					drawCbk(entity.GetComponent<T>());
+				}
+
+				ImGui::TreePop();
+			}
+		}
+	}
+
 	static void DrawVector3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		ImGui::PushID(label.c_str());
@@ -134,22 +151,19 @@ namespace GitGud
 		if (entity.HasComponent<TagComponent>())
 		{
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
-
+		
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, sizeof(buffer), tag.c_str());
-
+		
 			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
 		}
 
-		if (entity.HasComponent<TransformComponent>())
-		{
-			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Trasnform"))
+		ComponentInspector<TransformComponent>(entity, "Transform", [&](TransformComponent& transform)
 			{
-				auto& transform = entity.GetComponent<TransformComponent>();
 				glm::vec3 rot = glm::degrees(transform.Rotation);
 
 				DrawVector3Control("Position", transform.Translation);
@@ -157,29 +171,23 @@ namespace GitGud
 				DrawVector3Control("Scale", transform.Scale, 1.0f);
 
 				transform.Rotation = glm::radians(rot);
-
-				ImGui::TreePop();
-			}
-		}
-
-		if (entity.HasComponent<CameraComponent>())
-		{
-			if (ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera"))
+			});
+		
+		ComponentInspector<CameraComponent>(entity, "Camera", [&](CameraComponent& cameraCmp)
 			{
-				auto& cameraCmp = entity.GetComponent<CameraComponent>();
 				auto& camera = cameraCmp.Camera;
 
 				ImGui::Checkbox("Primary", &cameraCmp.Primary);
 
 				const char* projectionTypesStr[] = { "Perspective", "Orthographic" };
 				const char* currentProjectionTypeStr = projectionTypesStr[(int)camera.GetProjectionType()];
-				
+
 				if (ImGui::BeginCombo("Projection", currentProjectionTypeStr))
 				{
 					for (int i = 0; i < 2; ++i)
 					{
 						bool isSelected = (int)camera.GetProjectionType() == i;
-						
+
 						if (ImGui::Selectable(projectionTypesStr[i], isSelected))
 						{
 							camera.SetProjectionType((SceneCamera::ProjectionType)i);
@@ -227,20 +235,11 @@ namespace GitGud
 
 					ImGui::Checkbox("Fixed Aspect Ratio", &cameraCmp.FixedAsectRatio);
 				}
+			});
 
-				ImGui::TreePop();
-			}
-		}
-
-		if (entity.HasComponent<SpriteRendererComponent>())
-		{
-			if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+		ComponentInspector<SpriteRendererComponent>(entity, "Sprite Renderer", [&](SpriteRendererComponent& spriteRenderer)
 			{
-				auto& spriteRenderer = entity.GetComponent<SpriteRendererComponent>();
 				ImGui::ColorEdit4("Tint", glm::value_ptr(spriteRenderer.Color));
-
-				ImGui::TreePop();
-			}
-		}
+			});
 	}
 }
