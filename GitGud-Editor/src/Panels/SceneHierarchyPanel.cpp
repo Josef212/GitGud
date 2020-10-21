@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <type_traits>
+
 namespace GitGud
 {
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
@@ -137,7 +139,7 @@ namespace GitGud
 			bool remove = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
 			{
-				if(ImGui::MenuItem("Remove component"))
+				if(!std::is_same<T, TransformComponent>::value && ImGui::MenuItem("Remove component"))
 					remove = true;
 
 				ImGui::EndPopup();
