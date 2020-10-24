@@ -21,6 +21,7 @@ namespace GitGud
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		_context = scene;
+		_selectionContext = {};
 	}
 
 	template<typename T>

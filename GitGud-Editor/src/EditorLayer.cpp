@@ -80,9 +80,7 @@ namespace GitGud
 		}
 
 		if (_viewportFocused)
-		{
 			_cameraController.OnUpdate(ts);
-		}
 
 		Renderer2D::ResetStats();
 		_frambuffer->Bind();
@@ -97,6 +95,9 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		_cameraController.OnEvent(e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -154,17 +155,14 @@ namespace GitGud
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Serialize"))
-				{
-					SceneSerializer serializer(_activeScene);
-					serializer.SerializeText("assets/scenes/ExampleScene.gg");
-				}
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
 
-				if (ImGui::MenuItem("Deserialize"))
-				{
-					SceneSerializer serializer(_activeScene);
-					serializer.DeserializeText("assets/scenes/ExampleScene.gg");
-				}
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
 
 				if (ImGui::MenuItem("Exit", "")) 
 					Application::Get().Close();
@@ -179,8 +177,7 @@ namespace GitGud
 		{
 			_sceneHiararchyPanel.OnImGui();
 		}
-
-		
+				
 		{
 				ImGui::Begin("Stats");
 
@@ -223,5 +220,72 @@ namespace GitGud
 		}
 
 		ImGui::End();
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressEvent e)
+	{
+		if (e.GetRepeatCount() > 0)
+			return false;
+
+		bool controlPressed = Input::IsKey(GG_KEY_LEFT_CONTROL) || Input::IsKey(GG_KEY_RIGHT_CONTROL);
+		bool shiftPressed = Input::IsKey(GG_KEY_LEFT_SHIFT) || Input::IsKey(GG_KEY_RIGHT_SHIFT);
+
+		switch (e.GetKeyCode())
+		{
+			case GG_KEY_N:
+			{
+				if (controlPressed)
+					NewScene();
+
+				break;
+			}
+
+			case GG_KEY_O:
+			{
+				if (controlPressed)
+					OpenScene();
+
+				break;
+			}
+
+			case GG_KEY_S:
+			{
+				if (controlPressed && shiftPressed)
+					SaveSceneAs();
+
+				break;
+			}
+		}
+
+		return false;
+	}
+
+	void EditorLayer::NewScene()
+	{
+		_activeScene = CreateRef<Scene>();
+		_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+		_sceneHiararchyPanel.SetContext(_activeScene);
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		auto filepath = FileDialogs::OpenFile("GitGud Scene (*.gg)\0*.gg\0");
+		if (!filepath.empty())
+		{
+			NewScene();
+
+			SceneSerializer serializer(_activeScene);
+			serializer.DeserializeText(filepath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		auto filepath = FileDialogs::SaveFile("GitGud Scene (*.gg)\0*.gg\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer serializer(_activeScene);
+			serializer.SerializeText(filepath);
+		}
 	}
 }

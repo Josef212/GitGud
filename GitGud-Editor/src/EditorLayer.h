@@ -19,6 +19,13 @@ namespace GitGud
 		virtual void OnImGuiRender() override;
 
 	private:
+		bool OnKeyPressed(KeyPressEvent e);
+
+		void NewScene();
+		void OpenScene();
+		void SaveSceneAs();
+
+	private:
 		OrthographicCameraController _cameraController;
 		Ref<Texture2D> _checkerTexture;
 
