@@ -10,3 +10,6 @@
 [submodule "GitGud/vendor/glm"]
 	path = GitGud/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "GitGud/vendor/yaml-cpp"]
+	path = GitGud/vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp.git
