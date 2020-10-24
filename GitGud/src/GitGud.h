@@ -9,6 +9,8 @@
 
 #include "GitGud/Core/TimeStep.h"
 
+#include "GitGud/Utils/PlatformUtils.h"
+
 // ---- Input ---------------------------------
 #include "GitGud/Core/Input.h"
 #include "GitGud/Core/KeyCodes.h"
