@@ -23,6 +23,8 @@ namespace GitGud
 
 		void SetBlockEvents(bool block) { _blockEvents = block; }
 
+		void SetDarkTheme();
+
 	private:
 		bool _blockEvents = true;
 		float _time = 0.0f;

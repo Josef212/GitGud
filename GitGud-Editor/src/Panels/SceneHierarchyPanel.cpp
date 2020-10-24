@@ -65,17 +65,6 @@ namespace GitGud
 		if (_selectionContext)
 		{
 			EntityInspector(_selectionContext);
-
-			if (ImGui::Button("Add Component"))
-				ImGui::OpenPopup("AddComponent");
-
-			if (ImGui::BeginPopup("AddComponent"))
-			{
-				AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", _selectionContext);
-				AddComponentEntry<CameraComponent>("Camera", _selectionContext);
-
-				ImGui::EndPopup();
-			}
 		}
 
 		ImGui::End();
@@ -86,6 +75,8 @@ namespace GitGud
 		auto& tag = entity.GetComponent<TagComponent>();
 		
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | (_selectionContext == entity ? ImGuiTreeNodeFlags_Selected : 0);
+		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+
 		bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.Tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
@@ -119,22 +110,27 @@ namespace GitGud
 		}
 	}
 
-	template<typename T>
-	static void ComponentInspector(Entity entity, const std::string& label, std::function<void(T&)> drawCbk, bool forceShow = false)
+	template<typename T, typename UIFunction>
+	static void ComponentInspector(Entity entity, const std::string& label, UIFunction drawCbk, bool forceShow = false)
 	{
 		if (entity.HasComponent<T>())
 		{
+			const auto nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-			const auto nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			
+			ImGui::Separator();
+
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), nodeFlags, label.c_str());
-			ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
-			if (ImGui::Button("+", ImVec2{ 20, 20 }))
+			ImGui::PopStyleVar();
+
+			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
 			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
-
-			ImGui::PopStyleVar();
 
 			bool remove = false;
 			if (ImGui::BeginPopup("ComponentSettings"))
@@ -147,11 +143,7 @@ namespace GitGud
 
 			if (open || forceShow)
 			{
-				if (drawCbk != nullptr)
-				{
-					drawCbk(entity.GetComponent<T>());
-				}
-
+				drawCbk(entity.GetComponent<T>());
 				ImGui::TreePop();
 			}
 
@@ -245,10 +237,24 @@ namespace GitGud
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, sizeof(buffer), tag.c_str());
 		
-			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
+		}
+
+		ImGui::SameLine();
+		ImGui::PushItemWidth(-1);
+
+		if (ImGui::Button("Add Component"))
+			ImGui::OpenPopup("AddComponent");
+
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", _selectionContext);
+			AddComponentEntry<CameraComponent>("Camera", _selectionContext);
+
+			ImGui::EndPopup();
 		}
 
 		ComponentInspector<TransformComponent>(entity, "Transform", [&](TransformComponent& transform)
