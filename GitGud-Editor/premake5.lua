@@ -1,5 +1,4 @@
 project "GitGud-Editor"
-	location "GitGud-Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
