@@ -1,5 +1,6 @@
-project "GitGud"
-	kind "StaticLib"
+project "GitGud-Editor"
+	location "GitGud-Editor"
+	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
@@ -7,45 +8,24 @@ project "GitGud"
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
-	pchheader "ggpch.h"
-	pchsource "src/ggpch.cpp"
-
 	files
 	{
 		"src/**.h",
-		"src/**.cpp",
-		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp",
-		"vendor/glm/glm/**.hpp",
-		"vendor/glm/glm/**.inl"
+		"src/**.cpp"
 	}
 
 	includedirs
 	{
-		"src",
-		"vendor/spdlog/include",
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}",
+		"%{wks.location}/GitGud/vendor/spdlog/include",
+		"%{wks.location}/GitGud/src",
+		"%{wks.location}/GitGud/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}",
-		"%{IncludeDir.yaml_cpp}"
-	}
-
-	defines
-	{
-		"_CRT_SECURE_NO_WARNINGS",
-		"GLFW_INCLUDE_NONE"
+		"%{IncludeDir.entt}"
 	}
 
 	links
 	{
-		"GLFW",
-		"Glad",
-		"ImGui",
-		"yaml-cpp",
-		"opengl32.lib"
+		"GitGud"
 	}
 
 	filter "system:windows"
@@ -53,7 +33,7 @@ project "GitGud"
 
 		defines
 		{
-
+			--"GG_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"

@@ -1,3 +1,5 @@
+include "./vendor/premake/premake_customization/solution_items.lua"
+
 workspace "GitGud"
 	startproject "GitGud-Editor"
 	architecture "x86_64"
@@ -9,118 +11,36 @@ workspace "GitGud"
 		"Dist"
 	}
 
+	solution_items
+	{
+		".editorconfig"
+	}
+
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder 
+IncludeDir = {}
+IncludeDir["GLFW"] = "%{wks.location}/GitGud/vendor/glfw/include"
+IncludeDir["Glad"] = "%{wks.location}/GitGud/vendor/glad/include"
+IncludeDir["ImGui"] = "%{wks.location}/GitGud/vendor/imgui"
+IncludeDir["glm"] = "%{wks.location}/GitGud/vendor/glm"
+IncludeDir["stb_image"] = "%{wks.location}/GitGud/vendor/stb_image"
+IncludeDir["entt"] = "%{wks.location}/GitGud/vendor/entt"
+IncludeDir["yaml_cpp"] = "%{wks.location}/GitGud/vendor/yaml-cpp"
+
 group "Dependencies"
+	include "vendor/premake"
 	include "GitGud/vendor/glfw"
 	include "GitGud/vendor/glad"
 	include "GitGud/vendor/imgui"
+	include "GitGud/vendor/yaml-cpp"
 	
 group ""
 	include "GitGud"
-
-project "Sandbox"
-	location "Sandbox"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-	files
-	{
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs
-	{
-		"GitGud/vendor/spdlog/include",
-		"GitGud/src",
-		"GitGud/vendor",
-		"GitGud/vendor/glm",
-		"GitGud/vendor/entt"
-	}
-
-	links
-	{
-		"GitGud"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-
-		defines
-		{
-			--"GG_PLATFORM_WINDOWS"
-		}
-
-	filter "configurations:Debug"
-		defines "GG_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "GG_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "GG_DIST"
-		runtime "Release"
-		optimize "on"
-
-project "GitGud-Editor"
-	location "GitGud-Editor"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-	files
-	{
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs
-	{
-		"GitGud/vendor/spdlog/include",
-		"GitGud/src",
-		"GitGud/vendor",
-		"GitGud/vendor/glm",
-		"GitGud/vendor/entt"
-	}
-
-	links
-	{
-		"GitGud"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-
-		defines
-		{
-			--"GG_PLATFORM_WINDOWS"
-		}
-
-	filter "configurations:Debug"
-		defines "GG_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "GG_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "GG_DIST"
-		runtime "Release"
-		optimize "on"
+	include "GitGud-Editor"
+	include "Sandbox"
