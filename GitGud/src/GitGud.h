@@ -20,6 +20,8 @@
 #include "GitGud/Scene/Entity.h"
 #include "GitGud/Scene/ScriptableEntity.h"
 #include "GitGud/Scene/Components.h"
+
+#include "GitGud/Scene/SceneSerializer.h"
 // --------------------------------------------
 
 // ---- Renderer ------------------------------

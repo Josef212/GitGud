@@ -1,0 +1,56 @@
+Scene: Untitled
+Entities:
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: TestCamera
+    struct GitGud::TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectioveFOV: 0.785398185
+        PerspectioveNear: 0.00999999978
+        PerspectioveFar: 1000
+        OrthograpicSize: 10
+        OrthograpicNear: -1
+        OrthograpicFar: 1
+      Primary: false
+      FixedAsectRatio: false
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: CameraEntity
+    struct GitGud::TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectioveFOV: 0.785398185
+        PerspectioveNear: 0.00999999978
+        PerspectioveFar: 1000
+        OrthograpicSize: 10
+        OrthograpicNear: -1
+        OrthograpicFar: 1
+      Primary: true
+      FixedAsectRatio: false
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: Square B
+    struct GitGud::TransformComponent:
+      Translation: [3.9000001, -2.0999999, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [1, 0, 0, 1]
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: Square A
+    struct GitGud::TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0, 1, 0, 1]

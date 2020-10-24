@@ -42,6 +42,17 @@ namespace GitGud
 			return _scene->_registry.has<T>(_entityHandle);
 		}
 
+		template<typename T, typename... Args>
+		T& GetOrAddComponent(Args&&... args)
+		{
+			if(_scene->_registry.has<T>(_entityHandle))
+				return _scene->_registry.get<T>(_entityHandle);
+
+			T& cmp = _scene->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);
+			_scene->OnComponentAdded<T>(*this, cmp);
+			return cmp;
+		}
+
 		operator bool() const { return _entityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)_entityHandle; }
 		operator entt::entity() const { return _entityHandle; }

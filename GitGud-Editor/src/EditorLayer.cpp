@@ -26,6 +26,7 @@ namespace GitGud
 
 		_activeScene = CreateRef<Scene>();
 
+#if 0
 		// Entity tests
 		_activeScene->CreateEntity("Square A").AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 		_activeScene->CreateEntity("Square B").AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
@@ -56,7 +57,7 @@ namespace GitGud
 		};
 
 		_cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
+#endif
 		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 
@@ -153,7 +154,21 @@ namespace GitGud
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit", "")) Application::Get().Close();
+				if (ImGui::MenuItem("Serialize"))
+				{
+					SceneSerializer serializer(_activeScene);
+					serializer.SerializeText("assets/scenes/ExampleScene.gg");
+				}
+
+				if (ImGui::MenuItem("Deserialize"))
+				{
+					SceneSerializer serializer(_activeScene);
+					serializer.DeserializeText("assets/scenes/ExampleScene.gg");
+				}
+
+				if (ImGui::MenuItem("Exit", "")) 
+					Application::Get().Close();
+
 				ImGui::EndMenu();
 			}
 

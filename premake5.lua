@@ -31,7 +31,7 @@ IncludeDir["ImGui"] = "%{wks.location}/GitGud/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/GitGud/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/GitGud/vendor/stb_image"
 IncludeDir["entt"] = "%{wks.location}/GitGud/vendor/entt"
-IncludeDir["yaml_cpp"] = "%{wks.location}/GitGud/vendor/yaml-cpp"
+IncludeDir["yaml_cpp"] = "%{wks.location}/GitGud/vendor/yaml-cpp/include"
 
 group "Dependencies"
 	include "vendor/premake"
