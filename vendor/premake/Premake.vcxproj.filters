@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud">
+      <UniqueIdentifier>{B46B8923-20D6-3D9A-6914-EF3FD5BD1BEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud\vendor">
+      <UniqueIdentifier>{914F408E-7D48-5FE0-A67A-446592D23EEC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud\vendor\glad">
+      <UniqueIdentifier>{38859213-A4F1-4D0E-6DE5-E56BD9107076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud\vendor\glfw">
+      <UniqueIdentifier>{F0859213-5CF2-4D0E-25E6-E56B91117076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud\vendor\imgui">
+      <UniqueIdentifier>{BB050886-A7FF-30D8-906C-C7E87C059744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud\vendor\yaml-cpp">
+      <UniqueIdentifier>{63C9CB61-CF8B-FFEB-183C-8E78843DD8C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\GitGud-Editor">
+      <UniqueIdentifier>{E87CEA81-D475-09D4-FDA7-EE58E9FFE8DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Sandbox">
+      <UniqueIdentifier>{3F7B6B1D-2B33-AD6A-943A-86C68011485B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\GitGud-Editor\premake5.lua">
+      <Filter>..\GitGud-Editor</Filter>
+    </None>
+    <None Include="..\..\GitGud\premake5.lua">
+      <Filter>..\GitGud</Filter>
+    </None>
+    <None Include="..\..\GitGud\vendor\glad\premake5.lua">
+      <Filter>..\GitGud\vendor\glad</Filter>
+    </None>
+    <None Include="..\..\GitGud\vendor\glfw\premake5.lua">
+      <Filter>..\GitGud\vendor\glfw</Filter>
+    </None>
+    <None Include="..\..\GitGud\vendor\imgui\premake5.lua">
+      <Filter>..\GitGud\vendor\imgui</Filter>
+    </None>
+    <None Include="..\..\GitGud\vendor\yaml-cpp\premake5.lua">
+      <Filter>..\GitGud\vendor\yaml-cpp</Filter>
+    </None>
+    <None Include="..\..\Sandbox\premake5.lua">
+      <Filter>..\Sandbox</Filter>
+    </None>
+    <None Include="..\..\premake5.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="premake5.lua" />
+  </ItemGroup>
+</Project>
