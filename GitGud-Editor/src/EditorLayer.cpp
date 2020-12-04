@@ -1,5 +1,9 @@
 #include "EditorLayer.h"
+
+#include "GitGud/Maths/Maths.h"
+
 #include <imgui/imgui.h>
+#include <ImGuizmo.h>
 
 namespace GitGud
 {
@@ -209,12 +213,15 @@ namespace GitGud
 
 			_viewportFocused = ImGui::IsWindowFocused();
 			_viewportHovered = ImGui::IsWindowHovered();
-			Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused || !_viewportHovered);
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!_viewportFocused && !_viewportHovered);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 			ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+			
+			Gizmos();
+			
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
@@ -236,7 +243,6 @@ namespace GitGud
 			{
 				if (controlPressed)
 					NewScene();
-
 				break;
 			}
 
@@ -244,7 +250,6 @@ namespace GitGud
 			{
 				if (controlPressed)
 					OpenScene();
-
 				break;
 			}
 
@@ -252,9 +257,13 @@ namespace GitGud
 			{
 				if (controlPressed && shiftPressed)
 					SaveSceneAs();
-
 				break;
 			}
+
+			case GG_KEY_Q: _selectedOperation = -1; break;
+			case GG_KEY_W: _selectedOperation = ImGuizmo::OPERATION::TRANSLATE; break;
+			case GG_KEY_E: _selectedOperation = ImGuizmo::OPERATION::ROTATE; break;
+			case GG_KEY_R: _selectedOperation = ImGuizmo::OPERATION::SCALE; break;
 		}
 
 		return false;
@@ -286,6 +295,59 @@ namespace GitGud
 		{
 			SceneSerializer serializer(_activeScene);
 			serializer.SerializeText(filepath);
+		}
+	}
+	
+	void EditorLayer::Gizmos()
+	{
+		if (_selectedOperation == -1)
+			return;
+
+		Entity selectedEntity = _sceneHiararchyPanel.GetSelectedEntity();
+		if (!selectedEntity)
+			return;
+
+		auto cameraEntity = _activeScene->GetPrimaryCameraEntity();
+		if (!cameraEntity)
+			return;
+
+		auto windowPos = ImGui::GetWindowPos();
+		auto windowSize = ImGui::GetWindowSize();
+		
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
+
+		const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+		const glm::mat4 cameraProj = camera.GetProjection();
+		const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+		auto& entityTransformCmp = selectedEntity.GetComponent<TransformComponent>();
+		glm::mat4 entityTransform = entityTransformCmp.GetTransform();
+
+		bool controlPressed = Input::IsKey(GG_KEY_LEFT_CONTROL) || Input::IsKey(GG_KEY_RIGHT_CONTROL);
+		float snap = _selectedOperation == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
+		float snaps[3] = { snap, snap, snap };
+
+		ImGuizmo::Manipulate(
+			glm::value_ptr(cameraView),
+			glm::value_ptr(cameraProj),
+			(ImGuizmo::OPERATION)_selectedOperation,
+			ImGuizmo::LOCAL,
+			glm::value_ptr(entityTransform),
+			nullptr,
+			controlPressed ? snaps : nullptr
+		);
+
+		if (ImGuizmo::IsUsing())
+		{
+			glm::vec3 translation, rotation, scale;
+			if (Maths::DecomposeTransform(entityTransform, translation, rotation, scale))
+			{
+				entityTransformCmp.Translation = translation;
+				entityTransformCmp.Rotation += (rotation - entityTransformCmp.Rotation);
+				entityTransformCmp.Scale = scale;
+			}
 		}
 	}
 }

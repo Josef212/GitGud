@@ -25,6 +25,8 @@ namespace GitGud
 		void OpenScene();
 		void SaveSceneAs();
 
+		void Gizmos();
+
 	private:
 		OrthographicCameraController _cameraController;
 		Ref<Texture2D> _checkerTexture;
@@ -33,7 +35,9 @@ namespace GitGud
 
 		glm::vec2 _viewportSize;
 		bool _viewportFocused = false, _viewportHovered = false;
-				
+
+		int _selectedOperation = -1;
+
 		Ref<Scene> _activeScene;
 		Entity _cameraEntity;
 

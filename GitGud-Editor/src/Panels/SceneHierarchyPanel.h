@@ -15,6 +15,8 @@ namespace GitGud
 
 		void OnImGui();
 
+		Entity GetSelectedEntity() const { return _selectionContext; }
+
 	private:
 		void EntityNode(Entity entity);
 		void EntityInspector(Entity entity);

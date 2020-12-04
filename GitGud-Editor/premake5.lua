@@ -19,7 +19,8 @@ project "GitGud-Editor"
 		"%{wks.location}/GitGud/src",
 		"%{wks.location}/GitGud/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links

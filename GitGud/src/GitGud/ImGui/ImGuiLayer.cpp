@@ -8,6 +8,8 @@
 
 #include "GitGud/Core/Application.h"
 
+#include "ImGuizmo.h"
+
 // TMP
 #include <GLFW/glfw3.h>
 
@@ -84,6 +86,7 @@ namespace GitGud
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()

@@ -101,6 +101,19 @@ namespace GitGud
 		}
 	}
 
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = _registry.view<CameraComponent>();
+		for (auto e : view)
+		{
+			const auto& camera = view.get<CameraComponent>(e);
+			if (camera.Primary)
+				return Entity{ e, this };
+		}
+
+		return { };
+	}
+
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
