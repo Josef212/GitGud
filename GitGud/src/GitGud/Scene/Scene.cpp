@@ -29,7 +29,23 @@ namespace GitGud
 		_registry.destroy(entity);
 	}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+
+		{
+			auto group = _registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto e : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		// Update scripts
 		{

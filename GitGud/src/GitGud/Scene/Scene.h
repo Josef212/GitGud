@@ -3,6 +3,7 @@
 #include "entt.hpp"
 
 #include "GitGud/Core/Timestep.h"
+#include "GitGud/Renderer/Cameras/EditorCamera.h"
 
 namespace GitGud
 {
@@ -21,7 +22,8 @@ namespace GitGud
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 
-		void OnUpdate(Timestep ts);
+		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
+		void OnUpdateRuntime(Timestep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		// TODO: Might want to improve this

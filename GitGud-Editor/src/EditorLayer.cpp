@@ -29,6 +29,7 @@ namespace GitGud
 		_frambuffer = Framebuffer::Create(specs);
 
 		_activeScene = CreateRef<Scene>();
+		_editorCamera = EditorCamera(30.f, 1.778f, 0.1f, 1000.0f);
 
 #if 0
 		// Entity tests
@@ -80,17 +81,21 @@ namespace GitGud
 		{
 			_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 			//_cameraController.OnResize(_viewportSize.x, _viewportSize.y); // TODO
+			_editorCamera.SetViewportSize(_viewportSize.x, _viewportSize.y);
 			_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		}
 
 		if (_viewportFocused)
+		{
 			_cameraController.OnUpdate(ts);
+			_editorCamera.OnUpdate(ts);
+		}
 
 		Renderer2D::ResetStats();
 		_frambuffer->Bind();
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
-		_activeScene->OnUpdate(ts);
+		_activeScene->OnUpdateEditor(ts, _editorCamera);
 		_frambuffer->Unbind();
 	}
 
@@ -99,6 +104,7 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		_cameraController.OnEvent(e);
+		_editorCamera.OnEven(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -307,9 +313,9 @@ namespace GitGud
 		if (!selectedEntity)
 			return;
 
-		auto cameraEntity = _activeScene->GetPrimaryCameraEntity();
-		if (!cameraEntity)
-			return;
+		//auto cameraEntity = _activeScene->GetPrimaryCameraEntity();
+		//if (!cameraEntity)
+		//	return;
 
 		auto windowPos = ImGui::GetWindowPos();
 		auto windowSize = ImGui::GetWindowSize();
@@ -318,9 +324,14 @@ namespace GitGud
 		ImGuizmo::SetDrawlist();
 		ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-		const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-		const glm::mat4 cameraProj = camera.GetProjection();
-		const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+		// Camera
+		//const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+		//const glm::mat4 cameraProj = camera.GetProjection();
+		//const glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+		// EditorCamera
+		const glm::mat4 cameraProj = _editorCamera.GetProjection();
+		const glm::mat4 cameraView = _editorCamera.GetViewMatrix();
 
 		auto& entityTransformCmp = selectedEntity.GetComponent<TransformComponent>();
 		glm::mat4 entityTransform = entityTransformCmp.GetTransform();

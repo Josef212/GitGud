@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GitGud.h>
+#include "GitGud/Renderer/Cameras/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
 
 namespace GitGud
@@ -29,6 +30,8 @@ namespace GitGud
 
 	private:
 		OrthographicCameraController _cameraController;
+		EditorCamera _editorCamera;
+
 		Ref<Texture2D> _checkerTexture;
 
 		Ref<Framebuffer> _frambuffer;

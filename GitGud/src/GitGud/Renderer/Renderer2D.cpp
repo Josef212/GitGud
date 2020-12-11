@@ -153,6 +153,18 @@ namespace GitGud
 		s_Data->TextureSlotIndex = 1;
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		GG_PROFILE_FUNCTION();
+
+		s_Data->SpriteShader->Bind();
+		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewPorjection());
+
+		s_Data->QuadIndexCount = 0;
+		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+		s_Data->TextureSlotIndex = 1;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		GG_PROFILE_FUNCTION();
