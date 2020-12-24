@@ -3,6 +3,7 @@
 #include <GitGud.h>
 #include "GitGud/Renderer/Cameras/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/EntityInspectorPanel.h"
 
 namespace GitGud
 {
@@ -21,6 +22,10 @@ namespace GitGud
 
 	private:
 		bool OnKeyPressed(KeyPressEvent e);
+
+		void MainMenuBar();
+		void DrawPanels();
+		void DrawViewport();
 
 		void NewScene();
 		void OpenScene();
@@ -46,5 +51,6 @@ namespace GitGud
 
 		// Panels
 		SceneHierarchyPanel _sceneHiararchyPanel;
+		EntityInspectorPanel _entityInspectorPanel;
 	};
 }
