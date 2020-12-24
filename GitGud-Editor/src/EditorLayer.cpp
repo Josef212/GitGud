@@ -2,6 +2,8 @@
 
 #include "GitGud/Maths/Maths.h"
 
+#include "EditorSelection.h"
+
 #include <imgui/imgui.h>
 #include <ImGuizmo.h>
 
@@ -312,7 +314,7 @@ namespace GitGud
 		if (_selectedOperation == -1)
 			return;
 
-		Entity selectedEntity = _sceneHiararchyPanel.GetSelectedEntity();
+		Entity selectedEntity = EditorSelection::GetSelection();
 		if (!selectedEntity)
 			return;
 

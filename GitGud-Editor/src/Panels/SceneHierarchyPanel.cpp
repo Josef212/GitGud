@@ -1,5 +1,7 @@
 #include "SceneHierarchyPanel.h"
 
+#include "../EditorSelection.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 #include <glm/glm.hpp>
@@ -21,7 +23,6 @@ namespace GitGud
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		_context = scene;
-		_selectionContext = {};
 	}
 
 	template<typename T>
@@ -46,7 +47,7 @@ namespace GitGud
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 		{
-			_selectionContext = {};
+			EditorSelection::Select(Entity::Null());
 		}
 
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -63,9 +64,10 @@ namespace GitGud
 
 		ImGui::Begin("Inspector");
 
-		if (_selectionContext)
+		Entity selected = EditorSelection::GetSelection();
+		if (selected)
 		{
-			EntityInspector(_selectionContext);
+			EntityInspector(selected);
 		}
 
 		ImGui::End();
@@ -75,13 +77,16 @@ namespace GitGud
 	{
 		auto& tag = entity.GetComponent<TagComponent>();
 		
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | (_selectionContext == entity ? ImGuiTreeNodeFlags_Selected : 0);
-		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+		ImGuiTreeNodeFlags flags = 
+			ImGuiTreeNodeFlags_OpenOnArrow 
+			| (EditorSelection::GetSelection() == entity ? ImGuiTreeNodeFlags_Selected : 0)
+			| ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.Tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
-			_selectionContext = entity;
+
+			EditorSelection::Select(entity);
 		}
 
 		bool deleted = false;
@@ -102,9 +107,9 @@ namespace GitGud
 
 		if (deleted)
 		{
-			if (_selectionContext == entity)
+			if (EditorSelection::GetSelection() == entity)
 			{
-				_selectionContext = {};
+				EditorSelection::Select(Entity::Null());
 			}
 
 			_context->DestroyEntity(entity);
@@ -252,8 +257,9 @@ namespace GitGud
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", _selectionContext);
-			AddComponentEntry<CameraComponent>("Camera", _selectionContext);
+			Entity selected = EditorSelection::GetSelection();
+			AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", selected);
+			AddComponentEntry<CameraComponent>("Camera", selected);
 
 			ImGui::EndPopup();
 		}

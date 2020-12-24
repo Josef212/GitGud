@@ -12,10 +12,7 @@ namespace GitGud
 		~SceneHierarchyPanel();
 
 		void SetContext(const Ref<Scene>& scene);
-
 		void OnImGui();
-
-		Entity GetSelectedEntity() const { return _selectionContext; }
 
 	private:
 		void EntityNode(Entity entity);
@@ -23,7 +20,6 @@ namespace GitGud
 
 	private:
 		Ref<Scene> _context;
-		Entity _selectionContext;
 
 	};
 }

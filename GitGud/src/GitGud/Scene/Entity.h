@@ -60,6 +60,8 @@ namespace GitGud
 		bool operator==(const Entity& other) const { return _entityHandle == other._entityHandle && _scene == other._scene; }
 		bool operator!=(const Entity& other) const { return _entityHandle != other._entityHandle || _scene != other._scene; }
 
+		static Entity Null() { return Entity{ entt::null, nullptr }; }
+
 	private:
 		entt::entity _entityHandle = entt::null;
 		Scene* _scene = nullptr;
