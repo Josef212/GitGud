@@ -76,8 +76,11 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		// Resize
-		if (FramebufferSpecification spec = _frambuffer->GetSpecification();
-			_viewportSize.x > 0.0f && _viewportSize.y > 0.0f && (spec.Width != _viewportSize.x || spec.Height != _viewportSize.y))
+		FramebufferSpecification spec = _frambuffer->GetSpecification();
+		if (
+			_viewportSize.x > 0.0f && _viewportSize.y > 0.0f 
+			&& (spec.Width != _viewportSize.x || spec.Height != _viewportSize.y)
+			)
 		{
 			_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 			//_cameraController.OnResize(_viewportSize.x, _viewportSize.y); // TODO
