@@ -4,6 +4,7 @@
 #include "GitGud/Renderer/Cameras/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityInspectorPanel.h"
+#include "Panels/StatsPanel.h"
 
 namespace GitGud
 {
@@ -52,5 +53,6 @@ namespace GitGud
 		// Panels
 		SceneHierarchyPanel _sceneHiararchyPanel;
 		EntityInspectorPanel _entityInspectorPanel;
+		StatsPanel _statsPanel;
 	};
 }
