@@ -16,7 +16,6 @@ namespace GitGud
 
 	private:
 		void EntityNode(Entity entity);
-		void EntityInspector(Entity entity);
 
 	private:
 		Ref<Scene> _context;
