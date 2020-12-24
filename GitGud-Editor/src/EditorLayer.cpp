@@ -240,6 +240,8 @@ namespace GitGud
 
 	void EditorLayer::DrawPanels()
 	{
+		GG_PROFILE_FUNCTION();
+
 		_sceneHiararchyPanel.OnImGui();
 		_entityInspectorPanel.OnImGui();
 		_statsPanel.OnImGui();
@@ -247,6 +249,8 @@ namespace GitGud
 
 	void EditorLayer::DrawViewport()
 	{
+		GG_PROFILE_FUNCTION();
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
 
@@ -296,6 +300,8 @@ namespace GitGud
 	
 	void EditorLayer::Gizmos()
 	{
+		GG_PROFILE_FUNCTION();
+
 		if (_selectedOperation == -1)
 			return;
 
