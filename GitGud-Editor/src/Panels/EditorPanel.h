@@ -6,7 +6,7 @@ namespace GitGud
 	{
 	public:
 		EditorPanel() = default;	
-		~EditorPanel() = default;
+		virtual ~EditorPanel() = default;
 
 		virtual void OnAttach() {}
 		virtual void OnDettach() {}
