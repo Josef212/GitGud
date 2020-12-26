@@ -1,10 +1,11 @@
 #pragma once
 
+#include "EditorPanel.h"
 #include "GitGud.h"
 
 namespace GitGud
 {
-	class SceneHierarchyPanel
+	class SceneHierarchyPanel : public EditorPanel
 	{
 	public:
 		SceneHierarchyPanel() = default;
@@ -12,7 +13,7 @@ namespace GitGud
 		~SceneHierarchyPanel();
 
 		void SetContext(const Ref<Scene>& scene);
-		void OnImGui();
+		void OnImGui() override;
 
 	private:
 		void EntityNode(Entity entity);

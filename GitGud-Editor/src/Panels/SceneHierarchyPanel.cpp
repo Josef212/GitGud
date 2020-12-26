@@ -11,7 +11,7 @@
 
 namespace GitGud
 {
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
+	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene) : EditorPanel()
 	{
 		SetContext(scene);
 	}
