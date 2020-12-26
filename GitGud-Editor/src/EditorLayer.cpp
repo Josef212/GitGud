@@ -9,9 +9,13 @@
 
 namespace GitGud
 {
-	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _cameraController(1280.0f / 720.0f), _viewportSize({0, 0}), _viewportFocused(false), _viewportHovered(false)
+	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _viewportSize({0, 0}), _viewportFocused(false), _viewportHovered(false)
 	{
 		GG_PROFILE_FUNCTION();
+
+		_editorPanels[typeid(StatsPanel)] = &_statsPanel;
+		_editorPanels[typeid(SceneHierarchyPanel)] = &_sceneHiararchyPanel;
+		_editorPanels[typeid(EntityInspectorPanel)] = &_entityInspectorPanel;
 	}
 
 	EditorLayer::~EditorLayer()
@@ -64,13 +68,25 @@ namespace GitGud
 		};
 
 		_cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+#else
+		// TODO: Load default scene
 #endif
 		_sceneHiararchyPanel.SetContext(_activeScene);
+
+		for (auto it : _editorPanels)
+		{
+			it.second->OnAttach();
+		}
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		GG_PROFILE_FUNCTION();
+
+		for (auto it = _editorPanels.rbegin(); it != _editorPanels.rend(); ++it)
+		{
+			(*it).second->OnDettach();
+		}
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -80,19 +96,17 @@ namespace GitGud
 		// Resize
 		FramebufferSpecification spec = _frambuffer->GetSpecification();
 		if (
-			_viewportSize.x > 0.0f && _viewportSize.y > 0.0f 
-			&& (spec.Width != _viewportSize.x || spec.Height != _viewportSize.y)
+				_viewportSize.x > 0.0f && _viewportSize.y > 0.0f 
+				&& (spec.Width != _viewportSize.x || spec.Height != _viewportSize.y)
 			)
 		{
 			_frambuffer->Resize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
-			//_cameraController.OnResize(_viewportSize.x, _viewportSize.y); // TODO
 			_editorCamera.SetViewportSize(_viewportSize.x, _viewportSize.y);
 			_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		}
 
 		if (_viewportFocused)
 		{
-			_cameraController.OnUpdate(ts);
 			_editorCamera.OnUpdate(ts);
 		}
 
@@ -108,7 +122,6 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		_cameraController.OnEvent(e);
 		_editorCamera.OnEven(e);
 
 		EventDispatcher dispatcher(e);
@@ -242,9 +255,10 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		_sceneHiararchyPanel.OnImGui();
-		_entityInspectorPanel.OnImGui();
-		_statsPanel.OnImGui();
+		for (auto it : _editorPanels)
+		{
+			it.second->OnImGui();
+		}
 	}
 
 	void EditorLayer::DrawViewport()

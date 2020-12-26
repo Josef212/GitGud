@@ -5,11 +5,13 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <typeindex>
 
 #include <string>
 #include <sstream>
 #include <array>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 

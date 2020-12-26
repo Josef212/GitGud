@@ -2,6 +2,8 @@
 
 #include <GitGud.h>
 #include "GitGud/Renderer/Cameras/EditorCamera.h"
+
+#include "Panels/EditorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityInspectorPanel.h"
 #include "Panels/StatsPanel.h"
@@ -35,11 +37,9 @@ namespace GitGud
 		void Gizmos();
 
 	private:
-		OrthographicCameraController _cameraController;
 		EditorCamera _editorCamera;
 
 		Ref<Texture2D> _checkerTexture;
-
 		Ref<Framebuffer> _frambuffer;
 
 		glm::vec2 _viewportSize;
@@ -51,6 +51,7 @@ namespace GitGud
 		Entity _cameraEntity;
 
 		// Panels
+		std::map<std::type_index, EditorPanel*> _editorPanels;
 		SceneHierarchyPanel _sceneHiararchyPanel;
 		EntityInspectorPanel _entityInspectorPanel;
 		StatsPanel _statsPanel;
