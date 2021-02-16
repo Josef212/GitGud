@@ -276,7 +276,8 @@ namespace GitGud
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		_viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-		ImGui::Image((void*)_frambuffer->GetColorAttachmentRendererId(), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+		uint64_t textureId = _frambuffer->GetColorAttachmentRendererId();
+		ImGui::Image(reinterpret_cast<void*>(textureId), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
 		Gizmos();
 
