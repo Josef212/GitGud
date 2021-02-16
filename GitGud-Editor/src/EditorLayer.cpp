@@ -30,6 +30,7 @@ namespace GitGud
 		_checkerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FramebufferSpecification specs;
+		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
 		specs.Width = 1280;
 		specs.Height = 720;
 		_frambuffer = Framebuffer::Create(specs);

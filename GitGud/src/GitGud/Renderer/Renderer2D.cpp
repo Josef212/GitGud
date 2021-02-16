@@ -93,11 +93,11 @@ namespace GitGud
 
 		BufferLayout layout =
 		{
-			{ShaderDataType::Float3, "a_position"},
-			{ShaderDataType::Float4, "a_color"},
-			{ShaderDataType::Float2, "a_texCords"},
-			{ShaderDataType::Float, "a_texIndex"},
-			{ShaderDataType::Float2, "a_tiling"}
+			{ ShaderDataType::Float3, "a_position" },
+			{ ShaderDataType::Float4, "a_color"},
+			{ ShaderDataType::Float2, "a_texCords" },
+			{ ShaderDataType::Float, "a_texIndex" },
+			{ ShaderDataType::Float2, "a_tiling" }
 		};
 
 		s_Data->QuadVertexBuffer->SetLayout(layout);
