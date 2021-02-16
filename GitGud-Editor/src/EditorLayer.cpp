@@ -30,7 +30,7 @@ namespace GitGud
 		_checkerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FramebufferSpecification specs;
-		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
+		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INT, FramebufferTextureFormat::DEPTH };
 		specs.Width = 1280;
 		specs.Height = 720;
 		_frambuffer = Framebuffer::Create(specs);
@@ -116,6 +116,25 @@ namespace GitGud
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 		_activeScene->OnUpdateEditor(ts, _editorCamera);
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= _viewportBounds[0].x;
+		my -= _viewportBounds[0].y;
+		glm::vec2 viewportSize = _viewportBounds[1] - _viewportBounds[0];
+		my = viewportSize.y - my;
+
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && (int)viewportSize.y)
+		{
+			if (Input::IsMouseButtonDown(0))
+			{
+				int id = _frambuffer->ReadPixel(1, mouseX, mouseY);
+				GG_CORE_INFO("Mouse down on {0} - {1}. Index: {2}", mouseX, mouseY, id);
+			}
+		}
+
 		_frambuffer->Unbind();
 	}
 
@@ -268,6 +287,7 @@ namespace GitGud
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
+		auto viewportOffset = ImGui::GetCursorPos(); // Includes the tab bar
 
 		_viewportFocused = ImGui::IsWindowFocused();
 		_viewportHovered = ImGui::IsWindowHovered();
@@ -278,6 +298,15 @@ namespace GitGud
 
 		uint64_t textureId = _frambuffer->GetColorAttachmentRendererId();
 		ImGui::Image(reinterpret_cast<void*>(textureId), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		_viewportBounds[0] = { minBound.x, minBound.y };
+		_viewportBounds[1] = { maxBound.x, maxBound.y };
 
 		Gizmos();
 

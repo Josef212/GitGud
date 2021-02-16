@@ -43,6 +43,7 @@ namespace GitGud
 		Ref<Framebuffer> _frambuffer;
 
 		glm::vec2 _viewportSize;
+		glm::vec2 _viewportBounds[2];
 		bool _viewportFocused = false, _viewportHovered = false;
 
 		int _selectedOperation = -1;
