@@ -60,5 +60,7 @@ namespace GitGud
 		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
 
 		virtual uint32_t GetColorAttachmentRendererId(uint32_t index = 0) = 0;
+
+		virtual void ClearColorAttachment(uint32_t attachmentIndex, int value) = 0;
 	};
 }

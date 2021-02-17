@@ -115,11 +115,16 @@ namespace GitGud
 		_frambuffer->Bind();
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
+
+		// Clear entity ID frambebuffer attachment
+		_frambuffer->ClearColorAttachment(1, -1);
+
 		_activeScene->OnUpdateEditor(ts, _editorCamera);
 
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= _viewportBounds[0].x;
 		my -= _viewportBounds[0].y;
+		
 		glm::vec2 viewportSize = _viewportBounds[1] - _viewportBounds[0];
 		my = viewportSize.y - my;
 

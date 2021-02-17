@@ -23,6 +23,8 @@ namespace GitGud
 
 		virtual uint32_t GetColorAttachmentRendererId(uint32_t index = 0) override { GG_CORE_ASSERT(index < _colorAttachments.size(), "Index out of bounds."); return _colorAttachments[index]; }
 
+		virtual void ClearColorAttachment(uint32_t attachmentIndex, int value) override;
+
 	private:
 
 	private:

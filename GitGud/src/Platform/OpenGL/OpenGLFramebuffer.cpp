@@ -25,6 +25,19 @@ namespace GitGud
 			return multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		}
 
+		static GLenum GGFBTextureFormatToGL(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+				case GitGud::FramebufferTextureFormat::RGBA8: return GL_RGBA8;
+				case GitGud::FramebufferTextureFormat::RED_INT: return GL_RED_INTEGER;
+				case GitGud::FramebufferTextureFormat::DEPTH24STENCIL8: GL_DEPTH24_STENCIL8;
+			}
+
+			GG_CORE_ASSERT(false, "Invalid parameter.");
+			return 0;
+		}
+
 		static void CreateTextures(bool multisample, uint32_t* outId, uint32_t count)
 		{
 			glCreateTextures(TextureTarget(multisample), count, outId);
@@ -206,5 +219,13 @@ namespace GitGud
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 
 		return pixelData;
+	}
+
+	void OpenGLFramebuffer::ClearColorAttachment(uint32_t attachmentIndex, int value)
+	{
+		GG_CORE_ASSERT(attachmentIndex < _colorAttachments.size(), "Index out of bounds.");
+
+		auto& spec = _colorAttachmentSpecs[attachmentIndex];
+		glClearTexImage(_colorAttachments[attachmentIndex], 0, Utils::GGFBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
 	}
 }
