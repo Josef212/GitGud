@@ -6,6 +6,7 @@ layout(location = 1) in vec4 a_color;
 layout(location = 2) in vec2 a_texCords;
 layout(location = 3) in float a_texIndex;
 layout(location = 4) in vec2 a_tiling;
+layout(location = 5) in int a_entityId;
 
 uniform mat4 u_vp;
 
@@ -13,6 +14,7 @@ out vec4 v_color;
 out vec2 v_uv;
 out float v_texIndex;
 out vec2 v_tiling;
+flat out int v_entityId;
 
 void main()
 {
@@ -20,6 +22,7 @@ void main()
 	v_uv = a_texCords;
 	v_texIndex = a_texIndex;
 	v_tiling = a_tiling;
+	v_entityId = a_entityId;
 
 	gl_Position = u_vp * vec4(a_position, 1.0);
 }
@@ -36,6 +39,7 @@ in vec4 v_color;
 in vec2 v_uv;
 in float v_texIndex;
 in vec2 v_tiling;
+flat in int v_entityId;
 
 void main()
 {
@@ -77,5 +81,5 @@ void main()
 	}
 
 	color = texColor;
-	entityId = 50;
+	entityId = v_entityId;
 }

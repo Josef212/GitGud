@@ -16,6 +16,9 @@ namespace GitGud
 		glm::vec2 TexCoord;
 		float TextureId;
 		glm::vec2 Tiling;
+
+		// Editor
+		int EntityId = 0;
 	};
 
 	struct Renderer2DData
@@ -97,7 +100,8 @@ namespace GitGud
 			{ ShaderDataType::Float4, "a_color"},
 			{ ShaderDataType::Float2, "a_texCords" },
 			{ ShaderDataType::Float, "a_texIndex" },
-			{ ShaderDataType::Float2, "a_tiling" }
+			{ ShaderDataType::Float2, "a_tiling" },
+			{ ShaderDataType::Int, "a_entityId" }
 		};
 
 		s_Data->QuadVertexBuffer->SetLayout(layout);
@@ -246,6 +250,7 @@ namespace GitGud
 			s_Data->QuadVertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
 			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
 			s_Data->QuadVertexBufferPtr->Tiling = tiling;
+			s_Data->QuadVertexBufferPtr->EntityId = -1;
 			s_Data->QuadVertexBufferPtr++;
 		}
 
@@ -285,7 +290,7 @@ namespace GitGud
 		DrawQuad(transform, color, subTexture, tiling);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityId)
 	{
 		GG_PROFILE_FUNCTION();
 
@@ -303,6 +308,7 @@ namespace GitGud
 			s_Data->QuadVertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
 			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
 			s_Data->QuadVertexBufferPtr->Tiling = { 1.0f, 1.0f };
+			s_Data->QuadVertexBufferPtr->EntityId = entityId;
 			s_Data->QuadVertexBufferPtr++;
 		}
 
@@ -311,7 +317,7 @@ namespace GitGud
 		s_Data->Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling, int entityId)
 	{
 		GG_PROFILE_FUNCTION();
 
@@ -330,6 +336,7 @@ namespace GitGud
 			s_Data->QuadVertexBufferPtr->TexCoord = texCoords[i];
 			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
 			s_Data->QuadVertexBufferPtr->Tiling = tiling;
+			s_Data->QuadVertexBufferPtr->EntityId = entityId;
 			s_Data->QuadVertexBufferPtr++;
 		}
 
@@ -338,6 +345,13 @@ namespace GitGud
 		s_Data->Stats.QuadCount++;
 	}
 	
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& sprite, int entityId)
+	{
+		GG_PROFILE_FUNCTION();
+
+		DrawQuad(transform, sprite.Color, entityId);
+	}
+
 	Renderer2D::Statistics Renderer2D::GetStatistics()
 	{
 		return s_Data->Stats;

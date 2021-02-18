@@ -5,6 +5,7 @@
 #include "Cameras/EditorCamera.h"
 #include "Texture.h"
 #include "SubTexture2D.h"
+#include "GitGud/Scene/Components.h"
 
 namespace GitGud
 {
@@ -37,8 +38,10 @@ namespace GitGud
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling = { 1.0f, 1.0f });
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, float angle, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling = { 1.0f, 1.0f });
 
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityId = -1);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling, int entityId = 1);
+		
+		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& sprite, int entiyId);
 
 		struct Statistics
 		{
