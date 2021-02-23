@@ -292,7 +292,12 @@ namespace GitGud
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
-		auto viewportOffset = ImGui::GetCursorPos(); // Includes the tab bar
+
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		_viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		_viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		_viewportFocused = ImGui::IsWindowFocused();
 		_viewportHovered = ImGui::IsWindowHovered();
@@ -303,15 +308,6 @@ namespace GitGud
 
 		uint64_t textureId = _frambuffer->GetColorAttachmentRendererId();
 		ImGui::Image(reinterpret_cast<void*>(textureId), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-
-		auto windowSize = ImGui::GetWindowSize();
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;
-
-		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-		_viewportBounds[0] = { minBound.x, minBound.y };
-		_viewportBounds[1] = { maxBound.x, maxBound.y };
 
 		Gizmos();
 
@@ -362,13 +358,10 @@ namespace GitGud
 		//auto cameraEntity = _activeScene->GetPrimaryCameraEntity();
 		//if (!cameraEntity)
 		//	return;
-
-		auto windowPos = ImGui::GetWindowPos();
-		auto windowSize = ImGui::GetWindowSize();
 		
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
-		ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
+		ImGuizmo::SetRect(_viewportBounds[0].x, _viewportBounds[0].y, _viewportBounds[1].x - _viewportBounds[0].x, _viewportBounds[1].y - _viewportBounds[0].y);
 
 		// Camera
 		//const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
