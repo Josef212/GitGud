@@ -293,22 +293,22 @@ namespace GitGud
 	void EditorLayer::OpenScene()
 	{
 		auto filepath = FileDialogs::OpenFile("GitGud Scene (*.gg)\0*.gg\0");
-		if (!filepath.empty())
+		if (filepath)
 		{
 			NewScene();
 
 			SceneSerializer serializer(_activeScene);
-			serializer.DeserializeText(filepath);
+			serializer.DeserializeText(*filepath);
 		}
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
 		auto filepath = FileDialogs::SaveFile("GitGud Scene (*.gg)\0*.gg\0");
-		if (!filepath.empty())
+		if (filepath)
 		{
 			SceneSerializer serializer(_activeScene);
-			serializer.SerializeText(filepath);
+			serializer.SerializeText(*filepath);
 		}
 	}
 	
