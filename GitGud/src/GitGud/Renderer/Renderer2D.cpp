@@ -134,9 +134,7 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 
-		s_Data->QuadIndexCount = 0;
-		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
-		s_Data->TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
@@ -148,9 +146,7 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", vp);
 
-		s_Data->QuadIndexCount = 0;
-		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
-		s_Data->TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const EditorCamera& camera)
@@ -160,25 +156,24 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewPorjection());
 
-		s_Data->QuadIndexCount = 0;
-		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
-		s_Data->TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		GG_PROFILE_FUNCTION();
-
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
-		s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
-
-		if(dataSize > 0)
-			Flush();
+		Flush();
 	}
 
 	void Renderer2D::Flush()
 	{
 		GG_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndexCount == 0)
+			return;
+
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
+		s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
 
 		for (uint32_t i = 0; i < s_Data->TextureSlotIndex; ++i)
 			s_Data->TextureSlots[i]->Bind(i);
@@ -234,7 +229,7 @@ namespace GitGud
 
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 		{
-			FlushAndReset();
+			NextBatch();
 		}
 
 		float textureIndex = GetTextureIndex(texture);
@@ -291,7 +286,7 @@ namespace GitGud
 
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 		{
-			FlushAndReset();
+			NextBatch();
 		}
 
 		float textureIndex = GetTextureIndex(s_Data->WhiteTexture);
@@ -317,7 +312,7 @@ namespace GitGud
 
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 		{
-			FlushAndReset();
+			NextBatch();
 		}
 
 		float textureIndex = GetTextureIndex(subTexture->GetTexture());
@@ -348,13 +343,17 @@ namespace GitGud
 		memset(&s_Data->Stats, 0, sizeof(Statistics));
 	}
 
-	void Renderer2D::FlushAndReset()
+	void Renderer2D::StartBatch()
 	{
-		EndScene();
-
 		s_Data->QuadIndexCount = 0;
 		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
 		s_Data->TextureSlotIndex = 1;
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
 	}
 
 	float Renderer2D::GetTextureIndex(const Ref<Texture2D>& texture)
@@ -378,7 +377,7 @@ namespace GitGud
 		{
 			if (s_Data->TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
 			{
-				FlushAndReset();
+				NextBatch();
 			}
 
 			textureIndex = (float)s_Data->TextureSlotIndex;
