@@ -59,7 +59,7 @@ namespace GitGud
 		{
 			if (_event.GetEventType() == T::GetStaticType())
 			{
-				_event.Handled = func(static_cast<T&>(_event));
+				_event.Handled |= func(static_cast<T&>(_event));
 				return true;
 			}
 
