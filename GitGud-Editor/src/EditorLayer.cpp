@@ -27,6 +27,8 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
+		_hoveredEntity = Entity::Null();
+
 		_checkerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FramebufferSpecification specs;
@@ -131,13 +133,10 @@ namespace GitGud
 		int mouseX = (int)mx;
 		int mouseY = (int)my;
 
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && (int)viewportSize.y)
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			if (Input::IsMouseButtonDown(0))
-			{
-				int id = _frambuffer->ReadPixel(1, mouseX, mouseY);
-				GG_CORE_INFO("Mouse down on {0} - {1}. Index: {2}", mouseX, mouseY, id);
-			}
+			int id = _frambuffer->ReadPixel(1, mouseX, mouseY);
+			_hoveredEntity = id == -1 ? Entity::Null() : Entity((entt::entity)id, _activeScene.get());
 		}
 
 		_frambuffer->Unbind();
@@ -151,6 +150,7 @@ namespace GitGud
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -208,6 +208,13 @@ namespace GitGud
 		DrawPanels();
 		DrawViewport();
 
+		ImGui::Begin("Tmp");
+
+		std::string name = _hoveredEntity ? _hoveredEntity.GetComponent<TagComponent>().Tag : "None";
+		ImGui::Text("Hovered entity: %s", name.c_str());
+		
+		ImGui::End();
+
 		ImGui::End();
 	}
 
@@ -246,6 +253,19 @@ namespace GitGud
 		case GG_KEY_W: _selectedOperation = ImGuizmo::OPERATION::TRANSLATE; break;
 		case GG_KEY_E: _selectedOperation = ImGuizmo::OPERATION::ROTATE; break;
 		case GG_KEY_R: _selectedOperation = ImGuizmo::OPERATION::SCALE; break;
+		}
+
+		return false;
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressEvent e)
+	{
+		if (e.GetMouseButton() == GG_MOUSE_BUTTON_LEFT)
+		{
+			if (_viewportHovered && !ImGuizmo::IsOver() && !Input::IsKey(GG_KEY_LEFT_ALT))
+			{
+				EditorSelection::Select(_hoveredEntity);
+			}
 		}
 
 		return false;

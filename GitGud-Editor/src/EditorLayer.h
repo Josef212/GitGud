@@ -25,6 +25,7 @@ namespace GitGud
 
 	private:
 		bool OnKeyPressed(KeyPressEvent e);
+		bool OnMouseButtonPressed(MouseButtonPressEvent e);
 
 		void MainMenuBar();
 		void DrawPanels();
@@ -50,6 +51,8 @@ namespace GitGud
 
 		Ref<Scene> _activeScene;
 		Entity _cameraEntity;
+
+		Entity _hoveredEntity;
 
 		// Panels
 		std::map<std::type_index, EditorPanel*> _editorPanels;
