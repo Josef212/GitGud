@@ -16,6 +16,7 @@ namespace GitGud
 		_editorPanels[typeid(StatsPanel)] = &_statsPanel;
 		_editorPanels[typeid(SceneHierarchyPanel)] = &_sceneHiararchyPanel;
 		_editorPanels[typeid(EntityInspectorPanel)] = &_entityInspectorPanel;
+		_editorPanels[typeid(ContentPanel)] = &_contentPanel;
 	}
 
 	EditorLayer::~EditorLayer()
