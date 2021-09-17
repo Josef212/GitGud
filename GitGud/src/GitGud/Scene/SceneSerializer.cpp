@@ -10,6 +10,29 @@
 namespace YAML
 {
 	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec2& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+
+			return true;
+		}
+	};
+
+	template<>
 	struct convert<glm::vec3>
 	{
 		static Node encode(const glm::vec3& rhs)
@@ -64,6 +87,13 @@ namespace YAML
 
 namespace GitGud
 {
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
 	{
 		out << YAML::Flow;
@@ -115,6 +145,9 @@ namespace GitGud
 		SerializeComponent<SpriteRendererComponent>(out, entity, [](SpriteRendererComponent& spriteRendererComponent, YAML::Emitter& _out)
 			{
 				_out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+				// TODO: Serialize sprite path
+				//_out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite->Path();
+				_out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 			});
 
 		SerializeComponent<CameraComponent>(out, entity, [](CameraComponent& cameraComponent, YAML::Emitter& _out)
@@ -205,6 +238,8 @@ namespace GitGud
 		DeserializeComponent<SpriteRendererComponent>(in, deserializedEntity, [](YAML::Node& _in, SpriteRendererComponent& spriteRendererComponent)
 			{
 				spriteRendererComponent.Color = _in["Color"].as<glm::vec4>();
+				// TODO: Deserialize sprite path and load texture
+				spriteRendererComponent.TilingFactor = _in["TilingFactor"].IsDefined() ? _in["TilingFactor"].as<glm::vec2>() : glm::vec2(1.f, 1.f);
 			});
 
 		DeserializeComponent<CameraComponent>(in, deserializedEntity, [](YAML::Node& _in, CameraComponent& cameraComponent)
