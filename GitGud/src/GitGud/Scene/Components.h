@@ -8,6 +8,7 @@
 
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
+#include "GitGud/Renderer/Texture.h"
 
 namespace GitGud
 {
@@ -46,6 +47,8 @@ namespace GitGud
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		Ref<Texture2D> Sprite;
+		glm::vec2 TilingFactor = { 1.f, 1.f };
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;

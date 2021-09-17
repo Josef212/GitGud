@@ -312,6 +312,33 @@ namespace GitGud
 		s_Data->Stats.QuadCount++;
 	}
 
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<Texture2D>& texture, const glm::vec2& tiling, int entityId)
+	{
+		GG_PROFILE_FUNCTION();
+
+		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			NextBatch();
+		}
+
+		float textureIndex = GetTextureIndex(texture);
+
+		for (uint32_t i = 0; i < 4; ++i)
+		{
+			s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
+			s_Data->QuadVertexBufferPtr->Color = color;
+			s_Data->QuadVertexBufferPtr->TexCoord = s_Data->QuadVertexUv[i];
+			s_Data->QuadVertexBufferPtr->TextureId = textureIndex;
+			s_Data->QuadVertexBufferPtr->Tiling = tiling;
+			s_Data->QuadVertexBufferPtr->EntityId = entityId;
+			s_Data->QuadVertexBufferPtr++;
+		}
+
+		s_Data->QuadIndexCount += 6;
+
+		s_Data->Stats.QuadCount++;
+	}
+
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, const Ref<SubTexture2D>& subTexture, const glm::vec2& tiling, int entityId)
 	{
 		GG_PROFILE_FUNCTION();
@@ -340,11 +367,18 @@ namespace GitGud
 		s_Data->Stats.QuadCount++;
 	}
 	
-	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& sprite, int entityId)
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityId)
 	{
 		GG_PROFILE_FUNCTION();
 
-		DrawQuad(transform, sprite.Color, entityId);
+		if (src.Sprite)
+		{
+			DrawQuad(transform, src.Color, src.Sprite, src.TilingFactor, entityId);
+		}
+		else
+		{
+			DrawQuad(transform, src.Color, entityId);
+		}
 	}
 
 	Renderer2D::Statistics Renderer2D::GetStatistics()

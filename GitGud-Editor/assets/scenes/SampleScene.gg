@@ -2,15 +2,6 @@ Scene: Untitled
 Entities:
   - Entity: 123456789
     struct GitGud::TagComponent:
-      Tag: Square
-    struct GitGud::TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    struct GitGud::SpriteRendererComponent:
-      Color: [0.22644268, 0.945945919, 0.787599266, 1]
-  - Entity: 123456789
-    struct GitGud::TagComponent:
       Tag: Camera
     struct GitGud::TransformComponent:
       Translation: [0, 0, 0]
@@ -27,3 +18,13 @@ Entities:
         OrthograpicFar: 1
       Primary: true
       FixedAsectRatio: false
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: Square
+    struct GitGud::TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.22644268, 0.945945919, 0.787599266, 1]
+      TilingFactor: [4, 4]

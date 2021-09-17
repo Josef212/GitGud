@@ -6,6 +6,7 @@
 #include "Panels/EditorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityInspectorPanel.h"
+#include "Panels/ContentPanel.h"
 #include "Panels/StatsPanel.h"
 
 namespace GitGud
@@ -33,6 +34,7 @@ namespace GitGud
 
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
 
 		void Gizmos();
@@ -58,6 +60,7 @@ namespace GitGud
 		std::map<std::type_index, EditorPanel*> _editorPanels;
 		SceneHierarchyPanel _sceneHiararchyPanel;
 		EntityInspectorPanel _entityInspectorPanel;
+		ContentPanel _contentPanel;
 		StatsPanel _statsPanel;
 	};
 }
