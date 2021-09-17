@@ -7,10 +7,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <filesystem>
 #include <type_traits>
 
 namespace GitGud
 {
+	// TODO: Projects
+	extern const std::filesystem::path g_assetsPath;
+
 	template<typename T>
 	static void AddComponentEntry(const std::string& label, Entity entity)
 	{
@@ -261,6 +265,22 @@ namespace GitGud
 		ComponentInspector<SpriteRendererComponent>(entity, "Sprite Renderer", [&](SpriteRendererComponent& spriteRenderer)
 			{
 				ImGui::ColorEdit4("Tint", glm::value_ptr(spriteRenderer.Color));
+
+				ImGui::Button("Sprite", ImVec2(100.f, 0.f));
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						auto relativePath = (const wchar_t*)payload->Data;
+						auto path = g_assetsPath / relativePath;
+
+						spriteRenderer.Sprite = Texture2D::Create(path.string());
+					}
+
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::DragFloat2("Tiling Factor", glm::value_ptr(spriteRenderer.TilingFactor), 0.1, 0.f, 100.f);
 			});
 	}
 }
