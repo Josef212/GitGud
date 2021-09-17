@@ -9,6 +9,9 @@
 
 namespace GitGud
 {
+	// TODO: Projects
+	extern const std::filesystem::path g_assetsPath;
+
 	EditorLayer::EditorLayer() : Layer("GitGud-Editor"), _viewportSize({0, 0}), _viewportFocused(false), _viewportHovered(false)
 	{
 		GG_PROFILE_FUNCTION();
@@ -330,6 +333,17 @@ namespace GitGud
 		uint64_t textureId = _frambuffer->GetColorAttachmentRendererId();
 		ImGui::Image(reinterpret_cast<void*>(textureId), ImVec2(_viewportSize.x, _viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (auto payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				auto relativePath = (const wchar_t*)payload->Data;
+				OpenScene(g_assetsPath / relativePath);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
 		Gizmos();
 
 		ImGui::End();
@@ -346,13 +360,18 @@ namespace GitGud
 	void EditorLayer::OpenScene()
 	{
 		auto filepath = FileDialogs::OpenFile("GitGud Scene (*.gg)\0*.gg\0");
-		if (filepath)
+		if (filepath.has_value() && !filepath.value().empty())
 		{
-			NewScene();
-
-			SceneSerializer serializer(_activeScene);
-			serializer.DeserializeText(*filepath);
+			OpenScene(filepath.value());
 		}
+	}
+	
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		NewScene();
+
+		SceneSerializer serializer(_activeScene);
+		serializer.DeserializeText(path.string());
 	}
 
 	void EditorLayer::SaveSceneAs()

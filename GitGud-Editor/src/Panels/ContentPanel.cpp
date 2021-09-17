@@ -4,9 +4,10 @@
 
 namespace GitGud
 {
-	static std::filesystem::path s_assetsPath = "assets";
+	// TODO: Projects
+	extern const std::filesystem::path g_assetsPath = "assets";
 
-	ContentPanel::ContentPanel() : _currentDirectory(s_assetsPath)
+	ContentPanel::ContentPanel() : _currentDirectory(g_assetsPath)
 	{ 
 		// TODO: Manage editor resources properly
 		_directoryIcon = Texture2D::Create("EditorAssets/Icons/DirectoryIcon.png");
@@ -17,7 +18,7 @@ namespace GitGud
 	{
 		ImGui::Begin("Content");
 
-		if (_currentDirectory != std::filesystem::path(s_assetsPath))
+		if (_currentDirectory != std::filesystem::path(g_assetsPath))
 		{
 			if (ImGui::Button("<-"))
 			{
@@ -38,22 +39,40 @@ namespace GitGud
 		for (auto& dir : std::filesystem::directory_iterator(_currentDirectory))
 		{
 			const auto path = dir.path();
-			auto relativePath = std::filesystem::relative(path, s_assetsPath);
+			auto relativePath = std::filesystem::relative(path, g_assetsPath);
 			auto pathStr = relativePath.filename().string();
 			auto icon = GetPathIcon(dir);
 
+			ImGui::PushID(pathStr.c_str());
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { iconSize, iconSize }, { 0, 1 }, { 1, 0 });
+
+			if (ImGui::BeginDragDropSource())
+			{
+				auto itemRelativePath = relativePath.c_str();
+				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemRelativePath, (wcslen(itemRelativePath) + 1) * sizeof(wchar_t));
+				ImGui::EndDragDropSource();
+			}
+
+			ImGui::PopStyleColor();
+
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
 				if (dir.is_directory())
 				{
 					_currentDirectory /= path.filename();
 				}
+				else
+				{
+					// TODO: Open scene, prefab, select asset, etc.
+				}
 			}
 
 			ImGui::TextWrapped("%s", pathStr.c_str());
 
 			ImGui::NextColumn();
+			ImGui::PopID();
 		}
 
 		ImGui::Columns(1);
