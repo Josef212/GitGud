@@ -16,3 +16,6 @@
 [submodule "GitGud/vendor/ImGuizmo"]
 	path = GitGud/vendor/ImGuizmo
 	url = https://github.com/TheCherno/ImGuizmo.git
+[submodule "GitGud/vendor/Box2D"]
+	path = GitGud/vendor/Box2D
+	url = https://github.com/thecherno/box2d
