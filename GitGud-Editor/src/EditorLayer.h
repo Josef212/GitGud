@@ -13,6 +13,12 @@ namespace GitGud
 {
 	class EditorLayer : public Layer
 	{
+		enum class SceneState
+		{
+			Edit = 0,
+			Play = 1,
+		};
+
 	public:
 		EditorLayer();
 		virtual ~EditorLayer();
@@ -31,11 +37,15 @@ namespace GitGud
 		void MainMenuBar();
 		void DrawPanels();
 		void DrawViewport();
+		void DrawToolbar();
 
 		void NewScene();
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
+
+		void OnScenePlay();
+		void OnSceneStop();
 
 		void Gizmos();
 
@@ -55,6 +65,12 @@ namespace GitGud
 		Entity _cameraEntity;
 
 		Entity _hoveredEntity;
+
+		SceneState _sceneState = SceneState::Edit;
+
+		// TODO: Manage editor resources properly
+		Ref<Texture2D> _playIcon;
+		Ref<Texture2D> _stopIcon;
 
 		// Panels
 		std::map<std::type_index, EditorPanel*> _editorPanels;

@@ -13,7 +13,7 @@ namespace GitGud
 		glTextureStorage2D(_rendererId, 1, _internalFormat, _width, _height);
 
 		glTextureParameteri(_rendererId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(_rendererId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(_rendererId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureParameteri(_rendererId, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(_rendererId, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -59,7 +59,7 @@ namespace GitGud
 		glTextureStorage2D(_rendererId, 1, _internalFormat, _width, _height);
 
 		glTextureParameteri(_rendererId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(_rendererId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(_rendererId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureParameteri(_rendererId, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(_rendererId, GL_TEXTURE_WRAP_T, GL_REPEAT);
