@@ -35,6 +35,10 @@ namespace GitGud
 
 		_checkerTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
+		// Icons
+		_playIcon = Texture2D::Create("EditorAssets/Icons/PlayButton.png");
+		_stopIcon = Texture2D::Create("EditorAssets/Icons/StopButton.png");
+
 		FramebufferSpecification specs;
 		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INT, FramebufferTextureFormat::DEPTH };
 		specs.Width = 1280;
@@ -112,11 +116,6 @@ namespace GitGud
 			_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		}
 
-		if (_viewportFocused)
-		{
-			_editorCamera.OnUpdate(ts);
-		}
-
 		Renderer2D::ResetStats();
 		_frambuffer->Bind();
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
@@ -125,7 +124,24 @@ namespace GitGud
 		// Clear entity ID frambebuffer attachment
 		_frambuffer->ClearColorAttachment(1, -1);
 
-		_activeScene->OnUpdateEditor(ts, _editorCamera);
+		switch (_sceneState)
+		{
+			case GitGud::EditorLayer::SceneState::Edit:
+			{
+				if (_viewportFocused)
+				{
+					_editorCamera.OnUpdate(ts);
+				}
+
+				_activeScene->OnUpdateEditor(ts, _editorCamera);
+				break;
+			}
+			case GitGud::EditorLayer::SceneState::Play:
+			{
+				_activeScene->OnUpdateRuntime(ts);
+				break;
+			}
+		}
 
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= _viewportBounds[0].x;
@@ -211,6 +227,7 @@ namespace GitGud
 		MainMenuBar();
 		DrawPanels();
 		DrawViewport();
+		DrawToolbar();
 
 		ImGui::Begin("Tmp");
 
@@ -350,6 +367,43 @@ namespace GitGud
 		ImGui::PopStyleVar();
 	}
 
+	void EditorLayer::DrawToolbar()
+	{
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& hovered = colors[ImGuiCol_ButtonHovered];
+		const auto& active = colors[ImGuiCol_ButtonActive];
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(hovered.x, hovered.y, hovered.z, 0.5f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(active.x, active.y, active.z, 0.5f));
+
+		auto flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		ImGui::Begin("##toolbar", nullptr, flags);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+		auto icon = _sceneState == SceneState::Edit ? _playIcon : _stopIcon;
+		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		{
+			if (_sceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if (_sceneState == SceneState::Play)
+			{
+				OnSceneStop();
+			}
+		}
+
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+
+		ImGui::End();
+	}
+
 	void EditorLayer::NewScene()
 	{
 		EditorSelection::Select(Entity::Null());
@@ -385,6 +439,16 @@ namespace GitGud
 		}
 	}
 	
+	void EditorLayer::OnScenePlay()
+	{
+		_sceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		_sceneState = SceneState::Edit;
+	}
+
 	void EditorLayer::Gizmos()
 	{
 		GG_PROFILE_FUNCTION();
