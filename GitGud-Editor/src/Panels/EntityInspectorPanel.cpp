@@ -18,6 +18,11 @@ namespace GitGud
 	template<typename T>
 	static void AddComponentEntry(const std::string& label, Entity entity)
 	{
+		if (entity.HasComponent<T>())
+		{
+			return;
+		}
+
 		if (ImGui::MenuItem(label.c_str()))
 		{
 			entity.AddComponent<T>();
@@ -183,11 +188,13 @@ namespace GitGud
 			Entity selected = EditorSelection::GetSelection();
 			AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", selected);
 			AddComponentEntry<CameraComponent>("Camera", selected);
+			AddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D", selected);
+			AddComponentEntry<BoxCollider2DComponent>("BoxCollider 2D", selected);
 
 			ImGui::EndPopup();
 		}
 
-		ComponentInspector<TransformComponent>(entity, "Transform", [&](TransformComponent& transform)
+		ComponentInspector<TransformComponent>(entity, "Transform", [&](auto& transform)
 			{
 				glm::vec3 rot = glm::degrees(transform.Rotation);
 
@@ -198,7 +205,7 @@ namespace GitGud
 				transform.Rotation = glm::radians(rot);
 			});
 
-		ComponentInspector<CameraComponent>(entity, "Camera", [&](CameraComponent& cameraCmp)
+		ComponentInspector<CameraComponent>(entity, "Camera", [&](auto& cameraCmp)
 			{
 				auto& camera = cameraCmp.Camera;
 
@@ -262,7 +269,7 @@ namespace GitGud
 				}
 			});
 
-		ComponentInspector<SpriteRendererComponent>(entity, "Sprite Renderer", [&](SpriteRendererComponent& spriteRenderer)
+		ComponentInspector<SpriteRendererComponent>(entity, "Sprite Renderer", [&](auto& spriteRenderer)
 			{
 				ImGui::ColorEdit4("Tint", glm::value_ptr(spriteRenderer.Color));
 
@@ -281,6 +288,44 @@ namespace GitGud
 				}
 
 				ImGui::DragFloat2("Tiling Factor", glm::value_ptr(spriteRenderer.TilingFactor), 0.1, 0.f, 100.f);
+			});
+
+		ComponentInspector<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&](auto& rb)
+			{
+				const char* bodyTypeStr[] = { "Static", "Dynamic", "Kinematic" };
+				const char* currentBodyType = bodyTypeStr[(int)rb.Type];
+
+				if (ImGui::BeginCombo("Body Type", currentBodyType))
+				{
+					for (int i = 0; i < 3; ++i)
+					{
+						bool isSelected = (int)rb.Type == i;
+
+						if (ImGui::Selectable(bodyTypeStr[i], isSelected))
+						{
+							rb.Type = (Rigidbody2DComponent::BodyType)i;
+						}
+
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+
+				ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation);
+			});
+
+		ComponentInspector<BoxCollider2DComponent>(entity, "Box Collider 2D", [&](auto& collider)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset));
+				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size));
+				ImGui::DragFloat("Density", &collider.Density, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Friction", &collider.Friction, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("RestitutionThreshold", &collider.RestitutionThreshold, 0.01f, 0.0f);
 			});
 	}
 }
