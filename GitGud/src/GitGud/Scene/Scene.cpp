@@ -7,27 +7,27 @@
 #include "GitGud/Renderer/Renderer2D.h"
 
 // Box2D
-//#include "box2d/b2_world.h"
-//#include "box2d/b2_body.h"
-//#include "box2d/b2_fixture.h"
-//#include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
 
 #define WORLD_GRAVITY { 0.0f, -9.8f }
 
 namespace GitGud
 {
-	//static b2BodyType GitGudRigidbody2DBodyTypeToBox2D(Rigidbody2DComponent::BodyType bodyType)
-	//{
-	//	switch (bodyType)
-	//	{
-	//	case GitGud::Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
-	//	case GitGud::Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
-	//	case GitGud::Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-	//	}
+	static b2BodyType GitGudRigidbody2DBodyTypeToBox2D(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+		case GitGud::Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
+		case GitGud::Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
+		case GitGud::Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+		}
 
-	//	GG_CORE_ASSERT(false, "Unknown body type");
-	//	return b2_staticBody;
-	//}
+		GG_CORE_ASSERT(false, "Unknown body type");
+		return b2_staticBody;
+	}
 
 	Scene::Scene()
 	{
@@ -52,7 +52,7 @@ namespace GitGud
 
 	void Scene::OnRuntimeStart()
 	{
-		//_physicsWorld = new b2World(WORLD_GRAVITY);
+		_physicsWorld = new b2World(WORLD_GRAVITY);
 
 		auto view = _registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
@@ -61,41 +61,41 @@ namespace GitGud
 			auto& trans = entity.GetComponent<TransformComponent>();
 			auto& rb = entity.GetComponent<Rigidbody2DComponent>();
 
-			//b2BodyDef bodyDef;
-			//bodyDef.type = GitGudRigidbody2DBodyTypeToBox2D(rb.Type);
-			//bodyDef.position.Set(trans.Translation.x, trans.Translation.y);
-			//bodyDef.angle = trans.Rotation.z;
+			b2BodyDef bodyDef;
+			bodyDef.type = GitGudRigidbody2DBodyTypeToBox2D(rb.Type);
+			bodyDef.position.Set(trans.Translation.x, trans.Translation.y);
+			bodyDef.angle = trans.Rotation.z;
 
-			//auto body = _physicsWorld->CreateBody(&bodyDef);
-			//body->SetFixedRotation(rb.FixedRotation);
+			auto body = _physicsWorld->CreateBody(&bodyDef);
+			body->SetFixedRotation(rb.FixedRotation);
 
-			//rb.RuntimeBody = body;
+			rb.RuntimeBody = body;
 
-			//if (entity.HasComponent<BoxCollider2DComponent>())
-			//{
-			//	auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+			if (entity.HasComponent<BoxCollider2DComponent>())
+			{
+				auto& collider = entity.GetComponent<BoxCollider2DComponent>();
 
-			//	b2PolygonShape shape;
-			//	shape.SetAsBox(trans.Scale.x * collider.Size.x, trans.Scale.y * collider.Size.y);
+				b2PolygonShape shape;
+				shape.SetAsBox(trans.Scale.x * collider.Size.x, trans.Scale.y * collider.Size.y);
 
-			//	b2FixtureDef fixtureDef;
-			//	fixtureDef.shape = &shape;
-			//	fixtureDef.density = collider.Density;
-			//	fixtureDef.friction = collider.Friction;
-			//	fixtureDef.restitution = collider.Restitution;
-			//	fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = collider.Density;
+				fixtureDef.friction = collider.Friction;
+				fixtureDef.restitution = collider.Restitution;
+				fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
 
-			//	auto fixture = body->CreateFixture(&fixtureDef);
+				auto fixture = body->CreateFixture(&fixtureDef);
 
-			//	collider.RuntimeFixture = fixture;
-			//}
+				collider.RuntimeFixture = fixture;
+			}
 		}
 	}
 
 	void Scene::OnRuntimeStop()
 	{
-		//delete _physicsWorld;
-		//_physicsWorld = nullptr;
+		delete _physicsWorld;
+		_physicsWorld = nullptr;
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
@@ -135,7 +135,7 @@ namespace GitGud
 		{
 			const int32_t velocityIterations = 6;
 			const int32_t positionIterations = 2;
-			//_physicsWorld->Step(ts, velocityIterations, positionIterations);
+			_physicsWorld->Step(ts, velocityIterations, positionIterations);
 
 			auto view = _registry.view<Rigidbody2DComponent>();
 			for (auto e : view)
@@ -144,14 +144,14 @@ namespace GitGud
 				auto& trans = entity.GetComponent<TransformComponent>();
 				auto& rb = entity.GetComponent<Rigidbody2DComponent>();
 
-				//auto body = (b2Body*)rb.RuntimeBody;
+				auto body = (b2Body*)rb.RuntimeBody;
 
-				//const auto& position = body->GetPosition();
-				//trans.Translation.x = position.x;
-				//trans.Translation.y = position.y;
+				const auto& position = body->GetPosition();
+				trans.Translation.x = position.x;
+				trans.Translation.y = position.y;
 
-				//float rotation = body->GetAngle();
-				//trans.Rotation.z = rotation;
+				float rotation = body->GetAngle();
+				trans.Rotation.z = rotation;
 			}
 		}
 
