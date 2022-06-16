@@ -108,6 +108,29 @@ namespace GitGud
 		return out;
 	}
 
+	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+			case GitGud::Rigidbody2DComponent::BodyType::Static: return "Static";
+			case GitGud::Rigidbody2DComponent::BodyType::Dynamic: return "Dynamic";
+			case GitGud::Rigidbody2DComponent::BodyType::Kinematic: return "Kinematic";
+
+			GG_CORE_ASSERT(false, "Unknown body type");
+			return "";
+		}
+	}
+
+	static Rigidbody2DComponent::BodyType RigidBody2DBodyTypeFromString(std::string bodyTypeStr)
+	{
+		if (bodyTypeStr == "Static") return Rigidbody2DComponent::BodyType::Static;
+		if (bodyTypeStr == "Dynamic") return Rigidbody2DComponent::BodyType::Dynamic;
+		if (bodyTypeStr == "Kinematic") return Rigidbody2DComponent::BodyType::Kinematic;
+
+		GG_CORE_ASSERT(false, "Unknown body type");
+		return Rigidbody2DComponent::BodyType::Static;
+	}
+
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : _scene(scene)
 	{
 	}
@@ -170,7 +193,24 @@ namespace GitGud
 				_out << YAML::Key << "FixedAsectRatio" << YAML::Value << cameraComponent.FixedAsectRatio;
 			});
 
+		// TODO
 		//SerializeComponent<NativeScriptComponent>(out, entity, [](NativeScriptComponent& nativeScriptComponent, YAML::Emitter& _out) { });
+
+		SerializeComponent<Rigidbody2DComponent>(out, entity, [](Rigidbody2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(component.Type);
+				_out << YAML::Key << "FixedRotation" << YAML::Value << component.FixedRotation;
+			});
+
+		SerializeComponent<BoxCollider2DComponent>(out, entity, [](BoxCollider2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+				_out << YAML::Key << "Size" << YAML::Value << component.Size;
+				_out << YAML::Key << "Density" << YAML::Value << component.Density;
+				_out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+				_out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+				_out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+			});
 
 		out << YAML::EndMap; // Entity
 	}
@@ -263,7 +303,24 @@ namespace GitGud
 				cameraComponent.FixedAsectRatio = _in["FixedAsectRatio"].as<bool>();
 			});
 		
+		// TODO
 		//DeserializeComponent<NativeScriptComponent>(in, deserializedEntity, [](YAML::Node& _in, NativeScriptComponent& nativeScriptComponent) { });
+
+		DeserializeComponent<Rigidbody2DComponent>(in, deserializedEntity, [](YAML::Node& _in, Rigidbody2DComponent& component)
+			{
+				component.Type = RigidBody2DBodyTypeFromString(_in["BodyType"].as<std::string>());
+				component.FixedRotation = _in["FixedRotation"].as<bool>();
+			});
+
+		DeserializeComponent<BoxCollider2DComponent>(in, deserializedEntity, [](YAML::Node& _in, BoxCollider2DComponent& component)
+			{
+				component.Offset = _in["Offset"].as<glm::vec2>();
+				component.Size = _in["Size"].as<glm::vec2>();
+				component.Density = _in["Density"].as<float>();
+				component.Friction = _in["Friction"].as<float>();
+				component.Restitution = _in["Restitution"].as<float>();
+				component.RestitutionThreshold = _in["RestitutionThreshold"].as<float>();
+			});
 	}
 
 	bool SceneSerializer::DeserializeText(const std::string& filepath)
