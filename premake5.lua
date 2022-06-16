@@ -25,6 +25,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder 
 IncludeDir = {}
+--IncludeDir["Box2D"] = "%{wks.location}/GitGud/vendor/Box2D/include"
 IncludeDir["GLFW"] = "%{wks.location}/GitGud/vendor/glfw/include"
 IncludeDir["Glad"] = "%{wks.location}/GitGud/vendor/glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/GitGud/vendor/imgui"
@@ -33,11 +34,10 @@ IncludeDir["stb_image"] = "%{wks.location}/GitGud/vendor/stb_image"
 IncludeDir["entt"] = "%{wks.location}/GitGud/vendor/entt"
 IncludeDir["yaml_cpp"] = "%{wks.location}/GitGud/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/GitGud/vendor/ImGuizmo"
-IncludeDir["Box2D"] = "%{wks.location}/GitGud/vendor/Box2D/include"
 
 group "Dependencies"
 	include "vendor/premake"
-	include "GitGud/vendor/Box2D"
+	--include "GitGud/vendor/Box2D"
 	include "GitGud/vendor/glfw"
 	include "GitGud/vendor/glad"
 	include "GitGud/vendor/imgui"

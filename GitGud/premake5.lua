@@ -2,7 +2,7 @@ project "GitGud"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
@@ -26,7 +26,7 @@ project "GitGud"
 	{
 		"src",
 		"vendor/spdlog/include",
-		"%{IncludeDir.Box2D}",
+		--"%{IncludeDir.Box2D}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
@@ -45,7 +45,7 @@ project "GitGud"
 
 	links
 	{
-		"Box2D",
+		--"Box2D",
 		"GLFW",
 		"Glad",
 		"ImGui",

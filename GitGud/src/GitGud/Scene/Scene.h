@@ -5,6 +5,8 @@
 #include "GitGud/Core/Timestep.h"
 #include "GitGud/Renderer/Cameras/EditorCamera.h"
 
+//class b2World;
+
 namespace GitGud
 {
 	class Entity;
@@ -22,6 +24,9 @@ namespace GitGud
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+
 		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
 		void OnUpdateRuntime(Timestep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
@@ -36,5 +41,7 @@ namespace GitGud
 	private:
 		entt::registry _registry;
 		uint32_t _viewportWidth = 0, _viewportHeight = 0;
+
+		//b2World* _physicsWorld = nullptr;
 	};
 }
