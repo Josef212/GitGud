@@ -22,9 +22,39 @@ Entities:
     struct GitGud::TagComponent:
       Tag: Square
     struct GitGud::TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Translation: [2.80361533, 1.93096137, 0]
+      Rotation: [0, 0, 0.00028070237]
+      Scale: [0.999995649, 0.999995649, 1]
     struct GitGud::SpriteRendererComponent:
       Color: [0.22644268, 0.945945919, 0.787599266, 1]
       TilingFactor: [4, 4]
+    struct GitGud::Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    struct GitGud::BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.5
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 123456789
+    struct GitGud::TagComponent:
+      Tag: Floor
+    struct GitGud::TransformComponent:
+      Translation: [6.19919618e-08, -3, 0]
+      Rotation: [0, 0, 0.21110785]
+      Scale: [10, 0.499999851, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.922779918, 0, 0, 1]
+      TilingFactor: [1, 1]
+    struct GitGud::Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    struct GitGud::BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.5
+      Friction: 0.170000002
+      Restitution: 0.600000024
+      RestitutionThreshold: 0.5
