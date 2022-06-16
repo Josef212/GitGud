@@ -31,15 +31,15 @@ project "GitGud-Editor"
 	filter "system:windows"
 		systemversion "latest"
 
-		defines
-		{
-			--"GG_PLATFORM_WINDOWS"
-		}
-
 	filter "configurations:Debug"
 		defines "GG_DEBUG"
 		runtime "Debug"
 		symbols "on"
+		
+		postbuildcommands
+		{
+			--"{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
+		}
 
 	filter "configurations:Release"
 		defines "GG_RELEASE"
