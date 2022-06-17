@@ -406,7 +406,9 @@ namespace GitGud
 
 	void EditorLayer::NewScene()
 	{
+		_hoveredEntity = Entity::Null();
 		EditorSelection::Select(Entity::Null());
+
 		_activeScene = CreateRef<Scene>();
 		_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		_sceneHiararchyPanel.SetContext(_activeScene);
