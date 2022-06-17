@@ -6,12 +6,20 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "GitGud/Core/GUID.h"
 #include "SceneCamera.h"
-#include "ScriptableEntity.h"
 #include "GitGud/Renderer/Texture.h"
 
 namespace GitGud
 {
+	struct GuidComponent
+	{
+		GUID Id;
+
+		GuidComponent() = default;
+		GuidComponent(const GuidComponent&) = default;
+	};
+
 	struct TagComponent
 	{
 		std::string Tag;
@@ -65,6 +73,7 @@ namespace GitGud
 		CameraComponent(const CameraComponent&) = default;
 	};
 
+	class ScriptableEntity; // Forward declaration
 	struct NativeScriptComponent
 	{
 		ScriptableEntity* Instance = nullptr;

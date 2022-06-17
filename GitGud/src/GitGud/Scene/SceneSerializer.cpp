@@ -150,8 +150,10 @@ namespace GitGud
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
+		GG_CORE_ASSERT(entity.HasComponent<GuidComponent>(), "");
+
 		out << YAML::BeginMap; 
-		out << YAML::Key << "Entity" << YAML::Value << "123456789"; // TODO: Entity ID
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetGUID();
 
 		SerializeComponent<TagComponent>(out, entity, [](TagComponent& tagComponent, YAML::Emitter& _out)
 			{
@@ -257,16 +259,16 @@ namespace GitGud
 
 	static void DeserializeEntity(const Ref<Scene>& scene, YAML::Node& in)
 	{
-		uint64_t uuid = in["Entity"].as<uint64_t>(); // TODO
+		uint64_t guid = in["Entity"].as<uint64_t>();
 
 		std::string name;
 		auto tagComponent = in[typeid(TagComponent).name()];
 		if (tagComponent)
 			name = tagComponent["Tag"].as<std::string>();
 
-		GG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
+		GG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", guid, name);
 
-		Entity deserializedEntity = scene->CreateEntity(name);
+		Entity deserializedEntity = scene->CreateEntity(guid, name);
 		
 		DeserializeComponent<TransformComponent>(in, deserializedEntity, [](YAML::Node& _in, TransformComponent& transformComponent)
 			{

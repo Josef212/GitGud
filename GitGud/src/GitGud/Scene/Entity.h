@@ -2,6 +2,8 @@
 
 #include "entt.hpp"
 #include "Scene.h"
+#include "Components.h"
+#include "GitGud/Core/GUID.h"
 
 namespace GitGud 
 {
@@ -52,6 +54,8 @@ namespace GitGud
 			_scene->OnComponentAdded<T>(*this, cmp);
 			return cmp;
 		}
+
+		GUID GetGUID() { return GetComponent<GuidComponent>().Id; }
 
 		operator bool() const { return _entityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)_entityHandle; }

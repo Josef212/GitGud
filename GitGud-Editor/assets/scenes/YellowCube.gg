@@ -1,6 +1,36 @@
 Scene: Untitled
 Entities:
-  - Entity: 123456789
+  - Entity: 11077440263183634791
+    struct GitGud::TagComponent:
+      Tag: Top
+    struct GitGud::TransformComponent:
+      Translation: [0, 0.5, 0]
+      Rotation: [1.57079637, 0, 0.785398185]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.720184624, 0.874509811, 0, 1]
+      TilingFactor: [1, 1]
+  - Entity: 1833457354042002921
+    struct GitGud::TagComponent:
+      Tag: Right
+    struct GitGud::TransformComponent:
+      Translation: [0.349999994, 0, 0.349999994]
+      Rotation: [0, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.484429121, 0.588235319, 0, 1]
+      TilingFactor: [1, 1]
+  - Entity: 4971668298362222910
+    struct GitGud::TagComponent:
+      Tag: Left
+    struct GitGud::TransformComponent:
+      Translation: [-0.349999994, 0, 0.349999994]
+      Rotation: [0, -0.785398185, 0]
+      Scale: [1, 1, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.823529482, 1, 0, 1]
+      TilingFactor: [1, 1]
+  - Entity: 7081432268779224473
     struct GitGud::TagComponent:
       Tag: Camera
     struct GitGud::TransformComponent:
@@ -18,30 +48,3 @@ Entities:
         OrthograpicFar: 1
       Primary: true
       FixedAsectRatio: false
-  - Entity: 123456789
-    struct GitGud::TagComponent:
-      Tag: Left
-    struct GitGud::TransformComponent:
-      Translation: [-0.349999994, 0, 0.349999994]
-      Rotation: [0, -0.785398185, 0]
-      Scale: [1, 1, 1]
-    struct GitGud::SpriteRendererComponent:
-      Color: [0.823529482, 1, 0, 1]
-  - Entity: 123456789
-    struct GitGud::TagComponent:
-      Tag: Right
-    struct GitGud::TransformComponent:
-      Translation: [0.349999994, 0, 0.349999994]
-      Rotation: [0, 0.785398185, 0]
-      Scale: [1, 1, 1]
-    struct GitGud::SpriteRendererComponent:
-      Color: [0.484429121, 0.588235319, 0, 1]
-  - Entity: 123456789
-    struct GitGud::TagComponent:
-      Tag: Top
-    struct GitGud::TransformComponent:
-      Translation: [0, 0.5, 0]
-      Rotation: [1.57079637, 0, 0.785398185]
-      Scale: [1, 1, 1]
-    struct GitGud::SpriteRendererComponent:
-      Color: [0.720184624, 0.874509811, 0, 1]

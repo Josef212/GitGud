@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Components.h"
 #include "Entity.h"
+#include "ScriptableEntity.h"
 
 // TMP
 #include "GitGud/Renderer/Renderer2D.h"
@@ -39,7 +40,13 @@ namespace GitGud
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntity(GUID(), name);
+	}
+
+	Entity Scene::CreateEntity(GUID guid, const std::string& name)
+	{
 		Entity e = { _registry.create(), this };
+		e.AddComponent<GuidComponent>(guid);
 		e.AddComponent<TransformComponent>();
 		e.AddComponent<TagComponent>(name);
 		return e;
@@ -227,6 +234,12 @@ namespace GitGud
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
 		static_assert(false);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<GuidComponent>(Entity entity, GuidComponent& tag)
+	{
+
 	}
 
 	template<>

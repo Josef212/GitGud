@@ -1,6 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 123456789
+  - Entity: 5277828315329629883
     struct GitGud::TagComponent:
       Tag: Camera
     struct GitGud::TransformComponent:
@@ -18,7 +18,7 @@ Entities:
         OrthograpicFar: 1
       Primary: true
       FixedAsectRatio: false
-  - Entity: 123456789
+  - Entity: 1248263143351219700
     struct GitGud::TagComponent:
       Tag: Square
     struct GitGud::TransformComponent:
@@ -38,7 +38,7 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 123456789
+  - Entity: 15184602451047000261
     struct GitGud::TagComponent:
       Tag: Floor
     struct GitGud::TransformComponent:

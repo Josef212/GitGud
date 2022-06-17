@@ -3,6 +3,7 @@
 #include "entt.hpp"
 
 #include "GitGud/Core/Timestep.h"
+#include "GitGud/Core/GUID.h"
 #include "GitGud/Renderer/Cameras/EditorCamera.h"
 
 class b2World;
@@ -22,6 +23,7 @@ namespace GitGud
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = "Entity");
+		Entity CreateEntity(GUID guid, const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 
 		void OnRuntimeStart();
