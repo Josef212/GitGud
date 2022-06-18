@@ -43,6 +43,9 @@ namespace GitGud
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
+		void SaveScene();
+
+		void SerializeScene(Ref<Scene> scene, std::filesystem::path path);
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -65,6 +68,7 @@ namespace GitGud
 
 		Ref<Scene> _activeScene;
 		Ref<Scene> _editorScene;
+		std::filesystem::path _editorScenePath;
 
 		Entity _cameraEntity;
 

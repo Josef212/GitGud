@@ -4,9 +4,9 @@ Entities:
     struct GitGud::TagComponent:
       Tag: Floor
     struct GitGud::TransformComponent:
-      Translation: [6.19919618e-08, -3, 0]
+      Translation: [-1.00279891e-08, -3, 0]
       Rotation: [0, 0, 0.21110785]
-      Scale: [10, 0.499999851, 1]
+      Scale: [10, 0.499999702, 1]
     struct GitGud::SpriteRendererComponent:
       Color: [0.922779918, 0, 0, 1]
       TilingFactor: [1, 1]
@@ -28,7 +28,7 @@ Entities:
       Rotation: [0, 0, -0.589230537]
       Scale: [10.0000048, 0.499999583, 1]
     struct GitGud::SpriteRendererComponent:
-      Color: [0.922779918, 0, 0, 1]
+      Color: [0.327782929, 0.922779918, 0, 1]
       TilingFactor: [1, 1]
     struct GitGud::Rigidbody2DComponent:
       BodyType: Static
@@ -86,7 +86,7 @@ Entities:
       Rotation: [0, 0, -0.659826279]
       Scale: [0.999989867, 0.999989867, 1]
     struct GitGud::SpriteRendererComponent:
-      Color: [0.763936758, 0.942084968, 0.160045296, 1]
+      Color: [0.942084968, 0.160045296, 0.612964153, 1]
       TilingFactor: [4, 4]
     struct GitGud::Rigidbody2DComponent:
       BodyType: Dynamic
@@ -97,4 +97,24 @@ Entities:
       Density: 0.5
       Friction: 0.5
       Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 9943724749663915435
+    struct GitGud::TagComponent:
+      Tag: Floor
+    struct GitGud::TransformComponent:
+      Translation: [-1.88942242, -9.45743942, 0]
+      Rotation: [0, 0, 1.05315197]
+      Scale: [10.0000019, 0.499999404, 1]
+    struct GitGud::SpriteRendererComponent:
+      Color: [0.911186218, 0, 1, 1]
+      TilingFactor: [1, 1]
+    struct GitGud::Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    struct GitGud::BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.5
+      Friction: 0.170000002
+      Restitution: 0.600000024
       RestitutionThreshold: 0.5

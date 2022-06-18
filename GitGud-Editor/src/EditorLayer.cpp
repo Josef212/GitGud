@@ -267,6 +267,9 @@ namespace GitGud
 		{
 			if (controlPressed && shiftPressed)
 				SaveSceneAs();
+			else if (controlPressed)
+				SaveScene();
+
 			break;
 		}
 
@@ -310,6 +313,9 @@ namespace GitGud
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					OpenScene();
+
+				if (ImGui::MenuItem("Save...", "Ctrl+S"))
+					SaveScene();
 
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
@@ -419,6 +425,8 @@ namespace GitGud
 		_activeScene = CreateRef<Scene>();
 		_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		_sceneHiararchyPanel.SetContext(_activeScene);
+		
+		_editorScenePath = std::filesystem::path();
 	}
 
 	void EditorLayer::OpenScene()
@@ -455,6 +463,7 @@ namespace GitGud
 			_sceneHiararchyPanel.SetContext(_editorScene);
 
 			_activeScene = _editorScene;
+			_editorScenePath = path;
 		}
 	}
 
@@ -463,9 +472,25 @@ namespace GitGud
 		auto filepath = FileDialogs::SaveFile("GitGud Scene (*.gg)\0*.gg\0");
 		if (filepath)
 		{
-			SceneSerializer serializer(_activeScene);
-			serializer.SerializeText(*filepath);
+			SerializeScene(_activeScene, *filepath);
+			_editorScenePath = *filepath;
 		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (_editorScenePath.empty())
+		{
+			return;
+		}
+
+		SerializeScene(_activeScene, _editorScenePath);
+	}
+
+	void EditorLayer::SerializeScene(Ref<Scene> scene, std::filesystem::path path)
+	{
+		SceneSerializer serializer(scene);
+		serializer.SerializeText(path.string());
 	}
 	
 	void EditorLayer::OnScenePlay()
