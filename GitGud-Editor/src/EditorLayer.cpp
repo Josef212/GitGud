@@ -270,6 +270,13 @@ namespace GitGud
 			break;
 		}
 
+		case GG_KEY_D:
+		{
+			if (controlPressed)
+				OnDuplicateEntity();
+			break;
+		}
+
 		case GG_KEY_Q: _selectedOperation = -1; break;
 		case GG_KEY_W: _selectedOperation = ImGuizmo::OPERATION::TRANSLATE; break;
 		case GG_KEY_E: _selectedOperation = ImGuizmo::OPERATION::ROTATE; break;
@@ -467,6 +474,8 @@ namespace GitGud
 
 		_activeScene = Scene::Copy(_editorScene);
 		_activeScene->OnRuntimeStart();
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 
 	void EditorLayer::OnSceneStop()
@@ -474,6 +483,23 @@ namespace GitGud
 		_sceneState = SceneState::Edit;
 		_activeScene->OnRuntimeStop();
 		_activeScene = _editorScene;
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
+	}
+
+	void EditorLayer::OnDuplicateEntity()
+	{
+		if (_sceneState != SceneState::Edit)
+		{
+			return;
+		}
+
+		Entity selected = EditorSelection::GetSelection();
+		if (selected)
+		{
+			auto copy = _editorScene->DuplicateEntity(selected);
+			EditorSelection::Select(copy);
+		}
 	}
 
 	void EditorLayer::Gizmos()

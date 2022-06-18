@@ -53,6 +53,15 @@ namespace GitGud
 		}
 	}
 
+	template<typename TCmp>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		if (src.HasComponent<TCmp>())
+		{
+			dst.AddOrReplaceComponent<TCmp>(src.GetComponent<TCmp>());
+		}
+	}
+
 	Ref<Scene> Scene::Copy(Ref<Scene> other)
 	{
 		auto scene = CreateRef<Scene>();
@@ -167,6 +176,21 @@ namespace GitGud
 		}
 
 		Renderer2D::EndScene();
+	}
+
+	Entity Scene::DuplicateEntity(Entity entity)
+	{
+		auto& name = entity.GetComponent<TagComponent>().Tag;
+		Entity copy = CreateEntity(name);
+
+		CopyComponentIfExists<TransformComponent>(copy, entity);
+		CopyComponentIfExists<SpriteRendererComponent>(copy, entity);
+		CopyComponentIfExists<CameraComponent>(copy, entity);
+		CopyComponentIfExists<NativeScriptComponent>(copy, entity);
+		CopyComponentIfExists<Rigidbody2DComponent>(copy, entity);
+		CopyComponentIfExists<BoxCollider2DComponent>(copy, entity);
+
+		return copy;
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)

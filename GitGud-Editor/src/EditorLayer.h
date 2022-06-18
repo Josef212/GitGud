@@ -47,6 +47,8 @@ namespace GitGud
 		void OnScenePlay();
 		void OnSceneStop();
 
+		void OnDuplicateEntity();
+
 		void Gizmos();
 
 	private:

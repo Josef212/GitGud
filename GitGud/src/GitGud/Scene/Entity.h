@@ -24,6 +24,14 @@ namespace GitGud
 			return cmp;
 		}
 
+		template<typename T, typename... Args>
+		T& AddOrReplaceComponent(Args&&... args)
+		{
+			T& cmp = _scene->_registry.emplace_or_replace<T>(_entityHandle, std::forward<Args>(args)...);
+			_scene->OnComponentAdded<T>(*this, cmp);
+			return cmp;
+		}
+
 		template<typename T>
 		T& GetComponent()
 		{

@@ -28,6 +28,8 @@ namespace GitGud
 		Entity CreateEntity(GUID guid, const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 
+		Entity DuplicateEntity(Entity entity);
+
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
