@@ -62,6 +62,8 @@ namespace GitGud
 		int _selectedOperation = -1;
 
 		Ref<Scene> _activeScene;
+		Ref<Scene> _editorScene;
+
 		Entity _cameraEntity;
 
 		Entity _hoveredEntity;

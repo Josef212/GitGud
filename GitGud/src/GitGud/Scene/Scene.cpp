@@ -38,6 +38,54 @@ namespace GitGud
 	{
 	}
 
+	template<typename TCmp>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<GUID, entt::entity>& enttMap)
+	{
+		auto view = src.view<TCmp>();
+		for (auto e : view)
+		{
+			GUID guid = src.get<GuidComponent>(e).Id;
+			GG_CORE_ASSERT(enttMap.find(guid) != enttMap.end(), "");
+			entt::entity dstEnttId = enttMap.at(guid);
+
+			auto& cmp = src.get<TCmp>(e);
+			dst.emplace_or_replace<TCmp>(dstEnttId, cmp);
+		}
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other)
+	{
+		auto scene = CreateRef<Scene>();
+
+		scene->_viewportWidth = other->_viewportWidth;
+		scene->_viewportHeight = other->_viewportHeight;
+
+		std::unordered_map<GUID, entt::entity> enttMap;
+		auto& srcRegistry = other->_registry;
+		auto& dstRegistry = scene->_registry;
+
+		// Create new entities
+		auto idView = srcRegistry.view<GuidComponent>();
+		for (auto e : idView)
+		{
+			GUID guid = srcRegistry.get<GuidComponent>(e).Id;
+			const auto& name = srcRegistry.get<TagComponent>(e).Tag;
+
+			Entity entity = scene->CreateEntity(guid, name);
+			enttMap[guid] = (entt::entity)entity;
+		}
+
+		// Copy components but Id and Tag
+		CopyComponent<TransformComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CameraComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
+
+		return scene;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		return CreateEntity(GUID(), name);
@@ -125,7 +173,7 @@ namespace GitGud
 	{
 		// Update scripts
 		{
-			_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) 
+			_registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc) 
 			{
 				if (!nsc.Instance)
 				{

@@ -425,10 +425,30 @@ namespace GitGud
 	
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		NewScene();
+		if (path.extension().string() != ".gg")
+		{
+			GG_WARN("Could not load {0} - not scene file", path.filename().string());
+			return;
+		}
 
-		SceneSerializer serializer(_activeScene);
-		serializer.DeserializeText(path.string());
+		if (_sceneState != SceneState::Edit)
+		{
+			OnSceneStop();
+		}
+
+		auto scene = CreateRef<Scene>();
+		SceneSerializer serializer(scene);
+		if (serializer.DeserializeText(path.string()))
+		{
+			_hoveredEntity = Entity::Null();
+			EditorSelection::Select(Entity::Null());
+
+			_editorScene = scene;
+			_editorScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+			_sceneHiararchyPanel.SetContext(_editorScene);
+
+			_activeScene = _editorScene;
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -444,6 +464,8 @@ namespace GitGud
 	void EditorLayer::OnScenePlay()
 	{
 		_sceneState = SceneState::Play;
+
+		_activeScene = Scene::Copy(_editorScene);
 		_activeScene->OnRuntimeStart();
 	}
 
@@ -451,6 +473,7 @@ namespace GitGud
 	{
 		_sceneState = SceneState::Edit;
 		_activeScene->OnRuntimeStop();
+		_activeScene = _editorScene;
 	}
 
 	void EditorLayer::Gizmos()
