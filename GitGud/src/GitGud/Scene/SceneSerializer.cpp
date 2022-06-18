@@ -264,7 +264,9 @@ namespace GitGud
 		std::string name;
 		auto tagComponent = in[typeid(TagComponent).name()];
 		if (tagComponent)
+		{
 			name = tagComponent["Tag"].as<std::string>();
+		}
 
 		GG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", guid, name);
 
