@@ -37,7 +37,7 @@ namespace GitGud
 		UpdateView();
 	}
 
-	void EditorCamera::OnEven(Event& e)
+	void EditorCamera::OnEvent(Event& e)
 	{
 		EventDispatcher d(e);
 		d.Dispatch<MouseScrollEvent>(GG_BIND_EVENT_FN(EditorCamera::OnMouseScroll));

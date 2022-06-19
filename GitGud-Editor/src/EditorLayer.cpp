@@ -506,6 +506,7 @@ namespace GitGud
 	void EditorLayer::OnSceneStop()
 	{
 		_sceneState = SceneState::Edit;
+
 		_activeScene->OnRuntimeStop();
 		_activeScene = _editorScene;
 
