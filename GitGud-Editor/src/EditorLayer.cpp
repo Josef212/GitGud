@@ -166,7 +166,7 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		_editorCamera.OnEven(e);
+		_editorCamera.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
