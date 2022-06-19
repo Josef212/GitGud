@@ -174,6 +174,14 @@ namespace GitGud
 				//_out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite->Path();
 				_out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 			});
+		
+		SerializeComponent<CircleRendererComponent>(out, entity, [](CircleRendererComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Color" << YAML::Value << component.Color;
+				_out << YAML::Key << "Radius" << YAML::Value << component.Radius;
+				_out << YAML::Key << "Thickness" << YAML::Value << component.Thickness;
+				_out << YAML::Key << "Fade" << YAML::Value << component.Fade;
+			});
 
 		SerializeComponent<CameraComponent>(out, entity, [](CameraComponent& cameraComponent, YAML::Emitter& _out)
 			{
@@ -284,6 +292,14 @@ namespace GitGud
 				spriteRendererComponent.Color = _in["Color"].as<glm::vec4>();
 				// TODO: Deserialize sprite path and load texture
 				spriteRendererComponent.TilingFactor = _in["TilingFactor"].IsDefined() ? _in["TilingFactor"].as<glm::vec2>() : glm::vec2(1.f, 1.f);
+			});
+
+		DeserializeComponent<CircleRendererComponent>(in, deserializedEntity, [](YAML::Node& _in, CircleRendererComponent& component)
+			{
+				component.Color = _in["Color"].as<glm::vec4>();
+				component.Radius = _in["Radius"].as<float>();
+				component.Thickness = _in["Thickness"].as<float>();
+				component.Fade = _in["Fade"].as<float>();
 			});
 
 		DeserializeComponent<CameraComponent>(in, deserializedEntity, [](YAML::Node& _in, CameraComponent& cameraComponent)

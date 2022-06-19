@@ -21,6 +21,18 @@ namespace GitGud
 		int EntityId = 0;
 	};
 
+	struct CircleVertex
+	{
+		glm::vec3 WorldPosition;
+		glm::vec3 LocalPosition;
+		glm::vec4 Color;
+		float Thickness;
+		float Fade;
+
+		// Editor
+		int EntityId = 0;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32_t MaxQuads = 10000;
@@ -34,9 +46,17 @@ namespace GitGud
 		Ref<Shader> SpriteShader;
 		Ref<Texture2D> WhiteTexture;
 
+		Ref<VertexArray> CircleVertexArray;
+		Ref<VertexBuffer> CircleVertexBuffer;
+		Ref<Shader> CircleShader;
+
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
+
+		uint32_t CircleIndexCount = 0;
+		CircleVertex* CircleVertexBufferBase = nullptr;
+		CircleVertex* CircleVertexBufferPtr = nullptr;
 
 		// TODO: Using OpenGL texture id to identify the asset. Need to Change for a unique asset id
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
@@ -108,12 +128,32 @@ namespace GitGud
 		s_Data->QuadVertexArray->AddVertexBuffer(s_Data->QuadVertexBuffer);
 		s_Data->QuadVertexArray->AddIndexBuffer(quadIndexBuffer);
 
+		// Circles
+		s_Data->CircleVertexArray = VertexArray::Create();
+		s_Data->CircleVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(CircleVertex));
+		s_Data->CircleVertexBuffer->SetLayout(
+			{
+				{ ShaderDataType::Float3, "a_worldPosition" },
+				{ ShaderDataType::Float3, "a_localPosition" },
+				{ ShaderDataType::Float4, "a_color" },
+				{ ShaderDataType::Float, "a_thickness" },
+				{ ShaderDataType::Float, "a_fade" },
+				{ ShaderDataType::Int, "a_entityId" }
+			});
+
+		s_Data->CircleVertexArray->AddVertexBuffer(s_Data->CircleVertexBuffer);
+		s_Data->CircleVertexArray->AddIndexBuffer(quadIndexBuffer); // Use quad ib
+		s_Data->CircleVertexBufferBase = new CircleVertex[s_Data->MaxVertices];
+
+		// White texture
 		uint32_t whiteData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteData, sizeof(uint32_t));
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
-		s_Data->SpriteShader = Shader::Create("assets/shaders/SpriteShader.glsl");
+		// Shaders
+		s_Data->SpriteShader = Shader::Create("assets/shaders/Renderer2D_SpriteShader.glsl");
+		s_Data->CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 		
 		int32_t samplers[s_Data->MaxTextureSlots];
 		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
@@ -138,6 +178,9 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
 
+		s_Data->CircleShader->Bind();
+		s_Data->CircleShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
+
 		StartBatch();
 	}
 
@@ -150,6 +193,9 @@ namespace GitGud
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", vp);
 
+		s_Data->CircleShader->Bind();
+		s_Data->CircleShader->SetMat4("u_vp", vp);
+
 		StartBatch();
 	}
 
@@ -159,6 +205,9 @@ namespace GitGud
 
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewPorjection());
+
+		s_Data->CircleShader->Bind();
+		s_Data->CircleShader->SetMat4("u_vp", camera.GetViewPorjection());
 
 		StartBatch();
 	}
@@ -173,17 +222,28 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		if (s_Data->QuadIndexCount == 0)
-			return;
+		if (s_Data->QuadIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
+			s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
 
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
-		s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
+			for (uint32_t i = 0; i < s_Data->TextureSlotIndex; ++i)
+				s_Data->TextureSlots[i]->Bind(i);
 
-		for (uint32_t i = 0; i < s_Data->TextureSlotIndex; ++i)
-			s_Data->TextureSlots[i]->Bind(i);
+			s_Data->SpriteShader->Bind();
+			RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
+			s_Data->Stats.DrawCalls++;
+		}
 
-		RenderCommand::DrawIndexed(s_Data->QuadVertexArray, s_Data->QuadIndexCount);
-		s_Data->Stats.DrawCalls++;
+		if (s_Data->CircleIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->CircleVertexBufferPtr - (uint8_t*)s_Data->CircleVertexBufferBase);
+			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
+
+			s_Data->CircleShader->Bind();
+			RenderCommand::DrawIndexed(s_Data->CircleVertexArray, s_Data->CircleIndexCount);
+			s_Data->Stats.DrawCalls++;
+		}
 	}
 	
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
@@ -366,6 +426,32 @@ namespace GitGud
 
 		s_Data->Stats.QuadCount++;
 	}
+
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int entityId)
+	{
+		GG_PROFILE_FUNCTION();
+
+		// TODO: Implement for circles
+		//if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
+		//{
+		//	NextBatch();
+		//}
+
+		for (uint32_t i = 0; i < 4; ++i)
+		{
+			s_Data->CircleVertexBufferPtr->WorldPosition = transform * s_Data->QuadVertexPositions[i];
+			s_Data->CircleVertexBufferPtr->LocalPosition = s_Data->QuadVertexPositions[i] * 2.0f;
+			s_Data->CircleVertexBufferPtr->Color = color;
+			s_Data->CircleVertexBufferPtr->Thickness = thickness;
+			s_Data->CircleVertexBufferPtr->Fade = fade;
+			s_Data->CircleVertexBufferPtr->EntityId = entityId;
+			s_Data->CircleVertexBufferPtr++;
+		}
+
+		s_Data->CircleIndexCount += 6;
+
+		s_Data->Stats.QuadCount++;
+	}
 	
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityId)
 	{
@@ -395,6 +481,10 @@ namespace GitGud
 	{
 		s_Data->QuadIndexCount = 0;
 		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
+
+		s_Data->CircleIndexCount = 0;
+		s_Data->CircleVertexBufferPtr = s_Data->CircleVertexBufferBase;
+
 		s_Data->TextureSlotIndex = 1;
 	}
 

@@ -187,6 +187,7 @@ namespace GitGud
 		{
 			Entity selected = EditorSelection::GetSelection();
 			AddComponentEntry<SpriteRendererComponent>("SpriteRenderer", selected);
+			AddComponentEntry<CircleRendererComponent>("CircleRenderer", selected);
 			AddComponentEntry<CameraComponent>("Camera", selected);
 			AddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D", selected);
 			AddComponentEntry<BoxCollider2DComponent>("BoxCollider 2D", selected);
@@ -288,6 +289,13 @@ namespace GitGud
 				}
 
 				ImGui::DragFloat2("Tiling Factor", glm::value_ptr(spriteRenderer.TilingFactor), 0.1, 0.f, 100.f);
+			});
+
+		ComponentInspector<CircleRendererComponent>(entity, "Circle Renderer", [&](CircleRendererComponent& circleRenderer)
+			{
+				ImGui::ColorEdit4("Tint", glm::value_ptr(circleRenderer.Color));
+				ImGui::DragFloat("Thickness", &circleRenderer.Thickness, 0.025, 0.0f, 1.0f);
+				ImGui::DragFloat("Fade", &circleRenderer.Fade, 0.00025f, 0.0f, 1.0f);
 			});
 
 		ComponentInspector<Rigidbody2DComponent>(entity, "Rigidbody 2D", [&](auto& rb)

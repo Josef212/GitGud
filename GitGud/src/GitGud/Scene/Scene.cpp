@@ -87,6 +87,7 @@ namespace GitGud
 		// Copy components but Id and Tag
 		CopyComponent<TransformComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<CameraComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, enttMap);
@@ -172,6 +173,15 @@ namespace GitGud
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
 				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)e);
+			}
+		}
+
+		{
+			auto view = _registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto e : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(e);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)e);
 			}
 		}
 
@@ -270,6 +280,15 @@ namespace GitGud
 			}
 		}
 
+		{
+			auto view = _registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto e : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(e);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)e);
+			}
+		}
+
 		Renderer2D::EndScene();
 	}
 
@@ -328,6 +347,12 @@ namespace GitGud
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& spriteRenderer)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& spriteRenderer)
 	{
 
 	}
