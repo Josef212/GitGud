@@ -34,6 +34,15 @@ namespace GitGud
 		int EntityId = 0;
 	};
 
+	struct LineVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+
+		// Editor
+		int EntityId = 0;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32_t MaxQuads = 10000;
@@ -42,24 +51,40 @@ namespace GitGud
 
 		static const uint32_t MaxTextureSlots = 32; // TODO: Assign querying GPU
 
+		// Quad / Sprite rendering
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<Shader> SpriteShader;
-		Ref<Texture2D> WhiteTexture;
-
-		Ref<VertexArray> CircleVertexArray;
-		Ref<VertexBuffer> CircleVertexBuffer;
-		Ref<Shader> CircleShader;
 
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
+		// Circle
+		Ref<VertexArray> CircleVertexArray;
+		Ref<VertexBuffer> CircleVertexBuffer;
+		Ref<Shader> CircleShader;
+
 		uint32_t CircleIndexCount = 0;
 		CircleVertex* CircleVertexBufferBase = nullptr;
 		CircleVertex* CircleVertexBufferPtr = nullptr;
 
+		// Line
+		Ref<VertexArray> LineVertexArray;
+		Ref<VertexBuffer> LineVertexBuffer;
+		Ref<Shader> LineShader;
+
+		uint32_t LineVertexCount = 0;
+		LineVertex* LineVertexBufferBase = nullptr;
+		LineVertex* LineVertexBufferPtr = nullptr;
+
+		float LineWidth = 2.0f;
+
+		// Default white texture
+		Ref<Texture2D> WhiteTexture;
+
 		// TODO: Using OpenGL texture id to identify the asset. Need to Change for a unique asset id
+		// Textures
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0: White
 
@@ -82,6 +107,7 @@ namespace GitGud
 
 		Renderer2D::Statistics Stats;
 
+		// Camera
 		struct CameraData
 		{
 			glm::mat4 ViewProjection;
@@ -98,10 +124,8 @@ namespace GitGud
 		GG_PROFILE_FUNCTION();
 
 		s_Data = new Renderer2DData();
-		s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
 
 		uint32_t* quadIndices = new uint32_t[s_Data->MaxIndices];
-		
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < s_Data->MaxIndices; i += 6)
 		{
@@ -116,26 +140,24 @@ namespace GitGud
 			offset += 4;
 		}
 
-		s_Data->QuadVertexArray = VertexArray::Create();
-		
 		Ref<IndexBuffer> quadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data->MaxIndices);
-		s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
-		
 		delete[] quadIndices;
 
-		BufferLayout layout =
-		{
-			{ ShaderDataType::Float3, "a_position" },
-			{ ShaderDataType::Float4, "a_color"},
-			{ ShaderDataType::Float2, "a_texCords" },
-			{ ShaderDataType::Float, "a_texIndex" },
-			{ ShaderDataType::Float2, "a_tiling" },
-			{ ShaderDataType::Int, "a_entityId" }
-		};
+		s_Data->QuadVertexArray = VertexArray::Create();
+		s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
+		s_Data->QuadVertexBuffer->SetLayout(
+			{
+				{ ShaderDataType::Float3, "a_position" },
+				{ ShaderDataType::Float4, "a_color"},
+				{ ShaderDataType::Float2, "a_texCords" },
+				{ ShaderDataType::Float, "a_texIndex" },
+				{ ShaderDataType::Float2, "a_tiling" },
+				{ ShaderDataType::Int, "a_entityId" }
+			});
 
-		s_Data->QuadVertexBuffer->SetLayout(layout);
 		s_Data->QuadVertexArray->AddVertexBuffer(s_Data->QuadVertexBuffer);
 		s_Data->QuadVertexArray->AddIndexBuffer(quadIndexBuffer);
+		s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
 
 		// Circles
 		s_Data->CircleVertexArray = VertexArray::Create();
@@ -154,6 +176,18 @@ namespace GitGud
 		s_Data->CircleVertexArray->AddIndexBuffer(quadIndexBuffer); // Use quad ib
 		s_Data->CircleVertexBufferBase = new CircleVertex[s_Data->MaxVertices];
 
+		// Lines
+		s_Data->LineVertexArray = VertexArray::Create();
+		s_Data->LineVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(LineVertex));
+		s_Data->LineVertexBuffer->SetLayout({
+				{ ShaderDataType::Float3, "a_position" },
+				{ ShaderDataType::Float4, "a_color"},
+				{ ShaderDataType::Int, "a_entityId" }
+			});
+
+		s_Data->LineVertexArray->AddVertexBuffer(s_Data->LineVertexBuffer);
+		s_Data->LineVertexBufferBase = new LineVertex[s_Data->MaxVertices];
+
 		// White texture
 		uint32_t whiteData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
@@ -163,6 +197,7 @@ namespace GitGud
 		// Shaders
 		s_Data->SpriteShader = Shader::Create("assets/shaders/Renderer2D_SpriteShader.glsl");
 		s_Data->CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
+		s_Data->LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
 		
 		int32_t samplers[s_Data->MaxTextureSlots];
 		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
@@ -244,6 +279,17 @@ namespace GitGud
 			RenderCommand::DrawIndexed(s_Data->CircleVertexArray, s_Data->CircleIndexCount);
 			s_Data->Stats.DrawCalls++;
 		}
+
+		if (s_Data->LineVertexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->LineVertexBufferPtr - (uint8_t*)s_Data->LineVertexBufferBase);
+			s_Data->LineVertexBuffer->SetData(s_Data->LineVertexBufferBase, dataSize);
+
+			s_Data->LineShader->Bind();
+			RenderCommand::SetLineWidth(s_Data->LineWidth);
+			RenderCommand::DrawLines(s_Data->LineVertexArray, s_Data->LineVertexCount);
+			s_Data->Stats.DrawCalls++;
+		}
 	}
 	
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
@@ -310,7 +356,6 @@ namespace GitGud
 		}
 
 		s_Data->QuadIndexCount += 6;
-
 		s_Data->Stats.QuadCount++;
 	}
 
@@ -368,7 +413,6 @@ namespace GitGud
 		}
 
 		s_Data->QuadIndexCount += 6;
-
 		s_Data->Stats.QuadCount++;
 	}
 
@@ -395,7 +439,6 @@ namespace GitGud
 		}
 
 		s_Data->QuadIndexCount += 6;
-
 		s_Data->Stats.QuadCount++;
 	}
 
@@ -423,7 +466,6 @@ namespace GitGud
 		}
 
 		s_Data->QuadIndexCount += 6;
-
 		s_Data->Stats.QuadCount++;
 	}
 
@@ -449,8 +491,49 @@ namespace GitGud
 		}
 
 		s_Data->CircleIndexCount += 6;
-
 		s_Data->Stats.QuadCount++;
+	}
+
+	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityId)
+	{
+		s_Data->LineVertexBufferPtr->Position = p0;
+		s_Data->LineVertexBufferPtr->Color = color;
+		s_Data->LineVertexBufferPtr->EntityId = entityId;
+		s_Data->LineVertexBufferPtr++;
+
+		s_Data->LineVertexBufferPtr->Position = p1;
+		s_Data->LineVertexBufferPtr->Color = color;
+		s_Data->LineVertexBufferPtr->EntityId = entityId;
+		s_Data->LineVertexBufferPtr++;
+
+		s_Data->LineVertexCount += 2;
+	}
+
+	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color, int entityId)
+	{
+		glm::vec3 p0 = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p1 = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+		glm::vec3 p3 = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+
+		DrawLine(p0, p1, color);
+		DrawLine(p1, p2, color);
+		DrawLine(p2, p3, color);
+		DrawLine(p3, p0, color);
+	}
+
+	void Renderer2D::DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityId)
+	{
+		glm::vec3 lineVertices[4];
+		for (size_t i = 0; i < 4; i++)
+		{
+			lineVertices[i] = transform * s_Data->QuadVertexPositions[i];
+		}
+
+		DrawLine(lineVertices[0], lineVertices[1], color);
+		DrawLine(lineVertices[1], lineVertices[2], color);
+		DrawLine(lineVertices[2], lineVertices[3], color);
+		DrawLine(lineVertices[3], lineVertices[0], color);
 	}
 	
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityId)
@@ -465,6 +548,16 @@ namespace GitGud
 		{
 			DrawQuad(transform, src.Color, entityId);
 		}
+	}
+
+	float Renderer2D::GetLineWidth()
+	{
+		return s_Data->LineWidth;
+	}
+
+	void Renderer2D::SetLineWidth(float width)
+	{
+		s_Data->LineWidth = width;
 	}
 
 	Renderer2D::Statistics Renderer2D::GetStatistics()
@@ -484,6 +577,9 @@ namespace GitGud
 
 		s_Data->CircleIndexCount = 0;
 		s_Data->CircleVertexBufferPtr = s_Data->CircleVertexBufferBase;
+
+		s_Data->LineVertexCount = 0;
+		s_Data->LineVertexBufferPtr = s_Data->LineVertexBufferBase;
 
 		s_Data->TextureSlotIndex = 1;
 	}
