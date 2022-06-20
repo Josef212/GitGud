@@ -8,7 +8,10 @@ layout(location = 3) in float a_texIndex;
 layout(location = 4) in vec2 a_tiling;
 layout(location = 5) in int a_entityId;
 
-uniform mat4 u_vp;
+layout(std140, binding = 0) uniform Camera
+{
+	mat4 u_vp;
+};
 
 out vec4 v_color;
 out vec2 v_uv;

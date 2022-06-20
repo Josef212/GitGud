@@ -3,6 +3,7 @@
 
 #include "VertexArray.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
 #include "RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -80,6 +81,14 @@ namespace GitGud
 		};
 
 		Renderer2D::Statistics Stats;
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+
+		CameraData CameraBuffer;
+		Ref<UniformBuffer> CameraUniformBuffer;
 	};
 
 	static Renderer2DData* s_Data;
@@ -161,6 +170,8 @@ namespace GitGud
 
 		s_Data->SpriteShader->Bind();
 		s_Data->SpriteShader->SetIntArray("u_textures", samplers, s_Data->MaxTextureSlots);
+
+		s_Data->CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -175,11 +186,8 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
-
-		s_Data->CircleShader->Bind();
-		s_Data->CircleShader->SetMat4("u_vp", camera.GetViewProjectionMatrix());
+		s_Data->CameraBuffer.ViewProjection = camera.GetViewProjectionMatrix();
+		s_Data->CameraUniformBuffer->SetData(&s_Data->CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -188,13 +196,8 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		glm::mat4 vp = camera.GetProjection() * glm::inverse(transform);
-
-		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetMat4("u_vp", vp);
-
-		s_Data->CircleShader->Bind();
-		s_Data->CircleShader->SetMat4("u_vp", vp);
+		s_Data->CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data->CameraUniformBuffer->SetData(&s_Data->CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -203,11 +206,8 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetMat4("u_vp", camera.GetViewPorjection());
-
-		s_Data->CircleShader->Bind();
-		s_Data->CircleShader->SetMat4("u_vp", camera.GetViewPorjection());
+		s_Data->CameraBuffer.ViewProjection = camera.GetViewPorjection();
+		s_Data->CameraUniformBuffer->SetData(&s_Data->CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
