@@ -12,6 +12,7 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_circle_shape.h"
 
 #define WORLD_GRAVITY { 0.0f, -9.8f }
 
@@ -92,6 +93,7 @@ namespace GitGud
 		CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, enttMap);
 		CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
 
 		return scene;
 	}
@@ -154,6 +156,26 @@ namespace GitGud
 
 				collider.RuntimeFixture = fixture;
 			}
+
+			if (entity.HasComponent<CircleCollider2DComponent>())
+			{
+				auto& collider = entity.GetComponent<CircleCollider2DComponent>();
+
+				b2CircleShape shape;
+				shape.m_p.Set(collider.Offset.x, collider.Offset.y);
+				shape.m_radius = trans.Scale.x * collider.Radius;
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = collider.Density;
+				fixtureDef.friction = collider.Friction;
+				fixtureDef.restitution = collider.Restitution;
+				fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+
+				auto fixture = body->CreateFixture(&fixtureDef);
+
+				collider.RuntimeFixture = fixture;
+			}
 		}
 	}
 
@@ -199,6 +221,7 @@ namespace GitGud
 		CopyComponentIfExists<NativeScriptComponent>(copy, entity);
 		CopyComponentIfExists<Rigidbody2DComponent>(copy, entity);
 		CopyComponentIfExists<BoxCollider2DComponent>(copy, entity);
+		CopyComponentIfExists<CircleCollider2DComponent>(copy, entity);
 
 		return copy;
 	}
@@ -377,6 +400,12 @@ namespace GitGud
 
 	template<>
 	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& collider)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& collider)
 	{
 
 	}

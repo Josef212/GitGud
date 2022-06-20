@@ -191,6 +191,7 @@ namespace GitGud
 			AddComponentEntry<CameraComponent>("Camera", selected);
 			AddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D", selected);
 			AddComponentEntry<BoxCollider2DComponent>("BoxCollider 2D", selected);
+			AddComponentEntry<CircleCollider2DComponent>("CircleCollider 2D", selected);
 
 			ImGui::EndPopup();
 		}
@@ -326,10 +327,20 @@ namespace GitGud
 				ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation);
 			});
 
-		ComponentInspector<BoxCollider2DComponent>(entity, "Box Collider 2D", [&](auto& collider)
+		ComponentInspector<BoxCollider2DComponent>(entity, "Box Collider 2D", [&](BoxCollider2DComponent& collider)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset));
 				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size));
+				ImGui::DragFloat("Density", &collider.Density, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Friction", &collider.Friction, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat("RestitutionThreshold", &collider.RestitutionThreshold, 0.01f, 0.0f);
+			});
+
+		ComponentInspector<CircleCollider2DComponent>(entity, "Box Collider 2D", [&](CircleCollider2DComponent& collider)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset));
+				ImGui::DragFloat("Radius", &collider.Radius);
 				ImGui::DragFloat("Density", &collider.Density, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Friction", &collider.Friction, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f);

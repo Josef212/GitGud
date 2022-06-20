@@ -222,6 +222,16 @@ namespace GitGud
 				_out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
 			});
 
+		SerializeComponent<CircleCollider2DComponent>(out, entity, [](CircleCollider2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+				_out << YAML::Key << "Radius" << YAML::Value << component.Radius;
+				_out << YAML::Key << "Density" << YAML::Value << component.Density;
+				_out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+				_out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+				_out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+			});
+
 		out << YAML::EndMap; // Entity
 	}
 
@@ -336,6 +346,16 @@ namespace GitGud
 			{
 				component.Offset = _in["Offset"].as<glm::vec2>();
 				component.Size = _in["Size"].as<glm::vec2>();
+				component.Density = _in["Density"].as<float>();
+				component.Friction = _in["Friction"].as<float>();
+				component.Restitution = _in["Restitution"].as<float>();
+				component.RestitutionThreshold = _in["RestitutionThreshold"].as<float>();
+			});
+
+		DeserializeComponent<CircleCollider2DComponent>(in, deserializedEntity, [](YAML::Node& _in, CircleCollider2DComponent& component)
+			{
+				component.Offset = _in["Offset"].as<glm::vec2>();
+				component.Radius = _in["Radius"].as<float>();
 				component.Density = _in["Density"].as<float>();
 				component.Friction = _in["Friction"].as<float>();
 				component.Restitution = _in["Restitution"].as<float>();
