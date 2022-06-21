@@ -131,11 +131,7 @@ namespace GitGud
 		{
 			case GitGud::EditorLayer::SceneState::Edit:
 			{
-				if (_viewportFocused)
-				{
-					_editorCamera.OnUpdate(ts);
-				}
-
+				_editorCamera.OnUpdate(ts);
 				_activeScene->OnUpdateEditor(ts, _editorCamera);
 				break;
 			}
@@ -241,12 +237,12 @@ namespace GitGud
 		DrawToolbar();
 		DrawSettings();
 
-		ImGui::Begin("Tmp");
-
-		std::string name = _hoveredEntity ? _hoveredEntity.GetComponent<TagComponent>().Tag : "None";
-		ImGui::Text("Hovered entity: %s", name.c_str());
-		
-		ImGui::End();
+		{
+			ImGui::Begin("Tmp");
+			std::string name = _hoveredEntity ? _hoveredEntity.GetComponent<TagComponent>().Tag : "None";
+			ImGui::Text("Hovered entity: %s", name.c_str());
+			ImGui::End();
+		}
 
 		ImGui::End();
 	}

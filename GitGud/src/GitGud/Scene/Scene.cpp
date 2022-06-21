@@ -384,7 +384,7 @@ namespace GitGud
 			for (auto e : group)
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)e);
 			}
 		}
 
