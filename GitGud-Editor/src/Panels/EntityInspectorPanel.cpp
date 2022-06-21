@@ -120,6 +120,7 @@ namespace GitGud
 
 		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
+
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
 
@@ -136,11 +137,11 @@ namespace GitGud
 
 		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
+
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
 
 		ImGui::PopItemWidth();
-
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 
@@ -195,6 +196,8 @@ namespace GitGud
 
 			ImGui::EndPopup();
 		}
+
+		ImGui::PopItemWidth();
 
 		ComponentInspector<TransformComponent>(entity, "Transform", [&](auto& transform)
 			{
@@ -340,7 +343,7 @@ namespace GitGud
 		ComponentInspector<CircleCollider2DComponent>(entity, "Box Collider 2D", [&](CircleCollider2DComponent& collider)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset));
-				ImGui::DragFloat("Radius", &collider.Radius);
+				ImGui::DragFloat("Radius", &collider.Radius, 0.05f, 0.0f);
 				ImGui::DragFloat("Density", &collider.Density, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Friction", &collider.Friction, 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f);
