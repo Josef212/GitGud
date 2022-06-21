@@ -3,6 +3,7 @@
 #include "GitGud/Maths/Maths.h"
 
 #include "EditorSelection.h"
+#include "EditorUtils/ConfigFile.h"
 
 #include <imgui/imgui.h>
 #include <ImGuizmo.h>
@@ -91,11 +92,15 @@ namespace GitGud
 		{
 			it.second->OnAttach();
 		}
+
+		LoadConfigs();
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		GG_PROFILE_FUNCTION();
+
+		SaveConfigs();
 
 		for (auto it = _editorPanels.rbegin(); it != _editorPanels.rend(); ++it)
 		{
@@ -714,5 +719,25 @@ namespace GitGud
 				entityTransformCmp.Scale = scale;
 			}
 		}
+	}
+
+	void EditorLayer::LoadConfigs()
+	{
+		ConfigFile physicsConfig("PhysicsConfig");
+		if (physicsConfig.DeserializeText("EditorConfigs/Physics.gg_config"))
+		{
+			_showPhysicsColliders = physicsConfig.Get<bool>("ShowColliders", false);
+		}
+	}
+
+	void EditorLayer::SaveConfigs()
+	{
+		ConfigFile physicsConfig("PhysicsConfig");
+
+		{
+			physicsConfig.Set("ShowColliders", _showPhysicsColliders);
+		}
+		
+		physicsConfig.SerializeText("EditorConfigs/Physics.gg_config");
 	}
 }

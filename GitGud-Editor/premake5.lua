@@ -20,6 +20,7 @@ project "GitGud-Editor"
 		"%{wks.location}/GitGud/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}"
 	}
 
