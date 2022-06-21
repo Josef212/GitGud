@@ -38,6 +38,7 @@ namespace GitGud
 		// Icons
 		_playIcon = Texture2D::Create("EditorAssets/Icons/PlayButton.png");
 		_stopIcon = Texture2D::Create("EditorAssets/Icons/StopButton.png");
+		_simulateIcon = Texture2D::Create("EditorAssets/Icons/SimulateButton.png");
 
 		FramebufferSpecification specs;
 		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INT, FramebufferTextureFormat::DEPTH };
@@ -45,7 +46,9 @@ namespace GitGud
 		specs.Height = 720;
 		_frambuffer = Framebuffer::Create(specs);
 
-		_activeScene = CreateRef<Scene>();
+		_editorScene = CreateRef<Scene>();
+		_activeScene = _editorScene;
+
 		_editorCamera = EditorCamera(30.f, 1.778f, 0.1f, 1000.0f);
 
 #if 0
@@ -134,6 +137,12 @@ namespace GitGud
 				}
 
 				_activeScene->OnUpdateEditor(ts, _editorCamera);
+				break;
+			}
+			case GitGud::EditorLayer::SceneState::Simulate:
+			{
+				_editorCamera.OnUpdate(ts);
+				_activeScene->OnUpdateSimulation(ts, _editorCamera);
 				break;
 			}
 			case GitGud::EditorLayer::SceneState::Play:
@@ -398,19 +407,44 @@ namespace GitGud
 		auto flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 		ImGui::Begin("##toolbar", nullptr, flags);
 
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		auto toolbarEnabled = (bool)_activeScene;
+		auto tintColor = ImVec4(1, 1, 1, toolbarEnabled ? 1 : 0.5f);
 
-		auto icon = _sceneState == SceneState::Edit ? _playIcon : _stopIcon;
-		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		float size = ImGui::GetWindowHeight() - 4.0f;
+
 		{
-			if (_sceneState == SceneState::Edit)
+			auto icon = (_sceneState == SceneState::Edit || _sceneState == SceneState::Simulate) ? _playIcon : _stopIcon;
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				OnScenePlay();
+				if (_sceneState == SceneState::Edit || _sceneState == SceneState::Simulate)
+				{
+					OnScenePlay();
+				}
+				else if (_sceneState == SceneState::Play)
+				{
+					OnSceneStop();
+				}
 			}
-			else if (_sceneState == SceneState::Play)
+		}
+
+		ImGui::SameLine();
+
+		{
+			auto icon = (_sceneState == SceneState::Edit || _sceneState == SceneState::Play) ? _simulateIcon : _stopIcon;
+			//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				OnSceneStop();
+				if (_sceneState == SceneState::Edit || _sceneState == SceneState::Play)
+				{
+					OnSceneSimulate();
+				}
+				else if (_sceneState == SceneState::Simulate)
+				{
+					OnSceneStop();
+				}
 			}
 		}
 
@@ -434,6 +468,11 @@ namespace GitGud
 		if (_sceneState == SceneState::Play)
 		{
 			Entity camera = _activeScene->GetPrimaryCameraEntity();
+			if (!camera)
+			{
+				return;
+			}
+
 			Renderer2D::BeginScene(camera.GetComponent<CameraComponent>().Camera, camera.GetComponent<TransformComponent>().GetTransform());
 		}
 		else
@@ -563,6 +602,11 @@ namespace GitGud
 	
 	void EditorLayer::OnScenePlay()
 	{
+		if (_sceneState == SceneState::Simulate)
+		{
+			OnSceneStop();
+		}
+
 		_sceneState = SceneState::Play;
 
 		_activeScene = Scene::Copy(_editorScene);
@@ -571,13 +615,36 @@ namespace GitGud
 		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 
+	void EditorLayer::OnSceneSimulate()
+	{
+		if (_sceneState == SceneState::Play)
+		{
+			OnSceneStop();
+		}
+
+		_sceneState = SceneState::Simulate;
+
+		_activeScene = Scene::Copy(_editorScene);
+		_activeScene->OnSimulationStart();
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
+	}
+
 	void EditorLayer::OnSceneStop()
 	{
+		GG_CORE_ASSERT(_sceneState == SceneState::Play || _sceneState == SceneState::Simulate, "");
+
+		if (_sceneState == SceneState::Play)
+		{
+			_activeScene->OnRuntimeStop();
+		}
+		else if (_sceneState == SceneState::Simulate)
+		{
+			_activeScene->OnSimulationStop();
+		}
+
 		_sceneState = SceneState::Edit;
-
-		_activeScene->OnRuntimeStop();
 		_activeScene = _editorScene;
-
 		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 

@@ -17,6 +17,7 @@ namespace GitGud
 		{
 			Edit = 0,
 			Play = 1,
+			Simulate = 2,
 		};
 
 	public:
@@ -51,6 +52,7 @@ namespace GitGud
 		void SerializeScene(Ref<Scene> scene, std::filesystem::path path);
 
 		void OnScenePlay();
+		void OnSceneSimulate();
 		void OnSceneStop();
 
 		void OnDuplicateEntity();
@@ -82,6 +84,7 @@ namespace GitGud
 		// TODO: Manage editor resources properly
 		Ref<Texture2D> _playIcon;
 		Ref<Texture2D> _stopIcon;
+		Ref<Texture2D> _simulateIcon;
 
 		// Panels
 		std::map<std::type_index, EditorPanel*> _editorPanels;
