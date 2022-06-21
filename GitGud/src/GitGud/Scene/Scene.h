@@ -40,6 +40,12 @@ namespace GitGud
 		// TODO: Might want to improve this
 		Entity GetPrimaryCameraEntity();
 
+		template<typename... Components>
+		auto GetAllEntitiesWith()
+		{
+			return _registry.view<Components...>();
+		}
+
 	private:
 		template <typename T>
 		void OnComponentAdded(Entity entity, T& component);

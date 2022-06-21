@@ -38,6 +38,9 @@ namespace GitGud
 		void DrawPanels();
 		void DrawViewport();
 		void DrawToolbar();
+		void DrawSettings();
+
+		void RenderOverlay();
 
 		void NewScene();
 		void OpenScene();
@@ -86,5 +89,8 @@ namespace GitGud
 		EntityInspectorPanel _entityInspectorPanel;
 		ContentPanel _contentPanel;
 		StatsPanel _statsPanel;
+
+		// Settings
+		bool _showPhysicsColliders = false;
 	};
 }

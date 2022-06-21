@@ -159,6 +159,8 @@ namespace GitGud
 			_hoveredEntity = id == -1 ? Entity::Null() : Entity((entt::entity)id, _activeScene.get());
 		}
 
+		RenderOverlay();
+
 		_frambuffer->Unbind();
 	}
 
@@ -228,6 +230,7 @@ namespace GitGud
 		DrawPanels();
 		DrawViewport();
 		DrawToolbar();
+		DrawSettings();
 
 		ImGui::Begin("Tmp");
 
@@ -415,6 +418,71 @@ namespace GitGud
 		ImGui::PopStyleColor(3);
 
 		ImGui::End();
+	}
+
+	void EditorLayer::DrawSettings()
+	{
+		ImGui::Begin("Settings");
+
+		ImGui::Checkbox("Show physics colliders", &_showPhysicsColliders);
+
+		ImGui::End();
+	}
+
+	void EditorLayer::RenderOverlay()
+	{
+		if (_sceneState == SceneState::Play)
+		{
+			Entity camera = _activeScene->GetPrimaryCameraEntity();
+			Renderer2D::BeginScene(camera.GetComponent<CameraComponent>().Camera, camera.GetComponent<TransformComponent>().GetTransform());
+		}
+		else
+		{
+			Renderer2D::BeginScene(_editorCamera);
+		}
+
+		if (_showPhysicsColliders)
+		{
+			// Box colliders
+			{
+				auto view = _activeScene->GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [trans, collider] = view.get<TransformComponent, BoxCollider2DComponent>(e);
+
+					glm::vec3 translation = trans.Translation + glm::vec3(collider.Offset, 0.001f);
+					glm::vec3 scale = trans.Scale * glm::vec3(collider.Size * 2.0f, 1.0f);
+
+					glm::mat4 transform = 
+						glm::translate(glm::mat4(1.0f), translation)
+						* glm::rotate(glm::mat4(1.0f), trans.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+				}
+			}
+
+			// Circle colliders
+			{
+				auto view = _activeScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [trans, collider] = view.get<TransformComponent, CircleCollider2DComponent>(e);
+
+					glm::vec3 translation = trans.Translation + glm::vec3(collider.Offset, 0.001f);
+					glm::vec3 scale = trans.Scale * glm::vec3(collider.Radius * 2.0f);
+
+					glm::mat4 transform = 
+						glm::translate(glm::mat4(1.0f), translation)
+						* glm::rotate(glm::mat4(1.0f), trans.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+				}
+			}
+		}
+
+		Renderer2D::EndScene();
 	}
 
 	void EditorLayer::NewScene()

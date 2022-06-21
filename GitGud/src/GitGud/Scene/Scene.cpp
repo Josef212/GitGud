@@ -143,6 +143,7 @@ namespace GitGud
 				auto& collider = entity.GetComponent<BoxCollider2DComponent>();
 
 				b2PolygonShape shape;
+				// TODO: Use collider offset
 				shape.SetAsBox(trans.Scale.x * collider.Size.x, trans.Scale.y * collider.Size.y);
 
 				b2FixtureDef fixtureDef;

@@ -15,7 +15,7 @@ Entities:
       FixedRotation: false
     struct GitGud::BoxCollider2DComponent:
       Offset: [0, 0]
-      Size: [0.5, 0.5]
+      Size: [0.25, 0.25]
       Density: 0.5
       Friction: 0.170000002
       Restitution: 0.600000024
