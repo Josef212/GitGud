@@ -496,6 +496,14 @@ namespace GitGud
 
 	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityId)
 	{
+		GG_PROFILE_FUNCTION();
+
+		// TODO: Implement for lines
+		//if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
+		//{
+		//	NextBatch();
+		//}
+
 		s_Data->LineVertexBufferPtr->Position = p0;
 		s_Data->LineVertexBufferPtr->Color = color;
 		s_Data->LineVertexBufferPtr->EntityId = entityId;
@@ -511,6 +519,8 @@ namespace GitGud
 
 	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2 size, const glm::vec4& color, int entityId)
 	{
+		GG_PROFILE_FUNCTION();
+
 		glm::vec3 p0 = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
 		glm::vec3 p1 = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
 		glm::vec3 p2 = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
@@ -524,6 +534,8 @@ namespace GitGud
 
 	void Renderer2D::DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityId)
 	{
+		GG_PROFILE_FUNCTION();
+
 		glm::vec3 lineVertices[4];
 		for (size_t i = 0; i < 4; i++)
 		{
