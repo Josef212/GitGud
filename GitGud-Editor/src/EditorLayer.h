@@ -59,6 +59,9 @@ namespace GitGud
 
 		void Gizmos();
 
+		void LoadConfigs();
+		void SaveConfigs();
+
 	private:
 		EditorCamera _editorCamera;
 
