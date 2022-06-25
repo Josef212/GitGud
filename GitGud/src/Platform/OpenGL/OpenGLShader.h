@@ -46,10 +46,20 @@ namespace GitGud
 	private:
 		std::string ReadFile(const std::string& filePath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
-		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
+
+		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
+		void CompileOrGetOpenGLBinaries();
+		void CreateProgram();
+		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
 
 	private:
 		uint32_t _rendererId;
 		std::string _name;
+		std::string _filePath;
+
+		std::unordered_map<GLenum, std::vector<uint32_t>> _vulkanSpirv;
+		std::unordered_map<GLenum, std::vector<uint32_t>> _openGlSpirv;
+
+		std::unordered_map<GLenum, std::string> _openGlSourceCode;
 	};
 }

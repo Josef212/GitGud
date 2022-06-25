@@ -147,12 +147,12 @@ namespace GitGud
 		s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
 		s_Data->QuadVertexBuffer->SetLayout(
 			{
-				{ ShaderDataType::Float3, "a_position" },
-				{ ShaderDataType::Float4, "a_color"},
-				{ ShaderDataType::Float2, "a_texCords" },
-				{ ShaderDataType::Float, "a_texIndex" },
-				{ ShaderDataType::Float2, "a_tiling" },
-				{ ShaderDataType::Int, "a_entityId" }
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float4, "a_Color"},
+				{ ShaderDataType::Float2, "a_TexCords" },
+				{ ShaderDataType::Float, "a_TexIndex" },
+				{ ShaderDataType::Float2, "a_Tiling" },
+				{ ShaderDataType::Int, "a_EntityId" }
 			});
 
 		s_Data->QuadVertexArray->AddVertexBuffer(s_Data->QuadVertexBuffer);
@@ -164,12 +164,12 @@ namespace GitGud
 		s_Data->CircleVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(CircleVertex));
 		s_Data->CircleVertexBuffer->SetLayout(
 			{
-				{ ShaderDataType::Float3, "a_worldPosition" },
-				{ ShaderDataType::Float3, "a_localPosition" },
-				{ ShaderDataType::Float4, "a_color" },
-				{ ShaderDataType::Float, "a_thickness" },
-				{ ShaderDataType::Float, "a_fade" },
-				{ ShaderDataType::Int, "a_entityId" }
+				{ ShaderDataType::Float3, "a_WorldPosition" },
+				{ ShaderDataType::Float3, "a_LocalPosition" },
+				{ ShaderDataType::Float4, "a_Color" },
+				{ ShaderDataType::Float, "a_Thickness" },
+				{ ShaderDataType::Float, "a_Fade" },
+				{ ShaderDataType::Int, "a_EntityId" }
 			});
 
 		s_Data->CircleVertexArray->AddVertexBuffer(s_Data->CircleVertexBuffer);
@@ -180,9 +180,9 @@ namespace GitGud
 		s_Data->LineVertexArray = VertexArray::Create();
 		s_Data->LineVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(LineVertex));
 		s_Data->LineVertexBuffer->SetLayout({
-				{ ShaderDataType::Float3, "a_position" },
-				{ ShaderDataType::Float4, "a_color"},
-				{ ShaderDataType::Int, "a_entityId" }
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float4, "a_Color"},
+				{ ShaderDataType::Int, "a_EntityId" }
 			});
 
 		s_Data->LineVertexArray->AddVertexBuffer(s_Data->LineVertexBuffer);
@@ -192,19 +192,17 @@ namespace GitGud
 		uint32_t whiteData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteData, sizeof(uint32_t));
-		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
+
+		int32_t samplers[s_Data->MaxTextureSlots];
+		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
+			samplers[i] = i;
 
 		// Shaders
 		s_Data->SpriteShader = Shader::Create("assets/shaders/Renderer2D_SpriteShader.glsl");
 		s_Data->CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 		s_Data->LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
-		
-		int32_t samplers[s_Data->MaxTextureSlots];
-		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
-			samplers[i] = i;
 
-		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetIntArray("u_textures", samplers, s_Data->MaxTextureSlots);
+		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
 		s_Data->CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}

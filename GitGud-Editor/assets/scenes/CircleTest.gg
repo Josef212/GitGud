@@ -1,0 +1,14 @@
+Scene: Untitled
+Entities:
+  - Entity: 10399119531366908116
+    struct GitGud::TagComponent:
+      Tag: Circle
+    struct GitGud::TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 1]
+    struct GitGud::CircleRendererComponent:
+      Color: [1, 0.999989986, 0.999989986, 1]
+      Radius: 0.5
+      Thickness: 1
+      Fade: 0.00200000009

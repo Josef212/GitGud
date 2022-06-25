@@ -1,3 +1,3 @@
 Config: PhysicsConfig
 Properties:
-  ShowColliders: true
+  ShowColliders: false
