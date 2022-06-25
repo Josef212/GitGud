@@ -40,6 +40,10 @@ namespace GitGud
 		{
 			const auto path = dir.path();
 			auto relativePath = std::filesystem::relative(path, g_assetsPath);
+
+			if (relativePath == "cache")
+				continue;
+
 			auto pathStr = relativePath.filename().string();
 			auto icon = GetPathIcon(dir);
 
