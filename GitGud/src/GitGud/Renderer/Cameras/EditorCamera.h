@@ -16,7 +16,7 @@ namespace GitGud
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
 		void OnUpdate(Timestep ts);
-		void OnEven(Event& e);
+		void OnEvent(Event& e);
 
 		inline float GetDistance() const { return _distance; }
 		inline void SetDistance(float distance) { _distance = distance; }

@@ -2,7 +2,7 @@ project "GitGud-Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
@@ -20,6 +20,7 @@ project "GitGud-Editor"
 		"%{wks.location}/GitGud/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}"
 	}
 
@@ -31,15 +32,15 @@ project "GitGud-Editor"
 	filter "system:windows"
 		systemversion "latest"
 
-		defines
-		{
-			--"GG_PLATFORM_WINDOWS"
-		}
-
 	filter "configurations:Debug"
 		defines "GG_DEBUG"
 		runtime "Debug"
 		symbols "on"
+		
+		postbuildcommands
+		{
+			--"{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
+		}
 
 	filter "configurations:Release"
 		defines "GG_RELEASE"

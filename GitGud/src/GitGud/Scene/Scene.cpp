@@ -2,23 +2,112 @@
 #include "Scene.h"
 #include "Components.h"
 #include "Entity.h"
+#include "ScriptableEntity.h"
 
 // TMP
 #include "GitGud/Renderer/Renderer2D.h"
 
+// Box2D
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_circle_shape.h"
+
+#define WORLD_GRAVITY { 0.0f, -9.8f }
+
 namespace GitGud
 {
+	static b2BodyType GitGudRigidbody2DBodyTypeToBox2D(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+		case GitGud::Rigidbody2DComponent::BodyType::Static: return b2_staticBody;
+		case GitGud::Rigidbody2DComponent::BodyType::Dynamic: return b2_dynamicBody;
+		case GitGud::Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+		}
+
+		GG_CORE_ASSERT(false, "Unknown body type");
+		return b2_staticBody;
+	}
+
 	Scene::Scene()
 	{
 	}
 
 	Scene::~Scene()
 	{
+		delete _physicsWorld;
+	}
+
+	template<typename TCmp>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<GUID, entt::entity>& enttMap)
+	{
+		auto view = src.view<TCmp>();
+		for (auto e : view)
+		{
+			GUID guid = src.get<GuidComponent>(e).Id;
+			GG_CORE_ASSERT(enttMap.find(guid) != enttMap.end(), "");
+			entt::entity dstEnttId = enttMap.at(guid);
+
+			auto& cmp = src.get<TCmp>(e);
+			dst.emplace_or_replace<TCmp>(dstEnttId, cmp);
+		}
+	}
+
+	template<typename TCmp>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		if (src.HasComponent<TCmp>())
+		{
+			dst.AddOrReplaceComponent<TCmp>(src.GetComponent<TCmp>());
+		}
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other)
+	{
+		auto scene = CreateRef<Scene>();
+
+		scene->_viewportWidth = other->_viewportWidth;
+		scene->_viewportHeight = other->_viewportHeight;
+
+		std::unordered_map<GUID, entt::entity> enttMap;
+		auto& srcRegistry = other->_registry;
+		auto& dstRegistry = scene->_registry;
+
+		// Create new entities
+		auto idView = srcRegistry.view<GuidComponent>();
+		for (auto e : idView)
+		{
+			GUID guid = srcRegistry.get<GuidComponent>(e).Id;
+			const auto& name = srcRegistry.get<TagComponent>(e).Tag;
+
+			Entity entity = scene->CreateEntity(guid, name);
+			enttMap[guid] = (entt::entity)entity;
+		}
+
+		// Copy components but Id and Tag
+		CopyComponent<TransformComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CameraComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
+
+		return scene;
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntity(GUID(), name);
+	}
+
+	Entity Scene::CreateEntity(GUID guid, const std::string& name)
+	{
 		Entity e = { _registry.create(), this };
+		e.AddComponent<GuidComponent>(guid);
 		e.AddComponent<TransformComponent>();
 		e.AddComponent<TagComponent>(name);
 		return e;
@@ -29,27 +118,76 @@ namespace GitGud
 		_registry.destroy(entity);
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+	Entity Scene::DuplicateEntity(Entity entity)
 	{
-		Renderer2D::BeginScene(camera);
+		auto& name = entity.GetComponent<TagComponent>().Tag;
+		Entity copy = CreateEntity(name);
 
+		CopyComponentIfExists<TransformComponent>(copy, entity);
+		CopyComponentIfExists<SpriteRendererComponent>(copy, entity);
+		CopyComponentIfExists<CameraComponent>(copy, entity);
+		CopyComponentIfExists<NativeScriptComponent>(copy, entity);
+		CopyComponentIfExists<Rigidbody2DComponent>(copy, entity);
+		CopyComponentIfExists<BoxCollider2DComponent>(copy, entity);
+		CopyComponentIfExists<CircleCollider2DComponent>(copy, entity);
+
+		return copy;
+	}
+
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	{
+		_viewportWidth = width;
+		_viewportHeight = height;
+
+		auto view = _registry.view<CameraComponent>();
+		for (auto e : view)
 		{
-			auto group = _registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto e : group)
+			auto& cameraCmp = view.get<CameraComponent>(e);
+			if (!cameraCmp.FixedAsectRatio)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)e);
+				cameraCmp.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
 
-		Renderer2D::EndScene();
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = _registry.view<CameraComponent>();
+		for (auto e : view)
+		{
+			const auto& camera = view.get<CameraComponent>(e);
+			if (camera.Primary)
+				return Entity{ e, this };
+		}
+
+		return { };
+	}
+
+	void Scene::OnRuntimeStart()
+	{
+		OnPhysics2DStart();
+	}
+
+	void Scene::OnRuntimeStop()
+	{
+		OnPhysics2DStop();
+	}
+
+	void Scene::OnSimulationStart()
+	{
+		OnPhysics2DStart();
+	}
+
+	void Scene::OnSimulationStop()
+	{
+		OnPhysics2DStop();
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		// Update scripts
 		{
-			_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) 
+			_registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc) 
 			{
 				if (!nsc.Instance)
 				{
@@ -60,6 +198,30 @@ namespace GitGud
 
 				nsc.Instance->OnUpdate(ts);
 			});
+		}
+
+		// Physics
+		{
+			const int32_t velocityIterations = 6;
+			const int32_t positionIterations = 2;
+			_physicsWorld->Step(ts, velocityIterations, positionIterations);
+
+			auto view = _registry.view<Rigidbody2DComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				auto& trans = entity.GetComponent<TransformComponent>();
+				auto& rb = entity.GetComponent<Rigidbody2DComponent>();
+
+				auto body = (b2Body*)rb.RuntimeBody;
+
+				const auto& position = body->GetPosition();
+				trans.Translation.x = position.x;
+				trans.Translation.y = position.y;
+
+				float rotation = body->GetAngle();
+				trans.Rotation.z = rotation;
+			}
 		}
 
 		// Render 2D
@@ -98,42 +260,156 @@ namespace GitGud
 			}
 		}
 
+		{
+			auto view = _registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto e : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(e);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)e);
+			}
+		}
+
 		Renderer2D::EndScene();
 	}
 
-	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
 	{
-		_viewportWidth = width;
-		_viewportHeight = height;
+		RenderScene(camera);
+	}
 
-		auto view = _registry.view<CameraComponent>();
+	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
+	{
+		// Physics
+		{
+			const int32_t velocityIterations = 6;
+			const int32_t positionIterations = 2;
+			_physicsWorld->Step(ts, velocityIterations, positionIterations);
+
+			auto view = _registry.view<Rigidbody2DComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				auto& trans = entity.GetComponent<TransformComponent>();
+				auto& rb = entity.GetComponent<Rigidbody2DComponent>();
+
+				auto body = (b2Body*)rb.RuntimeBody;
+
+				const auto& position = body->GetPosition();
+				trans.Translation.x = position.x;
+				trans.Translation.y = position.y;
+
+				float rotation = body->GetAngle();
+				trans.Rotation.z = rotation;
+			}
+		}
+
+		RenderScene(camera);
+	}
+
+	void Scene::OnPhysics2DStart()
+	{
+		_physicsWorld = new b2World(WORLD_GRAVITY);
+
+		auto view = _registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
 		{
-			auto& cameraCmp = view.get<CameraComponent>(e);
-			if (!cameraCmp.FixedAsectRatio)
+			Entity entity = { e, this };
+			auto& trans = entity.GetComponent<TransformComponent>();
+			auto& rb = entity.GetComponent<Rigidbody2DComponent>();
+
+			b2BodyDef bodyDef;
+			bodyDef.type = GitGudRigidbody2DBodyTypeToBox2D(rb.Type);
+			bodyDef.position.Set(trans.Translation.x, trans.Translation.y);
+			bodyDef.angle = trans.Rotation.z;
+
+			auto body = _physicsWorld->CreateBody(&bodyDef);
+			body->SetFixedRotation(rb.FixedRotation);
+
+			rb.RuntimeBody = body;
+
+			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
-				cameraCmp.Camera.SetViewportSize(width, height);
+				auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+
+				b2PolygonShape shape;
+				// TODO: Use collider offset
+				shape.SetAsBox(trans.Scale.x * collider.Size.x, trans.Scale.y * collider.Size.y);
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = collider.Density;
+				fixtureDef.friction = collider.Friction;
+				fixtureDef.restitution = collider.Restitution;
+				fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+
+				auto fixture = body->CreateFixture(&fixtureDef);
+
+				collider.RuntimeFixture = fixture;
+			}
+
+			if (entity.HasComponent<CircleCollider2DComponent>())
+			{
+				auto& collider = entity.GetComponent<CircleCollider2DComponent>();
+
+				b2CircleShape shape;
+				shape.m_p.Set(collider.Offset.x, collider.Offset.y);
+				shape.m_radius = trans.Scale.x * collider.Radius;
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = collider.Density;
+				fixtureDef.friction = collider.Friction;
+				fixtureDef.restitution = collider.Restitution;
+				fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+
+				auto fixture = body->CreateFixture(&fixtureDef);
+
+				collider.RuntimeFixture = fixture;
 			}
 		}
 	}
 
-	Entity Scene::GetPrimaryCameraEntity()
+	void Scene::OnPhysics2DStop()
 	{
-		auto view = _registry.view<CameraComponent>();
-		for (auto e : view)
+		delete _physicsWorld;
+		_physicsWorld = nullptr;
+	}
+
+	void Scene::RenderScene(EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+
 		{
-			const auto& camera = view.get<CameraComponent>(e);
-			if (camera.Primary)
-				return Entity{ e, this };
+			auto group = _registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto e : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(e);
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)e);
+			}
 		}
 
-		return { };
+		{
+			auto view = _registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto e : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(e);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)e);
+			}
+		}
+
+		Renderer2D::EndScene();
 	}
 
 	template <typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component)
 	{
 		static_assert(false);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<GuidComponent>(Entity entity, GuidComponent& tag)
+	{
+
 	}
 
 	template<>
@@ -155,6 +431,12 @@ namespace GitGud
 	}
 
 	template<>
+	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& spriteRenderer)
+	{
+
+	}
+
+	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& camera)
 	{
 		camera.Camera.SetViewportSize(_viewportWidth, _viewportHeight);
@@ -162,6 +444,24 @@ namespace GitGud
 
 	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& nativeScript)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& rb)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& collider)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& collider)
 	{
 
 	}

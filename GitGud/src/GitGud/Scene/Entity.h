@@ -2,6 +2,8 @@
 
 #include "entt.hpp"
 #include "Scene.h"
+#include "Components.h"
+#include "GitGud/Core/GUID.h"
 
 namespace GitGud 
 {
@@ -18,6 +20,14 @@ namespace GitGud
 		{
 			GG_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 			T& cmp = _scene->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);
+			_scene->OnComponentAdded<T>(*this, cmp);
+			return cmp;
+		}
+
+		template<typename T, typename... Args>
+		T& AddOrReplaceComponent(Args&&... args)
+		{
+			T& cmp = _scene->_registry.emplace_or_replace<T>(_entityHandle, std::forward<Args>(args)...);
 			_scene->OnComponentAdded<T>(*this, cmp);
 			return cmp;
 		}
@@ -52,6 +62,8 @@ namespace GitGud
 			_scene->OnComponentAdded<T>(*this, cmp);
 			return cmp;
 		}
+
+		GUID GetGUID() { return GetComponent<GuidComponent>().Id; }
 
 		operator bool() const { return _entityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)_entityHandle; }

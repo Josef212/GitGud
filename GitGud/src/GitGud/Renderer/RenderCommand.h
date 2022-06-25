@@ -32,6 +32,16 @@ namespace GitGud
 			s_rendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 
+		inline static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+		{
+			s_rendererAPI->DrawLines(vertexArray, vertexCount);
+		}
+
+		inline static void SetLineWidth(float width)
+		{
+			s_rendererAPI->SetLineWidth(width);
+		}
+
 	private:
 		static Scope<RendererAPI> s_rendererAPI;
 	};

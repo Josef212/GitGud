@@ -3,6 +3,7 @@
 #include "GitGud/Maths/Maths.h"
 
 #include "EditorSelection.h"
+#include "EditorUtils/ConfigFile.h"
 
 #include <imgui/imgui.h>
 #include <ImGuizmo.h>
@@ -38,6 +39,7 @@ namespace GitGud
 		// Icons
 		_playIcon = Texture2D::Create("EditorAssets/Icons/PlayButton.png");
 		_stopIcon = Texture2D::Create("EditorAssets/Icons/StopButton.png");
+		_simulateIcon = Texture2D::Create("EditorAssets/Icons/SimulateButton.png");
 
 		FramebufferSpecification specs;
 		specs.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INT, FramebufferTextureFormat::DEPTH };
@@ -45,7 +47,9 @@ namespace GitGud
 		specs.Height = 720;
 		_frambuffer = Framebuffer::Create(specs);
 
-		_activeScene = CreateRef<Scene>();
+		_editorScene = CreateRef<Scene>();
+		_activeScene = _editorScene;
+
 		_editorCamera = EditorCamera(30.f, 1.778f, 0.1f, 1000.0f);
 
 #if 0
@@ -88,11 +92,15 @@ namespace GitGud
 		{
 			it.second->OnAttach();
 		}
+
+		LoadConfigs();
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		GG_PROFILE_FUNCTION();
+
+		SaveConfigs();
 
 		for (auto it = _editorPanels.rbegin(); it != _editorPanels.rend(); ++it)
 		{
@@ -128,12 +136,14 @@ namespace GitGud
 		{
 			case GitGud::EditorLayer::SceneState::Edit:
 			{
-				if (_viewportFocused)
-				{
-					_editorCamera.OnUpdate(ts);
-				}
-
+				_editorCamera.OnUpdate(ts);
 				_activeScene->OnUpdateEditor(ts, _editorCamera);
+				break;
+			}
+			case GitGud::EditorLayer::SceneState::Simulate:
+			{
+				_editorCamera.OnUpdate(ts);
+				_activeScene->OnUpdateSimulation(ts, _editorCamera);
 				break;
 			}
 			case GitGud::EditorLayer::SceneState::Play:
@@ -159,6 +169,8 @@ namespace GitGud
 			_hoveredEntity = id == -1 ? Entity::Null() : Entity((entt::entity)id, _activeScene.get());
 		}
 
+		RenderOverlay();
+
 		_frambuffer->Unbind();
 	}
 
@@ -166,7 +178,7 @@ namespace GitGud
 	{
 		GG_PROFILE_FUNCTION();
 
-		_editorCamera.OnEven(e);
+		_editorCamera.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressEvent>(GG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -228,13 +240,14 @@ namespace GitGud
 		DrawPanels();
 		DrawViewport();
 		DrawToolbar();
+		DrawSettings();
 
-		ImGui::Begin("Tmp");
-
-		std::string name = _hoveredEntity ? _hoveredEntity.GetComponent<TagComponent>().Tag : "None";
-		ImGui::Text("Hovered entity: %s", name.c_str());
-		
-		ImGui::End();
+		{
+			ImGui::Begin("Tmp");
+			std::string name = _hoveredEntity ? _hoveredEntity.GetComponent<TagComponent>().Tag : "None";
+			ImGui::Text("Hovered entity: %s", name.c_str());
+			ImGui::End();
+		}
 
 		ImGui::End();
 	}
@@ -267,6 +280,16 @@ namespace GitGud
 		{
 			if (controlPressed && shiftPressed)
 				SaveSceneAs();
+			else if (controlPressed)
+				SaveScene();
+
+			break;
+		}
+
+		case GG_KEY_D:
+		{
+			if (controlPressed)
+				OnDuplicateEntity();
 			break;
 		}
 
@@ -303,6 +326,9 @@ namespace GitGud
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					OpenScene();
+
+				if (ImGui::MenuItem("Save...", "Ctrl+S"))
+					SaveScene();
 
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
@@ -382,19 +408,44 @@ namespace GitGud
 		auto flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 		ImGui::Begin("##toolbar", nullptr, flags);
 
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		auto toolbarEnabled = (bool)_activeScene;
+		auto tintColor = ImVec4(1, 1, 1, toolbarEnabled ? 1 : 0.5f);
 
-		auto icon = _sceneState == SceneState::Edit ? _playIcon : _stopIcon;
-		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		float size = ImGui::GetWindowHeight() - 4.0f;
+
 		{
-			if (_sceneState == SceneState::Edit)
+			auto icon = (_sceneState == SceneState::Edit || _sceneState == SceneState::Simulate) ? _playIcon : _stopIcon;
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				OnScenePlay();
+				if (_sceneState == SceneState::Edit || _sceneState == SceneState::Simulate)
+				{
+					OnScenePlay();
+				}
+				else if (_sceneState == SceneState::Play)
+				{
+					OnSceneStop();
+				}
 			}
-			else if (_sceneState == SceneState::Play)
+		}
+
+		ImGui::SameLine();
+
+		{
+			auto icon = (_sceneState == SceneState::Edit || _sceneState == SceneState::Play) ? _simulateIcon : _stopIcon;
+			//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+			if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				OnSceneStop();
+				if (_sceneState == SceneState::Edit || _sceneState == SceneState::Play)
+				{
+					OnSceneSimulate();
+				}
+				else if (_sceneState == SceneState::Simulate)
+				{
+					OnSceneStop();
+				}
 			}
 		}
 
@@ -404,12 +455,86 @@ namespace GitGud
 		ImGui::End();
 	}
 
+	void EditorLayer::DrawSettings()
+	{
+		ImGui::Begin("Settings");
+
+		ImGui::Checkbox("Show physics colliders", &_showPhysicsColliders);
+
+		ImGui::End();
+	}
+
+	void EditorLayer::RenderOverlay()
+	{
+		if (_sceneState == SceneState::Play)
+		{
+			Entity camera = _activeScene->GetPrimaryCameraEntity();
+			if (!camera)
+			{
+				return;
+			}
+
+			Renderer2D::BeginScene(camera.GetComponent<CameraComponent>().Camera, camera.GetComponent<TransformComponent>().GetTransform());
+		}
+		else
+		{
+			Renderer2D::BeginScene(_editorCamera);
+		}
+
+		if (_showPhysicsColliders)
+		{
+			// Box colliders
+			{
+				auto view = _activeScene->GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [trans, collider] = view.get<TransformComponent, BoxCollider2DComponent>(e);
+
+					glm::vec3 translation = trans.Translation + glm::vec3(collider.Offset, 0.001f);
+					glm::vec3 scale = trans.Scale * glm::vec3(collider.Size * 2.0f, 1.0f);
+
+					glm::mat4 transform = 
+						glm::translate(glm::mat4(1.0f), translation)
+						* glm::rotate(glm::mat4(1.0f), trans.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+				}
+			}
+
+			// Circle colliders
+			{
+				auto view = _activeScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [trans, collider] = view.get<TransformComponent, CircleCollider2DComponent>(e);
+
+					glm::vec3 translation = trans.Translation + glm::vec3(collider.Offset, 0.001f);
+					glm::vec3 scale = trans.Scale * glm::vec3(collider.Radius * 2.0f);
+
+					glm::mat4 transform = 
+						glm::translate(glm::mat4(1.0f), translation)
+						* glm::rotate(glm::mat4(1.0f), trans.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+				}
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
 	void EditorLayer::NewScene()
 	{
+		_hoveredEntity = Entity::Null();
 		EditorSelection::Select(Entity::Null());
+
 		_activeScene = CreateRef<Scene>();
 		_activeScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
 		_sceneHiararchyPanel.SetContext(_activeScene);
+		
+		_editorScenePath = std::filesystem::path();
 	}
 
 	void EditorLayer::OpenScene()
@@ -423,10 +548,31 @@ namespace GitGud
 	
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		NewScene();
+		if (path.extension().string() != ".gg")
+		{
+			GG_WARN("Could not load {0} - not scene file", path.filename().string());
+			return;
+		}
 
-		SceneSerializer serializer(_activeScene);
-		serializer.DeserializeText(path.string());
+		if (_sceneState != SceneState::Edit)
+		{
+			OnSceneStop();
+		}
+
+		auto scene = CreateRef<Scene>();
+		SceneSerializer serializer(scene);
+		if (serializer.DeserializeText(path.string()))
+		{
+			_hoveredEntity = Entity::Null();
+			EditorSelection::Select(Entity::Null());
+
+			_editorScene = scene;
+			_editorScene->OnViewportResize((uint32_t)_viewportSize.x, (uint32_t)_viewportSize.y);
+			_sceneHiararchyPanel.SetContext(_editorScene);
+
+			_activeScene = _editorScene;
+			_editorScenePath = path;
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -434,19 +580,88 @@ namespace GitGud
 		auto filepath = FileDialogs::SaveFile("GitGud Scene (*.gg)\0*.gg\0");
 		if (filepath)
 		{
-			SceneSerializer serializer(_activeScene);
-			serializer.SerializeText(*filepath);
+			SerializeScene(_activeScene, *filepath);
+			_editorScenePath = *filepath;
 		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (_editorScenePath.empty())
+		{
+			return;
+		}
+
+		SerializeScene(_activeScene, _editorScenePath);
+	}
+
+	void EditorLayer::SerializeScene(Ref<Scene> scene, std::filesystem::path path)
+	{
+		SceneSerializer serializer(scene);
+		serializer.SerializeText(path.string());
 	}
 	
 	void EditorLayer::OnScenePlay()
 	{
+		if (_sceneState == SceneState::Simulate)
+		{
+			OnSceneStop();
+		}
+
 		_sceneState = SceneState::Play;
+
+		_activeScene = Scene::Copy(_editorScene);
+		_activeScene->OnRuntimeStart();
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
+	}
+
+	void EditorLayer::OnSceneSimulate()
+	{
+		if (_sceneState == SceneState::Play)
+		{
+			OnSceneStop();
+		}
+
+		_sceneState = SceneState::Simulate;
+
+		_activeScene = Scene::Copy(_editorScene);
+		_activeScene->OnSimulationStart();
+
+		_sceneHiararchyPanel.SetContext(_activeScene);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		GG_CORE_ASSERT(_sceneState == SceneState::Play || _sceneState == SceneState::Simulate, "");
+
+		if (_sceneState == SceneState::Play)
+		{
+			_activeScene->OnRuntimeStop();
+		}
+		else if (_sceneState == SceneState::Simulate)
+		{
+			_activeScene->OnSimulationStop();
+		}
+
 		_sceneState = SceneState::Edit;
+		_activeScene = _editorScene;
+		_sceneHiararchyPanel.SetContext(_activeScene);
+	}
+
+	void EditorLayer::OnDuplicateEntity()
+	{
+		if (_sceneState != SceneState::Edit)
+		{
+			return;
+		}
+
+		Entity selected = EditorSelection::GetSelection();
+		if (selected)
+		{
+			auto copy = _editorScene->DuplicateEntity(selected);
+			EditorSelection::Select(copy);
+		}
 	}
 
 	void EditorLayer::Gizmos()
@@ -504,5 +719,25 @@ namespace GitGud
 				entityTransformCmp.Scale = scale;
 			}
 		}
+	}
+
+	void EditorLayer::LoadConfigs()
+	{
+		ConfigFile physicsConfig("PhysicsConfig");
+		if (physicsConfig.DeserializeText("EditorConfigs/Physics.gg_config"))
+		{
+			_showPhysicsColliders = physicsConfig.Get<bool>("ShowColliders", false);
+		}
+	}
+
+	void EditorLayer::SaveConfigs()
+	{
+		ConfigFile physicsConfig("PhysicsConfig");
+
+		{
+			physicsConfig.Set("ShowColliders", _showPhysicsColliders);
+		}
+		
+		physicsConfig.SerializeText("EditorConfigs/Physics.gg_config");
 	}
 }

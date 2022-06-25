@@ -20,7 +20,7 @@ namespace GitGud
 	void EditorCamera::OnUpdate(Timestep ts)
 	{
 		// TODO: Do unity like
-		if (Input::IsKey(GG_KEY_LEFT_ALT))
+		if (Input::IsKey(GG_KEY_LEFT_CONTROL))
 		{
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 			glm::vec2 delta = (mouse - _initialMousePos) * 0.003f;
@@ -37,7 +37,7 @@ namespace GitGud
 		UpdateView();
 	}
 
-	void EditorCamera::OnEven(Event& e)
+	void EditorCamera::OnEvent(Event& e)
 	{
 		EventDispatcher d(e);
 		d.Dispatch<MouseScrollEvent>(GG_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
@@ -98,7 +98,7 @@ namespace GitGud
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-		_yaw += yawSign * delta.x * RotationSpeed();
+		_yaw -= yawSign * delta.x * RotationSpeed();
 		_pitch += delta.y * RotationSpeed();
 	}
 

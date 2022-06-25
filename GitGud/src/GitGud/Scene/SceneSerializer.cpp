@@ -108,6 +108,29 @@ namespace GitGud
 		return out;
 	}
 
+	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+			case GitGud::Rigidbody2DComponent::BodyType::Static: return "Static";
+			case GitGud::Rigidbody2DComponent::BodyType::Dynamic: return "Dynamic";
+			case GitGud::Rigidbody2DComponent::BodyType::Kinematic: return "Kinematic";
+
+			GG_CORE_ASSERT(false, "Unknown body type");
+			return "";
+		}
+	}
+
+	static Rigidbody2DComponent::BodyType RigidBody2DBodyTypeFromString(std::string bodyTypeStr)
+	{
+		if (bodyTypeStr == "Static") return Rigidbody2DComponent::BodyType::Static;
+		if (bodyTypeStr == "Dynamic") return Rigidbody2DComponent::BodyType::Dynamic;
+		if (bodyTypeStr == "Kinematic") return Rigidbody2DComponent::BodyType::Kinematic;
+
+		GG_CORE_ASSERT(false, "Unknown body type");
+		return Rigidbody2DComponent::BodyType::Static;
+	}
+
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : _scene(scene)
 	{
 	}
@@ -127,8 +150,10 @@ namespace GitGud
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
+		GG_CORE_ASSERT(entity.HasComponent<GuidComponent>(), "");
+
 		out << YAML::BeginMap; 
-		out << YAML::Key << "Entity" << YAML::Value << "123456789"; // TODO: Entity ID
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetGUID();
 
 		SerializeComponent<TagComponent>(out, entity, [](TagComponent& tagComponent, YAML::Emitter& _out)
 			{
@@ -148,6 +173,14 @@ namespace GitGud
 				// TODO: Serialize sprite path
 				//_out << YAML::Key << "Sprite" << YAML::Value << spriteRendererComponent.Sprite->Path();
 				_out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
+			});
+		
+		SerializeComponent<CircleRendererComponent>(out, entity, [](CircleRendererComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Color" << YAML::Value << component.Color;
+				_out << YAML::Key << "Radius" << YAML::Value << component.Radius;
+				_out << YAML::Key << "Thickness" << YAML::Value << component.Thickness;
+				_out << YAML::Key << "Fade" << YAML::Value << component.Fade;
 			});
 
 		SerializeComponent<CameraComponent>(out, entity, [](CameraComponent& cameraComponent, YAML::Emitter& _out)
@@ -170,7 +203,34 @@ namespace GitGud
 				_out << YAML::Key << "FixedAsectRatio" << YAML::Value << cameraComponent.FixedAsectRatio;
 			});
 
+		// TODO
 		//SerializeComponent<NativeScriptComponent>(out, entity, [](NativeScriptComponent& nativeScriptComponent, YAML::Emitter& _out) { });
+
+		SerializeComponent<Rigidbody2DComponent>(out, entity, [](Rigidbody2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(component.Type);
+				_out << YAML::Key << "FixedRotation" << YAML::Value << component.FixedRotation;
+			});
+
+		SerializeComponent<BoxCollider2DComponent>(out, entity, [](BoxCollider2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+				_out << YAML::Key << "Size" << YAML::Value << component.Size;
+				_out << YAML::Key << "Density" << YAML::Value << component.Density;
+				_out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+				_out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+				_out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+			});
+
+		SerializeComponent<CircleCollider2DComponent>(out, entity, [](CircleCollider2DComponent& component, YAML::Emitter& _out)
+			{
+				_out << YAML::Key << "Offset" << YAML::Value << component.Offset;
+				_out << YAML::Key << "Radius" << YAML::Value << component.Radius;
+				_out << YAML::Key << "Density" << YAML::Value << component.Density;
+				_out << YAML::Key << "Friction" << YAML::Value << component.Friction;
+				_out << YAML::Key << "Restitution" << YAML::Value << component.Restitution;
+				_out << YAML::Key << "RestitutionThreshold" << YAML::Value << component.RestitutionThreshold;
+			});
 
 		out << YAML::EndMap; // Entity
 	}
@@ -217,16 +277,18 @@ namespace GitGud
 
 	static void DeserializeEntity(const Ref<Scene>& scene, YAML::Node& in)
 	{
-		uint64_t uuid = in["Entity"].as<uint64_t>(); // TODO
+		uint64_t guid = in["Entity"].as<uint64_t>();
 
 		std::string name;
 		auto tagComponent = in[typeid(TagComponent).name()];
 		if (tagComponent)
+		{
 			name = tagComponent["Tag"].as<std::string>();
+		}
 
-		GG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
+		GG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", guid, name);
 
-		Entity deserializedEntity = scene->CreateEntity(name);
+		Entity deserializedEntity = scene->CreateEntity(guid, name);
 		
 		DeserializeComponent<TransformComponent>(in, deserializedEntity, [](YAML::Node& _in, TransformComponent& transformComponent)
 			{
@@ -240,6 +302,14 @@ namespace GitGud
 				spriteRendererComponent.Color = _in["Color"].as<glm::vec4>();
 				// TODO: Deserialize sprite path and load texture
 				spriteRendererComponent.TilingFactor = _in["TilingFactor"].IsDefined() ? _in["TilingFactor"].as<glm::vec2>() : glm::vec2(1.f, 1.f);
+			});
+
+		DeserializeComponent<CircleRendererComponent>(in, deserializedEntity, [](YAML::Node& _in, CircleRendererComponent& component)
+			{
+				component.Color = _in["Color"].as<glm::vec4>();
+				component.Radius = _in["Radius"].as<float>();
+				component.Thickness = _in["Thickness"].as<float>();
+				component.Fade = _in["Fade"].as<float>();
 			});
 
 		DeserializeComponent<CameraComponent>(in, deserializedEntity, [](YAML::Node& _in, CameraComponent& cameraComponent)
@@ -263,7 +333,34 @@ namespace GitGud
 				cameraComponent.FixedAsectRatio = _in["FixedAsectRatio"].as<bool>();
 			});
 		
+		// TODO
 		//DeserializeComponent<NativeScriptComponent>(in, deserializedEntity, [](YAML::Node& _in, NativeScriptComponent& nativeScriptComponent) { });
+
+		DeserializeComponent<Rigidbody2DComponent>(in, deserializedEntity, [](YAML::Node& _in, Rigidbody2DComponent& component)
+			{
+				component.Type = RigidBody2DBodyTypeFromString(_in["BodyType"].as<std::string>());
+				component.FixedRotation = _in["FixedRotation"].as<bool>();
+			});
+
+		DeserializeComponent<BoxCollider2DComponent>(in, deserializedEntity, [](YAML::Node& _in, BoxCollider2DComponent& component)
+			{
+				component.Offset = _in["Offset"].as<glm::vec2>();
+				component.Size = _in["Size"].as<glm::vec2>();
+				component.Density = _in["Density"].as<float>();
+				component.Friction = _in["Friction"].as<float>();
+				component.Restitution = _in["Restitution"].as<float>();
+				component.RestitutionThreshold = _in["RestitutionThreshold"].as<float>();
+			});
+
+		DeserializeComponent<CircleCollider2DComponent>(in, deserializedEntity, [](YAML::Node& _in, CircleCollider2DComponent& component)
+			{
+				component.Offset = _in["Offset"].as<glm::vec2>();
+				component.Radius = _in["Radius"].as<float>();
+				component.Density = _in["Density"].as<float>();
+				component.Friction = _in["Friction"].as<float>();
+				component.Restitution = _in["Restitution"].as<float>();
+				component.RestitutionThreshold = _in["RestitutionThreshold"].as<float>();
+			});
 	}
 
 	bool SceneSerializer::DeserializeText(const std::string& filepath)
