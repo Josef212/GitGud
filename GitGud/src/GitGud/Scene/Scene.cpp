@@ -40,28 +40,46 @@ namespace GitGud
 		delete _physicsWorld;
 	}
 
-	template<typename TCmp>
+	template<typename... TCmp>
 	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<GUID, entt::entity>& enttMap)
 	{
-		auto view = src.view<TCmp>();
-		for (auto e : view)
+		([&]()
 		{
-			GUID guid = src.get<GuidComponent>(e).Id;
-			GG_CORE_ASSERT(enttMap.find(guid) != enttMap.end(), "");
-			entt::entity dstEnttId = enttMap.at(guid);
+			auto view = src.view<TCmp>();
+			for (auto e : view)
+			{
+				GUID guid = src.get<GuidComponent>(e).Id;
+				GG_CORE_ASSERT(enttMap.find(guid) != enttMap.end(), "");
+				entt::entity dstEnttId = enttMap.at(guid);
 
-			auto& cmp = src.get<TCmp>(e);
-			dst.emplace_or_replace<TCmp>(dstEnttId, cmp);
-		}
+				auto& cmp = src.get<TCmp>(e);
+				dst.emplace_or_replace<TCmp>(dstEnttId, cmp);
+			}
+		}(), ...);
 	}
 
-	template<typename TCmp>
+	template<typename... TCmp>
+	static void CopyComponent(ComponentGroup<TCmp...>, entt::registry& dst, entt::registry& src, const std::unordered_map<GUID, entt::entity>& enttMap)
+	{
+		CopyComponent<TCmp...>(dst, src, enttMap);
+	}
+
+	template<typename... TCmp>
 	static void CopyComponentIfExists(Entity dst, Entity src)
 	{
-		if (src.HasComponent<TCmp>())
+		([&]()
 		{
-			dst.AddOrReplaceComponent<TCmp>(src.GetComponent<TCmp>());
-		}
+			if (src.HasComponent<TCmp>())
+			{
+				dst.AddOrReplaceComponent<TCmp>(src.GetComponent<TCmp>());
+			}
+		}(), ...);
+	}
+
+	template<typename... TCmp>
+	static void CopyComponentIfExists(ComponentGroup<TCmp...>, Entity dst, Entity src)
+	{
+		CopyComponentIfExists<TCmp...>(dst, src);
 	}
 
 	Ref<Scene> Scene::Copy(Ref<Scene> other)
@@ -87,14 +105,7 @@ namespace GitGud
 		}
 
 		// Copy components but Id and Tag
-		CopyComponent<TransformComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<CameraComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
-		CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, enttMap);
+		CopyComponent(AllComponents{}, dstRegistry, srcRegistry, enttMap);
 
 		return scene;
 	}
@@ -122,14 +133,7 @@ namespace GitGud
 	{
 		auto& name = entity.GetComponent<TagComponent>().Tag;
 		Entity copy = CreateEntity(name);
-
-		CopyComponentIfExists<TransformComponent>(copy, entity);
-		CopyComponentIfExists<SpriteRendererComponent>(copy, entity);
-		CopyComponentIfExists<CameraComponent>(copy, entity);
-		CopyComponentIfExists<NativeScriptComponent>(copy, entity);
-		CopyComponentIfExists<Rigidbody2DComponent>(copy, entity);
-		CopyComponentIfExists<BoxCollider2DComponent>(copy, entity);
-		CopyComponentIfExists<CircleCollider2DComponent>(copy, entity);
+		CopyComponentIfExists(AllComponents{}, copy, entity);
 
 		return copy;
 	}

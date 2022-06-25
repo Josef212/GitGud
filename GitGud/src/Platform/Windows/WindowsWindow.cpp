@@ -115,7 +115,7 @@ namespace GitGud
 			{
 				case GLFW_PRESS:
 					{
-						KeyPressEvent event(key, 0);
+						KeyPressEvent event(key, false);
 						data.EventCallback(event);
 					}
 					break;
@@ -127,7 +127,7 @@ namespace GitGud
 					break;
 				case GLFW_REPEAT:
 					{
-						KeyPressEvent event(key, 1);
+						KeyPressEvent event(key, true);
 						data.EventCallback(event);
 					}
 					break;

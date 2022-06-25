@@ -20,21 +20,21 @@ namespace GitGud
 	class GG_API KeyPressEvent : public KeyEvent
 	{
 	public:
-		KeyPressEvent(int keyCode, int repeatCount) : KeyEvent(keyCode), _repeatCount(repeatCount) {}
+		KeyPressEvent(int keyCode, bool isRepeat = false) : KeyEvent(keyCode), _isRepeat(isRepeat) {}
 
-		inline int GetRepeatCount() const { return _repeatCount; }
+		inline int IsRepeat() const { return _isRepeat; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressEvent: " << _keyCode << " (" << _repeatCount << " repeats)";
+			ss << "KeyPressEvent: " << _keyCode << " (repeat = " << _isRepeat << ")";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPress)
 
 	private:
-		int _repeatCount;
+		bool _isRepeat;
 	};
 
 	class GG_API KeyReleaseEvent : public KeyEvent
