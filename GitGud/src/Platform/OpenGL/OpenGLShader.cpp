@@ -90,7 +90,7 @@ namespace GitGud
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filePath) : _rendererId(0)
+	OpenGLShader::OpenGLShader(const std::string& filePath) : _rendererId(0), _filePath(filePath)
 	{
 		GG_PROFILE_FUNCTION();
 
