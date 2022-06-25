@@ -254,7 +254,7 @@ namespace GitGud
 
 	bool EditorLayer::OnKeyPressed(KeyPressEvent e)
 	{
-		if (e.GetRepeatCount() > 0)
+		if (e.IsRepeat())
 			return false;
 
 		bool controlPressed = Input::IsKey(GG_KEY_LEFT_CONTROL) || Input::IsKey(GG_KEY_RIGHT_CONTROL);
