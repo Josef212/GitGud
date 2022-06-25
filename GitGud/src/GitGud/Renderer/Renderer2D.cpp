@@ -192,19 +192,17 @@ namespace GitGud
 		uint32_t whiteData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
 		s_Data->WhiteTexture->SetData(&whiteData, sizeof(uint32_t));
-		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
+
+		int32_t samplers[s_Data->MaxTextureSlots];
+		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
+			samplers[i] = i;
 
 		// Shaders
 		s_Data->SpriteShader = Shader::Create("assets/shaders/Renderer2D_SpriteShader.glsl");
 		s_Data->CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 		s_Data->LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
-		
-		int32_t samplers[s_Data->MaxTextureSlots];
-		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; ++i)
-			samplers[i] = i;
 
-		s_Data->SpriteShader->Bind();
-		s_Data->SpriteShader->SetIntArray("u_textures", samplers, s_Data->MaxTextureSlots);
+		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
 		s_Data->CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
